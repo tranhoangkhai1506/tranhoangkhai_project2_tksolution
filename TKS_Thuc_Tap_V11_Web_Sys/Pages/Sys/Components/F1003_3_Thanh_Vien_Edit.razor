@@ -1,0 +1,179 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (r_iAuto_ID != 0)
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Mã đăng nhập"):</label>
+                                    <input @ref="txtFocus" @bind="@m_objData.Ma_Dang_Nhap" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Mật khẩu"):</label>
+                                    <input @bind="@m_objData.Mat_Khau" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Họ tên"):</label>
+                                    <input @bind="@m_objData.Ho_Ten" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Email"):</label>
+                                    <input @bind="@m_objData.Email" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Điện thoại"):</label>
+                                    <input @bind="@m_objData.Dien_Thoai" class="form-control">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Trạng thái"):</label>
+                                    <FControl_Common_Combo_Enum m_arrData="@m_arrTrang_Thai" @bind-BindingIntValue="@m_objData.Trang_Thai_ID"></FControl_Common_Combo_Enum>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                                    <input @bind="@m_objData.Ghi_Chu" class="form-control">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data" style="margin-right: 37px;">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CSys_Thanh_Vien m_objData = new();
+
+    List<CCombo_Enum> m_arrTrang_Thai { get; set; } = new();
+
+    protected override void Init_Data()
+    {
+        m_arrTrang_Thai.Clear();
+        m_arrTrang_Thai.Add(new CCombo_Enum { Value = 1, Text= Get_Language_Data_Field("Hoạt động") });
+        m_arrTrang_Thai.Add(new CCombo_Enum { Value = 13, Text = Get_Language_Data_Field("Khoá") });
+    }
+
+    protected override void Load_Data()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrData = new();
+        m_objData = v_objCtrData.FQ_531_TV_sp_sel_Get_By_ID(r_iAuto_ID);
+
+        if (m_objData == null)
+        {
+            m_objData = new CSys_Thanh_Vien();
+            m_objData.Trang_Thai_ID = 1;
+        }
+        else
+        {
+            r_bUpdate = true;
+            CSys_Thanh_Vien v_objClone = new();
+            CUtility.Clone_Entity(m_objData, v_objClone);
+            r_objSource = v_objClone;
+        }
+    }
+
+    private string Check_Data()
+    {
+        StringBuilder v_sb = new StringBuilder();
+
+        if (m_objData.Mat_Khau == "")
+            v_sb.AppendLine(Get_Language_Data_Field("Xin vui lòng nhập mật khẩu.<br/>"));
+        
+        return v_sb.ToString();
+    }
+
+    protected override void Add_Data()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrData = new();
+
+        string v_strError = Check_Data();
+        if (v_strError != "")
+            throw new Exception(v_strError);
+
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        m_objData.Mat_Khau = CUtility.MD5_Encrypt(m_objData.Mat_Khau);
+
+        m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_531_TV_sp_ins_Insert(m_objData);
+
+        r_strAdd_Key = m_objData.Ma_Dang_Nhap;
+
+        CCache_Thanh_Vien.Add_Data(m_objData);
+    }
+
+    protected override void Update_Data()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrData = new();
+
+        string v_strError = Check_Data();
+        if (v_strError != "")
+            throw new Exception(v_strError);
+
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+        CSys_Thanh_Vien v_objOld = v_objCtrData.FQ_531_TV_sp_sel_Get_By_ID(r_iAuto_ID);
+        if (v_objOld.Mat_Khau != m_objData.Mat_Khau)
+            m_objData.Mat_Khau = CUtility.MD5_Encrypt(m_objData.Mat_Khau);
+
+        v_objCtrData.FQ_531_TV_sp_upd_Update(m_objData);
+
+        CSys_Thanh_Vien v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objDes = v_objClone;
+
+        CCache_Thanh_Vien.Update_Data(m_objData);
+    }
+}

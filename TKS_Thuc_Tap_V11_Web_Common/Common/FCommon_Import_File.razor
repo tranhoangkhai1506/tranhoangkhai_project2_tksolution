@@ -1,0 +1,139 @@
+﻿<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog">
+        <EditForm Model="@r_objImport_Excel">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="myLargeModalLabel">Import File</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>@((MarkupString)r_strError)</div>
+
+                    <div class="row mb-3">
+                        <TelerikFileSelect AllowedExtensions="@AllowedExtensions"
+                                           MaxFileSize="20480000" Multiple="false"
+                                           OnSelect="@OnSelectHandler" />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="@Import_File">Import File</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CImport_Excel r_objImport_Excel { get; set; }
+
+    [Parameter]
+    public EventCallback<CImport_Excel> OnClose { get; set; }
+
+    List<string> AllowedExtensions { get; set; } = new List<string>() { ".json" };
+    FileSelectFileInfo m_objFileSelect = null;
+    private string r_strError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private void OnSelectHandler(FileSelectEventArgs args)
+    {
+        try
+        {
+            m_objFileSelect = args.Files[0];
+
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    private async Task Import_File()
+    {
+        r_strError = "";
+        try
+        {
+            if (m_objFileSelect != null)
+            {
+                var v_objFile = m_objFileSelect;
+                string v_strTextExl = Path.GetExtension(v_objFile.Name).ToLower();
+
+                //if (!v_objCtrlExcel.Check_Excel_File_Type(v_strTextExl))
+                //    throw new Exception("File extension is not valid.");
+
+                string v_strFile_Name_Full = Path.GetFileName(v_objFile.Name);
+                string v_strFile_Name = v_strFile_Name_Full.Substring(0, v_strFile_Name_Full.Length - v_strTextExl.Length);
+
+                string v_strFolder = CConfig.Import_Excel_URL + DateTime.Now.ToString("yyyyMMdd") + "\\";
+                if (Directory.Exists(v_strFolder) == false)
+                    Directory.CreateDirectory(v_strFolder);
+
+                var v_strPath_File_New = v_strFolder + v_strFile_Name + "_" + DateTime.Now.ToString("ddMMyyHHmmss") + v_strTextExl;
+
+                int toCopyLength = 0;
+                int eachReadLength = 10000;
+                await using FileStream fs = new FileStream(v_strPath_File_New, FileMode.Create);
+                CancellationTokenSource cts = new CancellationTokenSource();
+                if (toCopyLength < v_objFile.Stream.Length)
+                {
+                    byte[] buffer = new byte[eachReadLength];
+                    long copied = 0;
+                    while (copied <= v_objFile.Stream.Length - eachReadLength)
+                    {
+                        toCopyLength = await v_objFile.Stream.ReadAsync(buffer, 0, eachReadLength, cts.Token);
+
+                        await fs.WriteAsync(buffer, 0, eachReadLength);
+                        await fs.FlushAsync();
+                        fs.Position = v_objFile.Stream.Position;
+                        copied += toCopyLength;
+                    }
+                    int left = (int)(v_objFile.Stream.Length - copied);
+                    toCopyLength = await v_objFile.Stream.ReadAsync(buffer, 0, left, cts.Token);
+
+                    await fs.WriteAsync(buffer, 0, left);
+                    await fs.FlushAsync();
+                }
+
+                else
+                {
+                    //If the length of the file copied each time is greater than the length of the source file, copy the actual file length directly
+                    byte[] buffer = new byte[v_objFile.Stream.Length];
+                    await v_objFile.Stream.ReadAsync(buffer, 0, buffer.Length);
+                    await v_objFile.Stream.FlushAsync();
+                    await fs.WriteAsync(buffer, 0, buffer.Length);
+                    await fs.FlushAsync();
+                }
+
+                //await v_objFile.Stream.CopyToAsync(fs);
+                v_objFile.Stream.Close();
+                fs.Close();
+
+                r_objImport_Excel.Path_File = v_strPath_File_New;
+                await OnClose.InvokeAsync(r_objImport_Excel);
+
+            }
+            else
+            {
+                throw new Exception("Please select file to import.");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+    }
+
+    private Task Modal_Cancel()
+    {
+        return OnClose.InvokeAsync(null);
+    }
+}

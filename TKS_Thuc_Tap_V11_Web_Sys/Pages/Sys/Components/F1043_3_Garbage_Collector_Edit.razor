@@ -1,0 +1,98 @@
+﻿@inherits FBase;
+
+<div class="card">
+	<div class="card-body">
+		<EditForm Model="@r_objFilter">
+			<div class="row">
+				<div class="col-lg-7">
+					<div class="row g-3">
+						<div class="col-lg-3">
+							<div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+								<button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Show_DC_Collector())">@Get_Language_Data_Field("Show GC Memory Info")</button>
+							</div>
+						</div>
+
+						<div class="col-lg-3">
+							<div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+								<button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Clear_DC_Collector())">@Get_Language_Data_Field("Clear GC")</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</EditForm>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		@((MarkupString)r_strError)
+	</div>
+</div>
+
+@code {
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+	}
+
+	private void Load_Memory()
+	{
+		long v_iGCHeapSize = GC.GetGCMemoryInfo().HeapSizeBytes / 1024 / 1024;
+		long v_iTotalAllocatedBytes = GC.GetTotalAllocatedBytes() / 1024 / 1024;
+		long v_iMemoryLoad = GC.GetGCMemoryInfo().MemoryLoadBytes / 1024 / 1024;
+		long v_iPromoted = GC.GetGCMemoryInfo().PromotedBytes / 1024 / 1024;
+		long v_iTotalAvailableMemory = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024 / 1024;
+		long v_iCommittedBytes = GC.GetGCMemoryInfo().TotalCommittedBytes / 1024 / 1024;
+		long v_iTotalMemoryGC = GC.GetTotalMemory(false) / 1024 / 1024;
+
+		r_strError = CCommonFunction.Set_Error_MessageBox("HeapSize: "
+			+ v_iGCHeapSize.ToString("###,###0.##") + "MB, " + (v_iGCHeapSize / 1024).ToString("###,###0.##") + "G");
+
+		r_strError += CCommonFunction.Set_Error_MessageBox("TotalAllocated: "
+			+ v_iTotalAllocatedBytes.ToString("###,###0.##") + "MB, " + (v_iTotalAllocatedBytes / 1024).ToString("###,###0.##") + "G");
+
+		r_strError += CCommonFunction.Set_Error_MessageBox("MemoryLoad: "
+			+ v_iMemoryLoad.ToString("###,###0.##") + "MB, " + (v_iMemoryLoad / 1024).ToString("###,###0.##") + "G");
+
+		r_strError += CCommonFunction.Set_Error_MessageBox("Promoted: "
+			+ v_iPromoted.ToString("###,###0.##") + "MB, " + (v_iPromoted / 1024).ToString("###,###0.##") + "G");
+
+		r_strError += CCommonFunction.Set_Error_MessageBox("TotalAvailableMemory: "
+			+ v_iTotalAvailableMemory.ToString("###,###0.##") + "MB, " + (v_iTotalAvailableMemory / 1024).ToString("###,###0.##") + "G");
+
+		r_strError += CCommonFunction.Set_Error_MessageBox("CommittedBytes: "
+			+ v_iCommittedBytes.ToString("###,###0.##") + "MB, " + (v_iCommittedBytes / 1024).ToString("###,###0.##") + "G");
+
+		r_strError += CCommonFunction.Set_Error_MessageBox("TotalMemoryGC: "
+			+ v_iTotalMemoryGC.ToString("###,###0.##") + "MB, " + (v_iTotalMemoryGC / 1024).ToString("###,###0.##") + "G");
+	}
+
+	private async void Show_DC_Collector()
+	{
+		await Task.Delay(1);
+
+		r_objLayout.Start_Loading();
+
+		GC.Collect();
+
+		Load_Memory();
+
+		r_objLayout.Stop_Loading();
+	}
+
+	private async void Clear_DC_Collector()
+	{
+		await Task.Delay(1);
+
+		r_objLayout.Start_Loading();
+
+		Load_Memory();
+
+		r_objLayout.Stop_Loading();
+	}
+}

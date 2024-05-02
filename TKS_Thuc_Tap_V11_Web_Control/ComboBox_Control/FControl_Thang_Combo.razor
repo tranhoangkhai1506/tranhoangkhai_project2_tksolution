@@ -1,0 +1,14 @@
+﻿@inherits FBase_Combo;
+
+<FControl_Common_Combo_Text m_arrData="@m_arrThang"></FControl_Common_Combo_Text>
+
+@code {
+    private List<CCombo_Enum> m_arrThang = new List<CCombo_Enum>();
+
+    protected override void Init_Data()
+    {
+        m_arrThang.Clear();
+        for (int v_i = 1; v_i <= 12; v_i++)
+            m_arrThang.Add(new CCombo_Enum { Text_Value = v_i.ToString(), Text = v_i.ToString() });
+    }
+}

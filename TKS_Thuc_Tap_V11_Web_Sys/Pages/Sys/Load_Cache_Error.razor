@@ -1,0 +1,44 @@
+﻿@layout MPBlank_Layout
+@inherits FBase_Blank;
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Http.Connections
+
+@inject NavigationManager navigationManager
+@inject IJSRuntime jsRuntime
+@inject ProtectedLocalStorage sessionStorage
+
+@page "/Sys/Load_Cache_Error"
+
+<!-- Background Start -->
+<div class="fixed-background"></div>
+<!-- Background End -->
+
+<div class="auth-page-wrapper d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-xl-7">
+        &nbsp;
+    </div>
+    <div class="col-xl-5">
+        <!-- auth-page content -->
+        <div class="auth-page-content overflow-hidden min-vh-100" style="background-color: white;">
+            <div class="container" style="margin-top: 40vh;">
+                <div class="row justify-content-center">
+                    <div style="padding-left: 50px;">
+                        <h2 class="cta-1 mb-3 text-primary">@Get_Language_Data_Field("Hệ thống đang load cache khi khởi động lại ứng dụng. Xin vui lòng chờ vài phút.")</h2>
+                        <a class="btn btn-success" href="javascript:window.location.href='/';">@Get_Language_Data_Field("Quay về trang chủ")</a>
+                    </div>
+                </div>
+                <!-- end row -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end auth page content -->
+    </div>
+</div>
+
+@code {
+    private void Quay_Ve_Trang_Chu()
+    {
+        navigationManager.NavigateTo("/", true);
+    }
+}

@@ -1,0 +1,484 @@
+﻿@inherits FBase;
+
+<div class="card">
+    <div class="card-body">
+        <EditForm Model="@r_objFilter">
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="row g-5">
+                        <div style="width: 100px; padding-top: 8px;">
+                            <label class="form-label">@Get_Language_Data_Field("Mã CN"):</label>
+                        </div>
+                        <div style="width: 250px;">
+                            <input @ref="txtFocus" @bind="@m_strMa_Chuc_Nang" class="form-control">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+                                <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+                        @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                        {
+                            <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Import_Excel("Cau_Hinh_Grid_UI_Global_Template.xlsx"))">
+                                <i class="ri-upload-fill align-bottom me-1"></i>
+                                @Get_Language_Data_Field("Import")
+                            </button>
+                        }
+                        <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Save_Click())">@Get_Language_Data_Field("Save layout")</button>
+                        @Layout_Tool_Button()
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<div class="row">
+    @((MarkupString)r_strError)
+    <div class="col-lg-6">
+        <h4 class="mb-sm">@Get_Language_Data_Field("Chưa khai báo")</h4>
+        <TelerikGrid Data="@m_arrChua_Khai_Bao" Height="calc(100vh - 220px)" Resizable="true" @ref="@grdChua_Khai_Bao"
+                     RowDraggable="true"
+                     OnRowDrop="@((GridRowDropEventArgs<CSys_Grid_UI_Global> args) => OnDrop(args))">
+            <GridColumns>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("1045", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="1045" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Field="Ma_Chuc_Nang" Title="Mã chức năng" Width="70px"></GridColumn>
+                    <GridColumn Field="Ten_Grid" Title="Tên Grid" Width="120px"></GridColumn>
+                    <GridColumn Field="Tieu_De_Column" Title="Tiêu Đề Cột" Width="150px"></GridColumn>
+                    <GridColumn Field="Field_Name" Title="Field Name" Width="110px"></GridColumn>
+                    <GridColumn Field="Column_Width" Title="Độ Rộng (px)" Width="70px"></GridColumn>
+                    <GridColumn Field="Field_Type_Text" Title="Loại Hình" Width="70px"></GridColumn>
+                    <GridColumn Field="" Title=""></GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+
+
+    </div>
+
+    <div class="col-lg-6">
+        <h4 class="mb-sm">@Get_Language_Data_Field("Đã khai báo")</h4>
+
+        <TelerikGrid Data="@m_arrDa_Khai_Bao" Height="calc(100vh - 220px)" Resizable="true" @ref="@grdDa_Khai_Bao"
+                     RowDraggable="true" OnRowDrop="@((GridRowDropEventArgs<CSys_Grid_UI_Global> args) => OnDrop_Move(args))">
+            <GridColumns>
+                <GridColumn Width="40px">
+                    <Template>
+                        <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                            {
+                                <li>
+                                    <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit_Item(context as CSys_Grid_UI_Global))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                </li>
+                            }
+                            @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                            {
+                                <li>
+                                    <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Item((context as CSys_Grid_UI_Global)))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                </li>
+                            }
+                        </ul>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="Ma_Chuc_Nang" Title="Mã chức năng" Width="70px"></GridColumn>
+                <GridColumn Field="Ten_Grid" Title="Tên Grid" Width="110px"></GridColumn>
+                <GridColumn Field="Tieu_De_Column" Title="Tiêu Đề Cột" Width="200px"></GridColumn>
+                <GridColumn Field="Field_Name" Title="Field Name" Width="110px"></GridColumn>
+                <GridColumn Field="Column_Width" Title="Độ Rộng (px)" Width="70px"></GridColumn>
+                <GridColumn Field="Field_Type_Text" Title="Loại Hình" Width="90px"></GridColumn>
+                <GridColumn Field="Sort_Priority" Title="Sort priority" Width="60px"></GridColumn>
+                <GridColumn Field="" Title=""></GridColumn>
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@if (m_blIs_Show_Edit == true)
+{
+    <F1045_3_Grid_UI_Global_Edit p_objData="@m_objGlobal_Edit" OnClose="@Close_Edit_Item"></F1045_3_Grid_UI_Global_Edit>
+}
+
+@if (r_bIs_Show_Import_Excel == true)
+{
+    <FCommon_Import_Excel r_objImport_Excel="@r_objImport_Excel" OnClose="@Close_Import_Excel"></FCommon_Import_Excel>
+}
+
+@if (r_bIs_Show_Message_Info == true)
+{
+    <FCommon_Message_Info r_strMessage_Header="@r_strMessage_Header" r_strMessage_Info="@r_strMessage_Info" OnClose="@Close_Message_Info"></FCommon_Message_Info>
+}
+
+@code {
+    public List<CSys_Grid_Field> m_arrField_All = new();
+    public List<CSys_Grid_UI_Global> m_arrChua_Khai_Bao = new();
+    TelerikGrid<CSys_Grid_UI_Global> grdChua_Khai_Bao = new();
+
+    public List<CSys_Grid_UI_Global> m_arrDa_Khai_Bao = new();
+    TelerikGrid<CSys_Grid_UI_Global> grdDa_Khai_Bao = new();
+
+    CSys_Grid_UI_Global m_objGlobal_Edit = new();
+    private bool m_blIs_Show_Edit = false;
+    string m_strMa_Chuc_Nang = "";
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        m_arrField_All = new();
+        m_arrChua_Khai_Bao = new();
+        m_arrDa_Khai_Bao = new();
+
+        Format_Grid(grdChua_Khai_Bao);
+        Format_Grid(grdDa_Khai_Bao);
+
+        CSys_Grid_Field_Controller v_objCtrlField = new();
+        CSys_Grid_UI_Global_Controller v_objCtrData = new();
+
+        //lấy all danh sách field grd
+        //m_arrField_All = v_objCtrlField.F1045_sp_sel_List_Cau_Hinh_Grid_Field_By_Ma_CN(m_strMa_Chuc_Nang);
+        m_arrField_All = v_objCtrlField.FQ_514_GF_sp_sel_List_By_Ma_Chuc_Nang(m_strMa_Chuc_Nang);
+
+        //m_arrDa_Khai_Bao = v_objCtrData.F1045_sp_sel_List_Grid_UI_Global(m_strMa_Chuc_Nang);
+        m_arrDa_Khai_Bao = v_objCtrData.FQ_516_GUG_sp_sel_List_By_Ma_CN(m_strMa_Chuc_Nang);
+
+        Dictionary<long, CSys_Grid_UI_Global> v_dicGDa_Khai_Bao = new();
+        foreach (var v_objItem in m_arrDa_Khai_Bao)
+        {
+            v_objItem.Created = DateTime.Now;
+            v_dicGDa_Khai_Bao.Add(v_objItem.Grid_Field_ID, v_objItem);
+        }
+
+        //tạo 1 danh sách chưa khai báo (loại ra những item đã khai báo)
+        foreach (CSys_Grid_Field v_objItem in m_arrField_All)
+        {
+            if (!v_dicGDa_Khai_Bao.ContainsKey(v_objItem.Auto_ID))
+            {
+                CSys_Grid_UI_Global v_objChua_Khai_Bao = new();
+                v_objChua_Khai_Bao.Grid_Field_ID = v_objItem.Auto_ID;
+                v_objChua_Khai_Bao.Ten_Grid = v_objItem.Ten_Grid;
+                v_objChua_Khai_Bao.Column_Width = v_objItem.Column_Width;
+                v_objChua_Khai_Bao.Ma_Chuc_Nang = v_objItem.Ma_Chuc_Nang;
+                v_objChua_Khai_Bao.Field_Name = v_objItem.Field_Name;
+                v_objChua_Khai_Bao.Tieu_De_Column = v_objItem.Tieu_De_Column;
+                v_objChua_Khai_Bao.Field_Type_ID = v_objItem.Field_Type_ID;
+
+                m_arrChua_Khai_Bao.Add(v_objChua_Khai_Bao);
+            }
+        }
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Format_Grid(grdChua_Khai_Bao);
+            Format_Grid(grdDa_Khai_Bao);
+
+            grdChua_Khai_Bao.Pageable = false;
+            grdDa_Khai_Bao.Pageable = false;
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void Delete_Item(CSys_Grid_UI_Global p_objGlobal)
+    {
+        //remove khỏi danh sách khai báo nếu xoá
+        m_arrDa_Khai_Bao.Remove(p_objGlobal);
+
+        foreach (var v_objItem in m_arrField_All)
+        {
+            //add lại danh sách chưa khai báo
+            if (p_objGlobal.Grid_Field_ID == v_objItem.Auto_ID)
+            {
+                CSys_Grid_UI_Global v_objChua_Khai_Bao = new();
+                v_objChua_Khai_Bao.Grid_Field_ID = v_objItem.Auto_ID;
+                v_objChua_Khai_Bao.Ten_Grid = v_objItem.Ten_Grid;
+                v_objChua_Khai_Bao.Column_Width = v_objItem.Column_Width;
+                v_objChua_Khai_Bao.Ma_Chuc_Nang = v_objItem.Ma_Chuc_Nang;
+                v_objChua_Khai_Bao.Field_Name = v_objItem.Field_Name;
+                v_objChua_Khai_Bao.Tieu_De_Column = v_objItem.Tieu_De_Column;
+                v_objChua_Khai_Bao.Field_Type_ID = v_objItem.Field_Type_ID;
+
+                m_arrChua_Khai_Bao.Add(v_objChua_Khai_Bao);
+            }
+        }
+
+        grdChua_Khai_Bao.Rebind();
+        grdDa_Khai_Bao.Rebind();
+    }
+
+
+    private void OnDrop(GridRowDropEventArgs<CSys_Grid_UI_Global> args)
+    {
+        foreach (var v_objItem in args.Items)
+        {
+            m_arrChua_Khai_Bao.Remove(v_objItem);
+        }
+
+        InsertItem(args);
+    }
+
+    private void OnDrop_Move(GridRowDropEventArgs<CSys_Grid_UI_Global> args)
+    {
+        foreach (var v_objItem in args.Items)
+        {
+            m_arrDa_Khai_Bao.Remove(v_objItem);
+        }
+
+        InsertItem(args);
+    }
+
+
+    private void InsertItem(GridRowDropEventArgs<CSys_Grid_UI_Global> args)
+    {
+        var v_arrData = args.DestinationGrid == grdDa_Khai_Bao ? m_arrDa_Khai_Bao : m_arrChua_Khai_Bao;
+        var v_iDestinationIndex = 0;
+        if (args.DestinationItem != null)
+        {
+
+            v_iDestinationIndex = v_arrData.IndexOf(args.DestinationItem);
+            if (args.DropPosition == GridRowDropPosition.After)
+            {
+                v_iDestinationIndex += 1;
+            }
+        }
+
+        v_arrData.InsertRange(v_iDestinationIndex, args.Items);
+
+        for (int v_i = 0; v_i < v_arrData.Count; v_i++)
+        {
+            v_arrData[v_i].Sort_Priority = v_i + 1;
+        }
+
+        m_arrDa_Khai_Bao = m_arrDa_Khai_Bao.OrderBy(it => it.Sort_Priority).ToList();
+
+    }
+
+    private void Open_Edit_Item(CSys_Grid_UI_Global p_objEdit)
+    {
+        m_blIs_Show_Edit = true;
+        m_objGlobal_Edit = p_objEdit;
+    }
+
+    private void Close_Edit_Item(CEvent_Call_Back p_obj)
+    {
+        if (p_obj.Message_ID != (int)EModal_Result.Exception)
+        {
+            m_blIs_Show_Edit = false;
+            //refress lại data
+            CSys_Grid_UI_Global v_objRefress = (CSys_Grid_UI_Global)p_obj.Object_1;
+            if (v_objRefress != null)
+            {
+                if (m_arrDa_Khai_Bao.Contains(m_objGlobal_Edit))
+                {
+                    m_arrDa_Khai_Bao.Remove(m_objGlobal_Edit);
+                }
+
+                m_arrDa_Khai_Bao.Add(v_objRefress);
+            }
+
+            m_arrDa_Khai_Bao = m_arrDa_Khai_Bao.OrderBy(it => it.Sort_Priority).ToList();
+            m_objGlobal_Edit = new();
+            grdChua_Khai_Bao.Rebind();
+            grdDa_Khai_Bao.Rebind();
+        }
+    }
+
+    private async void Save_Click()
+    {
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        CSys_Grid_UI_Global_Controller v_objCtrData = new();
+
+        DateTime v_dtmStart = DateTime.Now;
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+        r_objLayout.Start_Loading();
+        r_strError = "";
+
+        try
+        {
+            //tao ket noi transaction
+            v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
+            v_conn.Open();
+            v_trans = v_conn.BeginTransaction();
+
+            //xử lý data chỗ này
+            //lấy danh sách khai báo cũ của mã chức năng
+
+
+            //xoá danh sách cũ đi (by chức năng)
+            //v_objCtrData.F1045_sp_del_Grid_UI_Global_By_Ma_CN(v_conn, v_trans, m_strMa_Chuc_Nang, r_strActive_User_Name, r_strActive_Function_Code);
+            v_objCtrData.FQ_516_GUG_sp_del_Delete_By_Ma_CN(v_conn, v_trans, m_strMa_Chuc_Nang, r_strActive_User_Name, r_strActive_Function_Code);
+
+            //add danh sách mới vào
+            foreach (CSys_Grid_UI_Global v_obj in m_arrDa_Khai_Bao)
+            {
+                v_obj.Last_Updated_By = r_strActive_User_Name;
+                v_obj.Last_Updated_By_Function = r_strActive_Function_Code;
+                v_obj.Auto_ID = v_objCtrData.FQ_516_GUG_sp_ins_Insert(v_conn, v_trans, v_obj);
+            }
+
+            //lấy danh sách layout mới của chức năng
+            //List<CSys_Grid_UI_Global> v_arrNew = v_objCtrData.List_Grid_UI_Global_By_Ma_Chuc_Nang(v_conn, v_trans, m_strMa_Chuc_Nang);
+            List<CSys_Grid_UI_Global> v_arrNew = v_objCtrData.FQ_516_GUG_sp_sel_List_By_Ma_CN(v_conn, v_trans, m_strMa_Chuc_Nang);
+
+            ////rempove data cũ ra khỏi cache by Ma_Chuc_Nang
+            List<CSys_Grid_UI_Global> v_arrRemove = CCache_Grid_UI_Global.List_Data_By_Ma_Chuc_Nang(m_strMa_Chuc_Nang);
+            foreach (CSys_Grid_UI_Global v_obj in v_arrRemove)
+            {
+                CCache_Grid_UI_Global.Delete_Data(v_obj.Auto_ID);
+            }
+
+            // add cache mới
+            foreach (CSys_Grid_UI_Global v_obj in v_arrNew)
+            {
+                CCache_Grid_UI_Global.Add_Data(v_obj);
+            }
+
+            r_strError = CCommonFunction.Set_Success_MessageBox(Get_Language_Data_Field("Cập nhật layout thành công."));
+            v_trans.Commit();
+        }
+
+        catch (Exception ex)
+        {
+            if (v_trans != null)
+                v_trans.Rollback();
+
+            r_strError = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field(ex.Message));
+        }
+
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
+
+            if (v_conn != null)
+                v_conn.Close();
+        }
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+
+    protected override void Import_Excel_Entry(CExcel_Controller v_objCtrlExcel, ref int p_iCount_Success, ref int p_iCount_Error)
+    {
+        CSys_Grid_UI_Global_Controller v_objCtrData = new();
+
+        StringBuilder v_sbError = new StringBuilder();
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        try
+        {
+            DataTable v_dt = v_objCtrlExcel.List_Range_Value_To_End(0, "A2", "E");
+
+            // Loại mấy dòng trống
+            for (int v_i = v_dt.Rows.Count - 1; v_i >= 0; v_i--)
+                if (v_dt.Rows[v_i][0].ToString().Trim() == "")
+                    v_dt.Rows.RemoveAt(v_i);
+
+            int v_iCount = 1;
+
+            foreach (DataRow v_row in v_dt.Rows)
+            {
+                v_iCount++;
+
+                //tao ket noi transaction
+                v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
+                v_conn.Open();
+                v_trans = v_conn.BeginTransaction();
+
+                try
+                {
+                    CSys_Grid_UI_Global v_objData = new CSys_Grid_UI_Global();
+                    v_objData.Ten_Grid = CUtility.Convert_To_String(v_row[0]);
+                    v_objData.Ma_Chuc_Nang = CUtility.Convert_To_String(v_row[1]);
+                    v_objData.Field_Name = CUtility.Convert_To_String(v_row[2]);
+                    v_objData.Column_Width = CUtility.Convert_To_Int32(v_row[3]);
+                    v_objData.Sort_Priority = CUtility.Convert_To_Int32(v_row[4]);
+                    v_objData.Last_Updated_By = r_strActive_User_Name;
+                    v_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+                    //dưa vào bộ key Ten_Grid, Ma_Chuc_Nang, Field_Name lấy ra Grid_Field_ID
+
+                    CSys_Grid_Field v_objFiled = CCache_Grid_Field.Get_Data_By_Key(v_objData.Ma_Chuc_Nang, v_objData.Ten_Grid, v_objData.Field_Name);
+                    if (v_objFiled != null)
+                    {
+                        v_objData.Grid_Field_ID = v_objFiled.Auto_ID;
+                        if (v_objData.Column_Width == 0)
+                            v_objData.Column_Width = v_objFiled.Column_Width;
+                    }
+                    else
+                        throw new Exception("Cấu hình có bộ key [" + CUtility.Tao_Key(v_objData.Ma_Chuc_Nang, v_objData.Ten_Grid, v_objData.Field_Name) + "] này không tồn tại. <br/>");
+
+                    v_objData.Auto_ID = v_objCtrData.FQ_516_GUG_sp_ins_Insert(v_conn, v_trans, v_objData);
+                    p_iCount_Success++;
+                    v_trans.Commit();
+
+                    CCache_Grid_UI_Global.Add_Data(v_objData);
+
+                    CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.Ten_Grid);
+                }
+
+                catch (Exception ex)
+                {
+                    v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iCount.ToString() + " " + Get_Language_Data_Field("có lỗi") + ": " + ex.Message + "<br/>");
+
+                    if (v_trans != null)
+                        v_trans.Rollback();
+                }
+
+                finally
+                {
+                    if (v_trans != null)
+                        v_trans.Dispose();
+
+                    if (v_conn != null)
+                        v_conn.Close();
+                }
+            }
+
+            p_iCount_Error = v_dt.Rows.Count - p_iCount_Success;
+            string v_strMessage = CCommonFunction.Set_Success_MessageBox(Get_Language_Data_Field("Thêm mới") + " " + p_iCount_Success.ToString() + " " + Get_Language_Data_Field("dòng thành công."));
+            if (v_sbError.ToString() != "")
+                v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
+
+            Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);
+        }
+
+        catch (Exception ex)
+        {
+            Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), ex.Message);
+        }
+    }
+
+}

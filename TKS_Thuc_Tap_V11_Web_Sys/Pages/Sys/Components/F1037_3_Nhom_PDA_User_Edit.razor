@@ -1,0 +1,84 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Mã đăng nhập"):</label>
+								</div>
+								<div class="col-lg-8">
+									<FControl_Thanh_Vien_Combo m_arrData="@m_arrThanh_Vien" @bind-BindingStringValue="@m_objData.Ma_Dang_Nhap"></FControl_Thanh_Vien_Combo>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Nhom_PDA_User m_objData = new();
+
+	[Parameter]
+	public long m_iNhom_PDA_ID { get; set; } = 0;
+
+	private List<CSys_Thanh_Vien> m_arrThanh_Vien = new();
+
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Thanh_Vien_Controller v_objCtrThanh_Vien = new CSys_Thanh_Vien_Controller();
+
+		m_objData = new CSys_Nhom_PDA_User();
+		m_objData.Nhom_PDA_ID = m_iNhom_PDA_ID;
+
+		m_arrThanh_Vien = v_objCtrThanh_Vien.F1037_sp_sel_List_Thanh_Vien_Khong_Thuoc_Nhom_PDA(m_iNhom_PDA_ID);
+	}
+
+	protected override void Add_Data()
+	{
+		if (m_iNhom_PDA_ID == 0)
+			throw new Exception("Vui lòng chọn nhóm PDA.");
+
+		CSys_Nhom_PDA_User_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_524_NPU_sp_ins_Insert(m_objData);
+
+		r_strAdd_Key = m_objData.Ma_Dang_Nhap;
+
+		CCache_Nhom_PDA_User.Add_Data(m_objData);
+	}
+}

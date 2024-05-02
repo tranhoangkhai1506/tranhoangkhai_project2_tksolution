@@ -1,0 +1,37 @@
+﻿ @inherits FBase_Combo;
+<TelerikMultiColumnComboBox @bind-Value="@BindingIntValue"
+							ScrollMode="@DropDownScrollMode.Virtual"
+							Data="@m_arrData"
+							ValueField="@(nameof(CCombo_Enum.Value))"
+							TextField="@(nameof(CCombo_Enum.Text))"
+							Width="100%"
+							PageSize="10"
+							ItemHeight="35"
+							Filterable="true"
+							FilterOperator="@StringFilterOperator.Contains"
+							ListHeight="260px">
+	<MultiColumnComboBoxColumns>
+		<MultiColumnComboBoxColumn Field="@nameof(CCombo_Enum.Text)" Title="@Get_Language_Data_Field("Loại")" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+	</MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+	public List<CCombo_Enum> m_arrData { get; set; } = new();
+
+	protected override void Init_Data()
+	{
+		m_arrData = new();
+		
+		CCombo_Enum v_obj = new();
+		v_obj.Value = (int)ESTT_Next_Type_ID.Nhap;
+		v_obj.Text = Get_Language_Data_Field("Nhập");
+		m_arrData.Add(v_obj);
+
+	}
+
+	protected override void Load_Data()
+	{
+
+	}
+}
+

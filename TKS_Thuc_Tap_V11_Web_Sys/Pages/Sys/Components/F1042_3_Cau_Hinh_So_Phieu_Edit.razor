@@ -1,0 +1,135 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (r_iAuto_ID != 0)
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Chủ hàng"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <FControl_Chu_Hang_Combo @bind-BindingValue="m_objData.Chu_Hang_ID"></FControl_Chu_Hang_Combo>                                 
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Quy tắc"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input @bind="@m_objData.Quy_Tac_Phieu" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Type"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <FControl_STT_Next_Type_Combo @bind-BindingIntValue="@m_objData.Type_ID"></FControl_STT_Next_Type_Combo>
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Digits"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input @bind="@m_objData.Digits" class="form-control">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CSys_STT_Next m_objData = new();
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        CSys_STT_Next_Controller v_objCtrData = new();
+        m_objData = v_objCtrData.FQ_529_SN_sp_sel_Get_By_ID(r_iAuto_ID);
+
+        if (m_objData == null)
+            m_objData = new CSys_STT_Next() { Digits = 2 };
+        else
+        {
+            r_bUpdate = true;
+
+            // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+            CSys_STT_Next v_objClone = new();
+            CUtility.Clone_Entity(m_objData, v_objClone);
+            r_objSource = v_objClone;
+            // End tracking
+        }
+    }
+
+    protected override void Add_Data()
+    {
+        CSys_STT_Next_Controller v_objCtrData = new();
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+        m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_529_SN_sp_ins_Insert(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        r_strAdd_Key = m_objData.Quy_Tac_Phieu;
+        // End tracking
+
+        CCache_STT_Next.Add_Data(m_objData);
+    }
+
+    protected override void Update_Data()
+    {
+        CSys_STT_Next_Controller v_objCtrData = new();
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        v_objCtrData.FQ_529_SN_sp_upd_Update(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        CSys_STT_Next v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objDes = v_objClone;
+        // End tracking
+
+        CCache_STT_Next.Update_Data(m_objData);
+    }
+}

@@ -1,0 +1,721 @@
+@inherits FBase;
+@inject IJSRuntime JsRuntime
+
+<EditForm Model="@r_objFilter">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div style="width: 150px; padding-top: 8px;">
+                    <label class="form-label">@Get_Language_Data_Field("Nhóm chức năng"):</label>
+                </div>
+                <div style="width: 300px;">
+                    <TelerikMultiColumnComboBox Data="@m_arrNhom_CN"
+                                                @bind-Value="@m_iNhom_Chuc_Nang_ID"
+                                                OnChange="@OnChangeHandler"
+                                                ValueField="@nameof(CCombo_Enum.Value)"
+                                                TextField="@nameof(CCombo_Enum.Text)"
+                                                ScrollMode="@DropDownScrollMode.Virtual"
+                                                Width="100%"
+                                                PageSize="10"
+                                                ItemHeight="35"
+                                                Filterable="true"
+                                                FilterOperator="@StringFilterOperator.Contains"
+                                                ListHeight="260px">
+                        <MultiColumnComboBoxColumns>
+                            <MultiColumnComboBoxColumn Field="@nameof(CCombo_Enum.Text)" Title="Nhóm" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header"></MultiColumnComboBoxColumn>
+                        </MultiColumnComboBoxColumns>
+                    </TelerikMultiColumnComboBox>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+                @Layout_Tool_Button()
+            </div>
+        </div>
+    </div>
+</EditForm>
+<div style="padding-top: 10px;"></div>
+
+<table style="width: 1900px;">
+    @((MarkupString)r_strError)
+    <tr>
+        <td style="width: 450px; padding-right: 20px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-lg-4">
+                            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+                                @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                                {
+                                    <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Edit(0))">
+                                        <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                        @Get_Language_Data_Field("Thêm")
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <TelerikGrid Data="@v_arrData_Level_1" Height="calc(100vh - 270px)" Resizable="true" Reorderable="true" @ref="@grdData_Level_1"
+                                 OnRowClick="@grdData1_Row_Click">
+                        <GridColumns>
+                            <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                            <GridColumn Width="60px">
+                                <Template>
+                                    <button class="btn btn-link" @onclick="@(()=> Open_Info((context as CSys_Chuc_Nang).Auto_ID))">
+                                        <i class="mdi mdi-eye" style="color: purple;"></i>
+                                    </button>
+                                    &nbsp;
+                                    <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                            </li>
+                                        }
+
+                                        @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                            </li>
+                                        }
+                                    </ul>
+                                </Template>
+                            </GridColumn>
+                            @if (CCache_Grid_UI_Global.List_Data_By_Code("1001", "grdData").Count > 0)
+                            {
+                                <FCommon_General_Col_Grid m_strFCode="1001" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                            }
+                            else
+                            {
+                                <GridColumn Field="Ma_Chuc_Nang" Title="Mã CN" Width="60px"></GridColumn>
+                                <GridColumn Field="Ten_Chuc_Nang" Title="Tên chức năng"></GridColumn>
+                                <GridColumn Field="Sort_Priority" Title="Sort" Width="50px"></GridColumn>
+                            }
+                        </GridColumns>
+                    </TelerikGrid>
+                </div>
+            </div>
+        </td>
+
+        <td style="width: 450px; padding-right: 20px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-lg-4">
+                            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+                                @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                                {
+                                    <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Edit_Level_2(0))">
+                                        <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                        @Get_Language_Data_Field("Thêm")
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <TelerikGrid Data="@v_arrData_Level_2" Height="calc(100vh - 270px)" Resizable="true" Reorderable="true" @ref="@grdData_Level_2" OnRowClick="@grdData2_Row_Click">
+                        <GridColumns>
+                            <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                            <GridColumn Width="60px">
+                                <Template>
+                                    <button class="btn btn-link" @onclick="@(()=> Open_Info((context as CSys_Chuc_Nang).Auto_ID))">
+                                        <i class="mdi mdi-eye" style="color: purple;"></i>
+                                    </button>
+                                    &nbsp;
+                                    <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit_Level_2((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                            </li>
+                                        }
+                                        @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data_Level_2((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                            </li>
+                                        }
+                                    </ul>
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="Ma_Chuc_Nang" Title="Mã CN" Width="60px"></GridColumn>
+                            <GridColumn Field="Ten_Chuc_Nang" Title="Tên chức năng"></GridColumn>
+                            <GridColumn Field="Sort_Priority" Title="Sort" Width="50px"></GridColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                </div>
+            </div>
+        </td>
+
+        <td style="width: 450px; padding-right: 20px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-lg-4">
+                            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+                                @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                                {
+                                    <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Edit_Level_3(0))">
+                                        <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                        @Get_Language_Data_Field("Thêm")
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <TelerikGrid Data="@v_arrData_Level_3" Height="calc(100vh - 270px)" Resizable="true" Reorderable="true" @ref="@grdData_Level_3" OnRowClick="@grdData3_Row_Click">
+                        <GridColumns>
+                            <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                            <GridColumn Width="60px">
+                                <Template>
+                                    <button class="btn btn-link" @onclick="@(()=> Open_Info((context as CSys_Chuc_Nang).Auto_ID))">
+                                        <i class="mdi mdi-eye" style="color: purple;"></i>
+                                    </button>
+                                    &nbsp;
+                                    <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit_Level_3((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                            </li>
+                                        }
+                                        @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data_Level_3((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                            </li>
+                                        }
+                                    </ul>
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="Ma_Chuc_Nang" Title="Mã CN" Width="60px"></GridColumn>
+                            <GridColumn Field="Ten_Chuc_Nang" Title="Tên chức năng"></GridColumn>
+                            <GridColumn Field="Sort_Priority" Title="Sort" Width="50px"></GridColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                </div>
+            </div>
+        </td>
+
+        <td style="width: 450px; padding-right: 20px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-lg-4">
+                            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+                                @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                                {
+                                    <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Edit_Level_4(0))">
+                                        <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                        @Get_Language_Data_Field("Thêm")
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <TelerikGrid Data="@v_arrData_Level_4" Height="calc(100vh - 270px)" Resizable="true" Reorderable="true" @ref="@grdData_Level_4">
+                        <GridColumns>
+                            <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                            <GridColumn Width="60px">
+                                <Template>
+                                    <button class="btn btn-link" @onclick="@(()=> Open_Info((context as CSys_Chuc_Nang).Auto_ID))">
+                                        <i class="mdi mdi-eye" style="color: purple;"></i>
+                                    </button>
+                                    &nbsp;
+                                    <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit_Level_4((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                            </li>
+                                        }
+                                        @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data_Level_4((context as CSys_Chuc_Nang).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                            </li>
+                                        }
+                                    </ul>
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="Ma_Chuc_Nang" Title="Mã CN" Width="60px"></GridColumn>
+                            <GridColumn Field="Ten_Chuc_Nang" Title="Tên chức năng"></GridColumn>
+                            <GridColumn Field="Sort_Priority" Title="Sort" Width="50px"></GridColumn>
+                        </GridColumns>
+                    </TelerikGrid>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+@if (r_bIs_Show_Info == true)
+{
+    <F1001_2_Chuc_Nang_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F1001_2_Chuc_Nang_Info>
+}
+
+@if (r_bIs_Show_Edit == true)
+{
+    <F1001_3_Chuc_Nang_Edit r_iAuto_ID="@r_iAuto_ID" m_iNhom_Chuc_Nang_ID="@m_iNhom_Chuc_Nang_ID" OnClose="@Close_Edit"></F1001_3_Chuc_Nang_Edit>
+}
+
+@if (r_bIs_Show_Edit_Level_2 == true)
+{
+    <F1001_3_Chuc_Nang_Edit r_iAuto_ID="@r_iAuto_ID" m_iNhom_Chuc_Nang_ID="@m_iNhom_Chuc_Nang_ID" m_iChuc_Nang_Parent_ID="@m_iChuc_Nang_Parent" OnClose="@Close_Edit_Level_2"></F1001_3_Chuc_Nang_Edit>
+}
+
+@if (r_bIs_Show_Edit_Level_3 == true)
+{
+    <F1001_3_Chuc_Nang_Edit r_iAuto_ID="@r_iAuto_ID" m_iNhom_Chuc_Nang_ID="@m_iNhom_Chuc_Nang_ID" m_iChuc_Nang_Parent_ID="@m_iChuc_Nang_Parent" OnClose="@Close_Edit_Level_3"></F1001_3_Chuc_Nang_Edit>
+}
+
+@if (r_bIs_Show_Edit_Level_4 == true)
+{
+    <F1001_3_Chuc_Nang_Edit r_iAuto_ID="@r_iAuto_ID" m_iNhom_Chuc_Nang_ID="@m_iNhom_Chuc_Nang_ID" m_iChuc_Nang_Parent_ID="@m_iChuc_Nang_Parent" OnClose="@Close_Edit_Level_4"></F1001_3_Chuc_Nang_Edit>
+}
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@code {
+    private List<CCombo_Enum> m_arrNhom_CN{ get; set; } = new();
+
+    public List<CSys_Chuc_Nang> v_arrData_Level_1 = new();
+    TelerikGrid<CSys_Chuc_Nang> grdData_Level_1 = new();
+
+    public List<CSys_Chuc_Nang> v_arrData_Level_2 = new();
+    TelerikGrid<CSys_Chuc_Nang> grdData_Level_2 = new();
+
+    public List<CSys_Chuc_Nang> v_arrData_Level_3 = new();
+    TelerikGrid<CSys_Chuc_Nang> grdData_Level_3 = new();
+
+    public List<CSys_Chuc_Nang> v_arrData_Level_4 = new();
+    TelerikGrid<CSys_Chuc_Nang> grdData_Level_4 = new();
+
+    private int m_iNhom_Chuc_Nang_ID{get;set;} = 0;
+    private long m_iChuc_Nang_Parent_Level_1 = -1;
+    private long m_iChuc_Nang_Parent_Level_2 = -1;
+    private long m_iChuc_Nang_Parent_Level_3 = -1;
+
+    private long m_iChuc_Nang_Parent = 0;
+
+    private bool r_bIs_Show_Edit_Level_2 = false;
+    private bool r_bIs_Show_Edit_Level_3 = false;
+    private bool r_bIs_Show_Edit_Level_4 = false;
+
+    protected override void Init_Data()
+    {
+        LoadNhom_Chuc_Nang();
+        m_iNhom_Chuc_Nang_ID = (int)ENhom_Chuc_Nang_ID.Quan_Tri;
+    }
+
+    private void LoadNhom_Chuc_Nang()
+    {
+        m_arrNhom_CN = new();
+        CCombo_Enum v_obj = new();
+        v_obj.Value = (int)ENhom_Chuc_Nang_ID.Quan_Tri;
+        v_obj.Text = Get_Language_Data_Field("Quản trị");
+        m_arrNhom_CN.Add(v_obj);
+
+        v_obj = new();
+        v_obj.Value = (int)ENhom_Chuc_Nang_ID.PDA_App;
+        v_obj.Text = Get_Language_Data_Field("PDA App");
+        m_arrNhom_CN.Add(v_obj);
+
+        v_obj = new();
+        v_obj.Value = (int)ENhom_Chuc_Nang_ID.API;
+        v_obj.Text = Get_Language_Data_Field("API");
+        m_arrNhom_CN.Add(v_obj);
+
+        v_obj = new();
+        v_obj.Value = (int)ENhom_Chuc_Nang_ID.Supplier_Portal;
+        v_obj.Text = Get_Language_Data_Field("Supplier Portal");
+        m_arrNhom_CN.Add(v_obj);
+    }
+
+    protected override void Load_Data()
+    {
+        
+
+        Format_Grid(grdData_Level_1);
+        Format_Grid(grdData_Level_2);
+        Format_Grid(grdData_Level_3);
+        Format_Grid(grdData_Level_4);
+        CSys_Chuc_Nang_Controller v_objCtrData = new();
+        //v_arrData_Level_1 = v_objCtrData.F1001_sp_sel_List_Chuc_Nang(m_iNhom_Chuc_Nang_ID, 0);
+        v_arrData_Level_1 = v_objCtrData.FQ_507_CN_sp_sel_List_By_Nhom_Chuc_Nang_A_Parent_Func_ID(m_iNhom_Chuc_Nang_ID, 0);
+
+        v_arrData_Level_2.Clear();
+        v_arrData_Level_3.Clear();
+        v_arrData_Level_4.Clear();
+
+
+
+        Hide_Filter_Row(grdData_Level_1);
+        Hide_Pageable(grdData_Level_1);
+        Set_Grid_Single_Select(grdData_Level_1);
+
+        Hide_Filter_Row(grdData_Level_2);
+        Hide_Pageable(grdData_Level_2);
+        Set_Grid_Single_Select(grdData_Level_2);
+
+        Hide_Filter_Row(grdData_Level_3);
+        Hide_Pageable(grdData_Level_3);
+        Set_Grid_Single_Select(grdData_Level_3);
+
+        Hide_Filter_Row(grdData_Level_4);
+        Hide_Pageable(grdData_Level_4);
+        Set_Grid_Single_Select(grdData_Level_4);
+    }
+
+    protected override void Delete_Data_Entry(long p_iAuto_ID)
+    {
+        CSys_Chuc_Nang_Controller v_objCtrData = new();
+        //v_objCtrData.F1001_sp_del_Chuc_Nang(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+        v_objCtrData.FQ_507_CN_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+
+        CSys_Chuc_Nang v_objData = CCache_Chuc_Nang.Get_Data_By_ID(p_iAuto_ID);
+        if (v_objData != null)
+            r_strDelete_Key = v_objData.Ma_Chuc_Nang;
+
+        CCache_Chuc_Nang.Delete_Data(p_iAuto_ID);
+    }
+
+    // public async Task cboNhom_Chuc_Nang_Select_Index_Changed(ChangeEventArgs e)
+    // {
+    //     await Task.Delay(1);
+
+    //     m_iNhom_Chuc_Nang_ID = CUtility.Convert_To_Int32(e.Value);
+    //     Load_Data_Init();
+    // }
+    private async Task OnChangeHandler(object value)
+    {
+            await Task.Delay(1);
+
+        m_iNhom_Chuc_Nang_ID = CUtility.Convert_To_Int32(value);
+            Load_Data_Init();
+    }
+
+
+    private void Load_Data_Level_2()
+    {
+        CSys_Chuc_Nang_Controller v_objCtrData = new();
+
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            //v_arrData_Level_2 = v_objCtrData.F1001_sp_sel_List_Chuc_Nang(m_iNhom_Chuc_Nang_ID, m_iChuc_Nang_Parent_Level_1);
+            v_arrData_Level_2 = v_objCtrData.FQ_507_CN_sp_sel_List_By_Nhom_Chuc_Nang_A_Parent_Func_ID(m_iNhom_Chuc_Nang_ID, m_iChuc_Nang_Parent_Level_1);
+
+            m_iChuc_Nang_Parent_Level_2 = -1;
+            m_iChuc_Nang_Parent_Level_3 = -1;
+
+            v_arrData_Level_3 = new();
+            v_arrData_Level_4 = new();
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+
+    // Không làm hiệu ứng loading vì khá khó chịu -- TienPV 20/11/2022
+    private void grdData1_Row_Click(GridRowClickEventArgs args)
+    {
+        long v_iNew = ((CSys_Chuc_Nang)args.Item).Auto_ID;
+
+        if (v_iNew != m_iChuc_Nang_Parent_Level_1)
+        {
+            m_iChuc_Nang_Parent_Level_1 = v_iNew;
+            Load_Data_Level_2();
+        }
+    }
+
+    private void Load_Data_Level_3()
+    {
+        CSys_Chuc_Nang_Controller v_objCtrData = new();
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            //v_arrData_Level_3 = v_objCtrData.F1001_sp_sel_List_Chuc_Nang(m_iNhom_Chuc_Nang_ID, m_iChuc_Nang_Parent_Level_2);
+            v_arrData_Level_3 = v_objCtrData.FQ_507_CN_sp_sel_List_By_Nhom_Chuc_Nang_A_Parent_Func_ID(m_iNhom_Chuc_Nang_ID, m_iChuc_Nang_Parent_Level_2);
+
+            m_iChuc_Nang_Parent_Level_3 = -1;
+            v_arrData_Level_4 = new();
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+
+    // Không làm hiệu ứng loading vì khá khó chịu -- TienPV 20/11/2022
+    private void grdData2_Row_Click(GridRowClickEventArgs args)
+    {
+        long v_iNew = ((CSys_Chuc_Nang)args.Item).Auto_ID;
+
+        if (v_iNew != m_iChuc_Nang_Parent_Level_2)
+        {
+            m_iChuc_Nang_Parent_Level_2 = ((CSys_Chuc_Nang)args.Item).Auto_ID;
+            Load_Data_Level_3();
+        }
+    }
+
+    private void Load_Data_Level_4()
+    {
+        CSys_Chuc_Nang_Controller v_objCtrData = new();
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            //v_arrData_Level_4 = v_objCtrData.F1001_sp_sel_List_Chuc_Nang(m_iNhom_Chuc_Nang_ID, m_iChuc_Nang_Parent_Level_3);
+            v_arrData_Level_4 = v_objCtrData.FQ_507_CN_sp_sel_List_By_Nhom_Chuc_Nang_A_Parent_Func_ID(m_iNhom_Chuc_Nang_ID, m_iChuc_Nang_Parent_Level_3);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+
+    // Không làm hiệu ứng loading vì khá khó chịu -- TienPV 20/11/2022
+    private void grdData3_Row_Click(GridRowClickEventArgs args)
+    {
+        long v_iNew = ((CSys_Chuc_Nang)args.Item).Auto_ID;
+
+        if (v_iNew != m_iChuc_Nang_Parent_Level_3)
+        {
+            m_iChuc_Nang_Parent_Level_3 = ((CSys_Chuc_Nang)args.Item).Auto_ID;
+            Load_Data_Level_4();
+        }
+    }
+
+    protected void Open_Edit_Level_2(long p_iAuto_ID)
+    {
+        r_strError = "";
+        r_iAuto_ID = p_iAuto_ID;
+        m_iChuc_Nang_Parent = m_iChuc_Nang_Parent_Level_1;
+
+        if (m_iChuc_Nang_Parent_Level_1 <= 0 && p_iAuto_ID == 0)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field("Vui lòng chọn chức năng cha trước khi thêm."));
+            return;
+        }
+
+        r_bIs_Show_Edit_Level_2 = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Edit_Level_2(CEvent_Call_Back p_objEvent)
+    {
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data || p_objEvent.Message_ID == (int)EModal_Result.Close_Cancel)
+            r_bIs_Show_Edit_Level_2 = false;
+
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data)
+        {
+            await Task.Delay(1);
+            Load_Data_Level_2();
+        }
+    }
+
+    protected void Open_Edit_Level_3(long p_iAuto_ID)
+    {
+        r_strError = "";
+        r_iAuto_ID = p_iAuto_ID;
+        m_iChuc_Nang_Parent = m_iChuc_Nang_Parent_Level_2;
+
+        if (m_iChuc_Nang_Parent_Level_2 <= 0 && p_iAuto_ID == 0)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field("Vui lòng chọn chức năng cha trước khi thêm."));
+            return;
+        }
+
+        r_bIs_Show_Edit_Level_3 = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Edit_Level_3(CEvent_Call_Back p_objEvent)
+    {
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data || p_objEvent.Message_ID == (int)EModal_Result.Close_Cancel)
+            r_bIs_Show_Edit_Level_3 = false;
+
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data)
+        {
+            await Task.Delay(1);
+            Load_Data_Level_3();
+        }
+    }
+
+    protected void Open_Edit_Level_4(long p_iAuto_ID)
+    {
+        r_strError = "";
+        r_iAuto_ID = p_iAuto_ID;
+        m_iChuc_Nang_Parent = m_iChuc_Nang_Parent_Level_3;
+
+        if (m_iChuc_Nang_Parent_Level_3 <= 0 && p_iAuto_ID == 0)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field("Vui lòng chọn chức năng cha trước khi thêm."));
+            return;
+        }
+
+        r_bIs_Show_Edit_Level_4 = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Edit_Level_4(CEvent_Call_Back p_objEvent)
+    {
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data || p_objEvent.Message_ID == (int)EModal_Result.Close_Cancel)
+            r_bIs_Show_Edit_Level_4 = false;
+
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data)
+        {
+            await Task.Delay(1);
+            Load_Data_Level_4();
+        }
+    }
+
+    public async Task Delete_Data_Level_2(long p_iAuto_ID)
+    {
+        CSys_Chuc_Nang_Controller v_objCtrChuc_Nang = new();
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            r_strError = "";
+
+            if (p_iAuto_ID != 0)
+            {
+                bool v_bIs_Confirmed = await JsRuntime.InvokeAsync<bool>("confirm", Get_Language_Data_Field("Bạn chắc chắn muốn xóa dòng dữ liệu này?"));
+
+                if (v_bIs_Confirmed)
+                {
+                    CSys_Chuc_Nang v_objChuc_Nang = v_objCtrChuc_Nang.FQ_507_CN_sp_sel_Get_By_ID(p_iAuto_ID);
+                    string v_strKey = "";
+                    if (v_objChuc_Nang != null)
+                        v_strKey = v_objChuc_Nang.Ma_Chuc_Nang;
+
+                    Delete_Data_Entry(p_iAuto_ID);
+
+                    CCommon_Controller.FCommon_Insert_Action_History(p_iAuto_ID, Get_Language_Data_Field("Xoá"), "Web",
+                        r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_strKey + ", ID: " + p_iAuto_ID.ToString());
+
+                    Load_Data_Level_2();
+                }
+            }
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+
+    public async Task Delete_Data_Level_3(long p_iAuto_ID)
+    {
+        CSys_Chuc_Nang_Controller v_objCtrChuc_Nang = new();
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            r_strError = "";
+
+            if (p_iAuto_ID != 0)
+            {
+                bool v_bIs_Confirmed = await JsRuntime.InvokeAsync<bool>("confirm", Get_Language_Data_Field("Bạn chắc chắn muốn xóa dòng dữ liệu này?"));
+
+                if (v_bIs_Confirmed)
+                {
+                    CSys_Chuc_Nang v_objChuc_Nang = v_objCtrChuc_Nang.FQ_507_CN_sp_sel_Get_By_ID(p_iAuto_ID);
+                    string v_strKey = "";
+                    if (v_objChuc_Nang != null)
+                        v_strKey = v_objChuc_Nang.Ma_Chuc_Nang;
+
+                    Delete_Data_Entry(p_iAuto_ID);
+
+                    CCommon_Controller.FCommon_Insert_Action_History(p_iAuto_ID, Get_Language_Data_Field("Xoá"), "Web",
+                        r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_strKey + ", ID: " + p_iAuto_ID.ToString());
+
+                    Load_Data_Level_3();
+                }
+            }
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+
+    public async Task Delete_Data_Level_4(long p_iAuto_ID)
+    {
+        CSys_Chuc_Nang_Controller v_objCtrChuc_Nang = new();
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            r_strError = "";
+
+            if (p_iAuto_ID != 0)
+            {
+                bool v_bIs_Confirmed = await JsRuntime.InvokeAsync<bool>("confirm", Get_Language_Data_Field("Bạn chắc chắn muốn xóa dòng dữ liệu này?"));
+
+                if (v_bIs_Confirmed)
+                {
+                    CSys_Chuc_Nang v_objChuc_Nang = v_objCtrChuc_Nang.FQ_507_CN_sp_sel_Get_By_ID(p_iAuto_ID);
+                    string v_strKey = "";
+                    if (v_objChuc_Nang != null)
+                        v_strKey = v_objChuc_Nang.Ma_Chuc_Nang;
+
+                    Delete_Data_Entry(p_iAuto_ID);
+
+                    CCommon_Controller.FCommon_Insert_Action_History(p_iAuto_ID, Get_Language_Data_Field("Xoá"), "Web",
+                        r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_strKey + ", ID: " + p_iAuto_ID.ToString());
+
+                    Load_Data_Level_4();
+                }
+            }
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+}

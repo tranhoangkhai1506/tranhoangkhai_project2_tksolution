@@ -1,0 +1,118 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Field name"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @ref="txtFocus" id="txtFocus" @bind="@m_objData.Field_Name" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Mã số màu"):</label>
+								</div>
+								<div class="col-lg-8">
+									<FControl_Mau_Col_Combo @bind-BindingStringValue="@m_objData.Ma_So_Mau"></FControl_Mau_Col_Combo>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Ghi_Chu" class="form-control">
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Mau_Column m_objData = new();
+
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Mau_Column_Controller v_objCtrData = new();
+		m_objData = v_objCtrData.FQ_522_MC_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CSys_Mau_Column();
+		else
+		{
+			r_bUpdate = true;
+
+			CSys_Mau_Column v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Mau_Column_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_522_MC_sp_ins_Insert(m_objData);
+
+		r_strAdd_Key = m_objData.Field_Name;
+
+		CCache_Mau_Column.Add_Data(m_objData);
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Mau_Column_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		v_objCtrData.FQ_522_MC_sp_upd_Update(m_objData);
+
+		CSys_Mau_Column v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+
+		CCache_Mau_Column.Update_Data(m_objData);
+	}
+}

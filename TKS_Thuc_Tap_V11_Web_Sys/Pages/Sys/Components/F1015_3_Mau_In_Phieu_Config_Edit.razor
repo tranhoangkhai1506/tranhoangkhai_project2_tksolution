@@ -1,0 +1,113 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (r_iAuto_ID != 0)
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                } 
+                else
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+                }
+
+                <ul class="nav nav-pills card-header-pills" role="tablist" style="margin-left: 30px;">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab1" role="tab" aria-selected="true">
+                            @Get_Language_Data_Field("Nhóm 1")
+                        </a>
+                    </li>
+                </ul>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="tab-content">
+                        <div class="tab-pane active show" id="tab1" role="tabpanel">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="row mb-3">
+                                        <div class="col-lg-11">
+                                            <label class="form-label">@Get_Language_Data_Field("Chủ hàng"):</label>
+                                            <FControl_Chu_Hang_Combo @bind-BindingValue="@m_objData.Chu_Hang_ID"></FControl_Chu_Hang_Combo>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data" style="margin-right: 25px;">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CSys_Report_Template_Config m_objData = new();
+
+    protected override void Init_Data()
+    {
+        
+    }
+
+    protected override void Load_Data()
+    {
+        CSys_Report_Template_Config_Controller v_objCtrData = new();
+        m_objData = v_objCtrData.FQ_528_RTC_sp_sel_Get_By_ID(r_iAuto_ID);
+
+        if (m_objData == null)
+            m_objData = new CSys_Report_Template_Config();
+        else
+        {
+            r_bUpdate = true;
+
+            // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+            CSys_Report_Template_Config v_objClone = new();
+            CUtility.Clone_Entity(m_objData, v_objClone);
+            r_objSource = v_objClone;
+            // End tracking
+        }
+    }
+
+    protected override void Add_Data()
+    {
+        CSys_Report_Template_Config_Controller v_objCtrData = new();
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+        m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_528_RTC_sp_ins_Insert(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        r_strAdd_Key = m_objData.Auto_ID.ToString();
+        // End tracking
+        CCache_Report_Template_Config.Add_Data(m_objData);
+    }
+
+    protected override void Update_Data()
+    {
+        CSys_Report_Template_Config_Controller v_objCtrData = new();
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        v_objCtrData.FQ_528_RTC_sp_upd_Update(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        CSys_Report_Template_Config v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objDes = v_objClone;
+        // End tracking
+        CCache_Report_Template_Config.Update_Data(m_objData);
+    }
+}

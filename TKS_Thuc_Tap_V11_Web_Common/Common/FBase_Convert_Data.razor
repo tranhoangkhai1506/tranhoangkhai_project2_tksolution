@@ -1,0 +1,59 @@
+﻿@inherits FBase;
+
+@code {
+    protected string m_strVisibility = "visible";
+    protected int m_iCount_Total = 0;
+    protected int m_iCount_OK = 0;
+    protected string m_strTable_Name { get; set; } = "";
+    protected string m_strTieu_De { get; set; } = "";
+
+    private System.Threading.Timer m_objTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    public async void Convert_Data()
+    {
+        m_strVisibility = "hidden";
+        StateHasChanged();
+
+        DateTime v_dtmStart = DateTime.Now;
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+
+        m_objTimer = new System.Threading.Timer(_ =>
+        {
+            g_jsRuntime.InvokeVoidAsync("Set_Convert_Data_Label_Progress",
+                "Table " + m_strTable_Name + ": " + m_iCount_OK.ToString("n0") + " / " + m_iCount_Total.ToString("n0"));
+        }, null, 500, 500);
+
+        r_strError = "";
+
+        try
+        {
+            Xu_Ly_Data();
+
+            r_strError = "<br/> " + CCommonFunction.Set_Success_MessageBox("Convert xong. Không gặp sự cố gì.");
+        }
+        
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await Task.Delay(1000);
+        await m_objTimer.DisposeAsync();
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+        StateHasChanged();
+    }
+
+    protected virtual void Xu_Ly_Data()
+    {
+        
+    }
+}

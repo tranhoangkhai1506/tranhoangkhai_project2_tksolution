@@ -1,0 +1,42 @@
+﻿@if (p_strDrill_Down_Field == "So_Phieu_Nhap_Kho")
+{
+	<F3006_2_Quan_Ly_Nhap_Kho_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose"></F3006_2_Quan_Ly_Nhap_Kho_Info>
+}
+
+@if (p_strDrill_Down_Field == "So_ASN")
+{
+	<F3001_2_ASN_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose"></F3001_2_ASN_Info>
+}
+
+@if (p_strDrill_Down_Field == "Ma_San_Pham" || p_strDrill_Down_Field == "Ten_San_Pham")
+{
+	<F2008_2_San_Pham_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose"></F2008_2_San_Pham_Info>
+}
+
+@if (p_strDrill_Down_Field == "Ma_So_Vi_Tri")
+{
+	<F2005_2_Vi_Tri_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose"></F2005_2_Vi_Tri_Info>
+}
+
+@if (p_strDrill_Down_Field == "So_Phieu_Xuat_Kho")
+{
+	<F4002_2_Xuat_Kho_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose"></F4002_2_Xuat_Kho_Info>
+}
+
+@if (p_strDrill_Down_Field == "Ma_NXD")
+{
+	<F2011_2_Noi_Xuat_Den_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose"></F2011_2_Noi_Xuat_Den_Info>
+}
+@if (p_strDrill_Down_Field == "So_Master_DO")
+{
+	<F4016_2_Master_DO_Info r_iAuto_ID="@p_iAuto_ID" OnClose="@OnClose" />
+}
+@code {
+	[Parameter]
+	public string p_strDrill_Down_Field { get; set; } = "";
+	[Parameter]
+	public long p_iAuto_ID { get; set; } = 0;
+
+	[Parameter]
+	public EventCallback<CEvent_Call_Back> OnClose { get; set; }
+}

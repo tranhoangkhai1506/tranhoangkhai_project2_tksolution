@@ -1,0 +1,178 @@
+﻿@inherits FBase_Edit;
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (p_iAPI_Source_Function_ID != 0)
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @(
+                (MarkupString)r_strError
+                )
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Mã API Function"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input @bind="@m_objData.Ma_API_Function" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Tên API Function"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input @bind="@m_objData.Ten_API_Function" class="form-control">
+
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-lg-4 col-form-label">
+                                    <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                                </div>
+                                <div class="col-lg-8">
+                                    <input @bind="@m_objData.Ghi_Chu" class="form-control">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Cap_Nhat_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CSys_API_Source_Function m_objData = new();
+    private CSys_API_Source_Function m_objEdit = new();
+    [Parameter]
+    public List<CSys_API_Source_Function> p_arrAPI_Source_Function { get; set; }
+    [Parameter]
+    public long p_iAPI_Source_Function_ID { get; set; }
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        if (p_iAPI_Source_Function_ID == 0)
+        {
+            m_objData = new CSys_API_Source_Function();
+            return;
+        }
+        else
+        {
+            m_objEdit = p_arrAPI_Source_Function.FirstOrDefault(it => it.Auto_ID == p_iAPI_Source_Function_ID);
+            CUtility.Clone_Entity(m_objEdit, m_objData);
+        }
+    }
+
+
+    private void CheckData()
+    {
+        StringBuilder sb = new();
+        if (m_objData.Ma_API_Function == "")
+            sb.AppendLine("Vui lòng nhập mã API Function.<br/>");
+        else
+        {
+            CSys_API_Source_Function v_objCheck = p_arrAPI_Source_Function.FirstOrDefault(it => it.Auto_ID != m_objData.Auto_ID && it.Ma_API_Function.ToLower() == m_objData.Ma_API_Function.ToLower());
+            if (v_objCheck != null)
+                sb.AppendLine("Mã API Function này đã tồn tại.<br/>");
+        }
+
+        if (m_objData.Ten_API_Function == "")
+            sb.AppendLine("Vui lòng nhập tên API Function.<br/>");
+        else
+        {
+            CSys_API_Source_Function v_objCheck = p_arrAPI_Source_Function.FirstOrDefault(it => it.Auto_ID != m_objData.Auto_ID && it.Ten_API_Function.ToLower() == m_objData.Ten_API_Function.ToLower());
+            if (v_objCheck != null)
+                sb.AppendLine("Tên API Function này đã tồn tại.<br/>");
+        }
+
+        if (sb.ToString() != "")
+            throw new Exception(sb.ToString());
+
+    }
+
+    protected override void Add_Data()
+    {
+        p_iAPI_Source_Function_ID = CUtility.Create_Random_Number(6);
+        m_objData.Auto_ID = p_iAPI_Source_Function_ID;
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        p_arrAPI_Source_Function.Insert(0, m_objData);
+    }
+
+
+    protected override void Update_Data()
+    {
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        //cập nhật lại object cho mảng
+        p_arrAPI_Source_Function.Remove(m_objEdit);
+        p_arrAPI_Source_Function.Insert(0, m_objData);
+    }
+
+    private async Task Cap_Nhat_Data()
+    {
+        r_objCallback_Event.Message_ID = (int)EModal_Result.Close_And_Reload_Data;
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+
+        try
+        {
+            CheckData();
+
+            if (p_iAPI_Source_Function_ID == 0)
+            {
+                Add_Data();
+            }
+            else
+            {
+                Update_Data();
+            }
+
+            await OnClose.InvokeAsync(r_objCallback_Event);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+            r_objCallback_Event.Message_ID = (int)EModal_Result.Exception;
+
+            if (txtFocus.Id != null)
+                await txtFocus.FocusAsync();
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+
+}

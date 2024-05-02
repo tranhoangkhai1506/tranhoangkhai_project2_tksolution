@@ -1,0 +1,73 @@
+﻿@inherits FBase;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				<ul class="nav nav-pills card-header-pills" role="tablist">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link active" data-bs-toggle="tab" href="#thongtin" role="tab" aria-selected="true">
+							@Get_Language_Data_Field("Hướng dẫn")
+						</a>
+					</li>
+				</ul>
+
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<div class="modal-body">
+				<div class="tab-content">
+					<div class="tab-pane active show" id="thongtin" role="tabpanel">
+						<div class="row">
+							<div class="col-lg-12">
+								@((MarkupString)m_objHelp_Guide.Noi_Dung)
+
+								@if (m_objHelp_Guide_Khach_Hang != null)
+								{
+									<br/><br/>
+									<span style="font-weight: bold">@Get_Language_Data_Field("Hướng dẫn dành riêng cho đặc thù của quý khách")</span>
+									<br />
+									@((MarkupString)m_objHelp_Guide_Khach_Hang.Noi_Dung)
+								}
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public string m_strFCode { get; set; } = "";
+
+	private CSys_Help_Guide m_objHelp_Guide = new();
+	private CSys_Help_Guide m_objHelp_Guide_Khach_Hang = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		r_bIs_Show_Help_Guide = true;
+		await base.OnInitializedAsync();
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Help_Guide_Controller m_objCtrData = new CSys_Help_Guide_Controller();
+
+		m_objHelp_Guide = m_objCtrData.FQ_518_HG_sp_sel_Get_By_Data(m_strFCode, 0, r_strLanguage);
+		if (m_objHelp_Guide == null)
+			m_objHelp_Guide = new();
+
+		if (CConfig.Khach_Hang_ID != 0)
+			m_objHelp_Guide_Khach_Hang = m_objCtrData.FQ_518_HG_sp_sel_Get_By_Data(m_strFCode, CConfig.Khach_Hang_ID, r_strLanguage);
+		else
+			m_objHelp_Guide_Khach_Hang = null;
+
+		base.Load_Data();
+	}
+}

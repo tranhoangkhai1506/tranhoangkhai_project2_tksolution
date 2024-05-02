@@ -1,0 +1,42 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingStringValue"
+                            ScrollMode="@DropDownScrollMode.Virtual"
+                            Data="@m_arrData"
+                            ValueField="Ten_Grid"
+                            TextField="Ten_Grid"
+                            Width="100%"
+                            PageSize="10"
+                            ItemHeight="35"
+                            Filterable="true"
+                            FilterOperator="@StringFilterOperator.Contains"
+                            ListHeight="260px">
+    <MultiColumnComboBoxColumns>
+        <MultiColumnComboBoxColumn Field="Ten_Grid" Title="@Get_Language_Data_Field("Tên Grid")" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+    </MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+    List<CSys_Grid_Field> m_arrData = new();
+
+    protected override void Load_Data()
+    {
+        m_arrData.Clear();
+
+        List<CSys_Grid_Field> v_arrField = CCache_Grid_Field.List_Data_All();
+        var v_arrField_Dis = v_arrField.Select(it => new
+        {
+            it.Ten_Grid
+        }).Distinct().ToList();
+
+        foreach (var v_obj in v_arrField_Dis)
+        {
+            CSys_Grid_Field  v_objField = new();
+            v_objField.Ten_Grid = v_obj.Ten_Grid;
+            m_arrData.Add(v_objField);
+        }
+
+        m_arrData = m_arrData.ToList();
+    }
+
+}

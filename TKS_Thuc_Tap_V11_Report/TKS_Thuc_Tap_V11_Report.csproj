@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<NoWarn>NU1701, CS8632, CS1062, CS8669, CA1416, BL0005, RZ9991, CS8602, CS8604, CS8600, CS8629, NETSDK1206</NoWarn>
+	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+	<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+	<EnableNETAnalyzers>False</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Data_Access\TKS_Thuc_Tap_V11_Data_Access.csproj" />
+  </ItemGroup>
+
+</Project>

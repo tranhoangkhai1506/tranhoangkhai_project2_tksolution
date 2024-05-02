@@ -1,0 +1,83 @@
+@inherits FBase;
+
+<EditForm Model="@r_objFilter">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div style="width: 80px; padding-top: 8px;">
+                    <label class="form-label">@Get_Language_Data_Field("Ngày tạo"):</label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_From" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+                <div style="width: 40px; text-align: center; padding-top: 8px;">
+                    <label class="form-label">--></label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_To" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+                        <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+                @Layout_Tool_Button(grdData)
+            </div>
+        </div>
+    </div>
+</EditForm>
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+    <div class="col-lg-12">
+        @((MarkupString)r_strError)
+
+        <TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+            <GridExport>
+                <GridExcelExport FileName="Nhat_Ky_Dang_Nhap_Ca_Nhan_Export" AllPages="true" />
+                <GridCsvExport FileName="Nhat_Ky_Dang_Nhap_Ca_Nhan_Export" AllPages="true" />
+            </GridExport>
+            <GridColumns>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("1009", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="1009" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Field="Created" Title="Ngày giờ tạo" Width="120px"></GridColumn>
+                    <GridColumn Field="IP" Title="IP" Width="200px"></GridColumn>
+                    <GridColumn Field="User_Agent" Title="User agent"></GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@code {
+    public List<CLog_Nhat_Ky_Dang_Nhap> v_arrData = new();
+    TelerikGrid<CLog_Nhat_Ky_Dang_Nhap> grdData = new();
+
+    protected override void Init_Data()
+    {
+        r_objFilter.Date_From = DateTime.Now.AddDays(-30);
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+        CLog_Nhat_Ky_Dang_Nhap_Controller v_objCtrData = new();
+        v_arrData = v_objCtrData.F1009_sp_sel_List_Nhat_Ky_Dang_Nhap_Ca_Nhan(r_objFilter.Date_From, r_objFilter.Date_To, r_strActive_User_Name);
+
+
+    }
+}

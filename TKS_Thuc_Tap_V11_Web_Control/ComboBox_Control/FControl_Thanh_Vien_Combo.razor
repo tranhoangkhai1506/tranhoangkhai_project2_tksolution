@@ -1,0 +1,29 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingStringValue"
+							ScrollMode="@DropDownScrollMode.Virtual"
+							Data="@m_arrData"
+							ValueField="@(nameof(CSys_Thanh_Vien.Ma_Dang_Nhap))"
+							TextField="@(nameof(CSys_Thanh_Vien.Ma_Dang_Nhap_Combo))"
+							Width="100%"
+							PageSize="10"
+							ItemHeight="35"
+							Filterable="true"
+							FilterOperator="@StringFilterOperator.Contains"
+							ListHeight="260px">
+	<MultiColumnComboBoxColumns>
+		<MultiColumnComboBoxColumn Field="@nameof(CSys_Thanh_Vien.Ma_Dang_Nhap)" Title="@Get_Language_Data_Field("Mã đăng nhập")" Width="150px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+		<MultiColumnComboBoxColumn Field="@nameof(CSys_Thanh_Vien.Ho_Ten)" Title="@Get_Language_Data_Field("Họ tên")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+	</MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+	[Parameter]
+	public List<CSys_Thanh_Vien> m_arrData{ get; set; } = new();
+
+	protected override void Load_Data()
+	{
+		if (m_arrData.Count == 0)
+			m_arrData = CCache_Thanh_Vien.List_Data();
+	}
+}

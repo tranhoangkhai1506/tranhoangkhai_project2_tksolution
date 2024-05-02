@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<NoWarn>NU1701, CS8632, CS1062, CS8669, CA1416, BL0005, RZ9991, RZ10012, $(NoWarn);NETSDK1206</NoWarn>
+		<AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Append.Blazor.Printing" Version="6.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Telerik.Reporting.OpenXmlRendering" Version="17.2.23.1114" />
+		<PackageReference Include="Telerik.Reporting.Services.AspNetCore" Version="17.2.23.1114" />
+		<PackageReference Include="Telerik.ReportViewer.Blazor" Version="17.2.23.1114" />
+		<PackageReference Include="Telerik.UI.for.Blazor" Version="5.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TKS_Thuc_Tap_V11_Data_Access\TKS_Thuc_Tap_V11_Data_Access.csproj" />
+		<ProjectReference Include="..\TKS_Thuc_Tap_V11_Report\TKS_Thuc_Tap_V11_Report.csproj" />
+		<ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Common\TKS_Thuc_Tap_V11_Web_Common.csproj" />
+		<ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Control\TKS_Thuc_Tap_V11_Web_Control.csproj" />
+	</ItemGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\Danh_Muc\Chu_Hang.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,143 @@
+﻿<div class="app-menu navbar-menu">
+    <!-- LOGO -->
+    <div class="navbar-brand-box">
+        <!-- Dark Logo-->
+        <a href="/" class="logo logo-dark">
+            <span class="logo-sm">
+                <img src="/assets/images/logo-sm.png" alt="" height="22">
+            </span>
+            <span class="logo-lg">
+                <img src="/assets/images/logo-dark.png" alt="" height="17">
+            </span>
+        </a>
+        <!-- Light Logo-->
+        <a href="/" class="logo logo-light">
+            <span class="logo-sm">
+                <img src="/assets/images/logo-sm.png" alt="" height="22">
+            </span>
+            <span class="logo-lg">
+                <img src="/assets/images/logo-light.png" alt="" height="17">
+            </span>
+        </a>
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+            <i class="ri-record-circle-line"></i>
+        </button>
+    </div>
+
+    <div id="scrollbar">
+        <div class="container-fluid">
+
+            <div id="two-column-menu">
+            </div>
+            <ul class="navbar-nav" id="navbar-nav">
+                <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+                @((MarkupString)m_strMenu)
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->
+<!-- Vertical Overlay-->
+<div class="vertical-overlay"></div>
+
+@code{
+    List<CSys_Chuc_Nang> m_arrChuc_Nang = new();
+    private string m_strMenu = "";
+
+    private string Generate_Menu(CSys_Chuc_Nang p_objChuc_Nang, int p_iLevel)
+    {
+        StringBuilder v_sb = new StringBuilder();
+
+        long v_iParent_ID = 0;
+        if (p_objChuc_Nang != null)
+            v_iParent_ID = p_objChuc_Nang.Auto_ID;
+
+        // List function con
+        List<CSys_Chuc_Nang> v_arrFunc_Con = new List<CSys_Chuc_Nang>();
+        foreach (CSys_Chuc_Nang v_objFunc_Con in m_arrChuc_Nang)
+        {
+            if (v_objFunc_Con.Chuc_Nang_Parent_ID == v_iParent_ID && v_objFunc_Con.Is_View == true && v_objFunc_Con.Is_Have_View_Permission == true)
+                v_arrFunc_Con.Add(v_objFunc_Con);
+        }
+
+        if (p_iLevel == 0)
+        {
+            foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                v_sb.AppendLine(Generate_Menu(v_objCN_Con, p_iLevel + 1));
+        }
+
+        if (p_iLevel == 1)
+        {
+            v_sb.AppendLine("<li class=\"nav-item\">");
+            v_sb.AppendLine("<a class=\"nav-link menu-link\" href=\"#F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\" data-bs-toggle=\"collapse\" role=\"button\" aria-expanded=\"false\" aria-controls=\"F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\">");
+            v_sb.AppendLine("<i class=\"" + p_objChuc_Nang.Image_URL + "\"></i> <span data-key=\"t-" + p_objChuc_Nang.Auto_ID.ToString() + "\">" + p_objChuc_Nang.Ten_Chuc_Nang + "</span>");
+            v_sb.AppendLine("</a>");
+
+            if (v_arrFunc_Con.Count > 0)
+            {
+                v_sb.AppendLine("<div class=\"collapse menu-dropdown\" id=\"F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\">");
+                v_sb.AppendLine("<ul class=\"nav nav-sm flex-column\">");
+                foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                    v_sb.AppendLine(Generate_Menu(v_objCN_Con, p_iLevel + 1));
+
+                v_sb.AppendLine("</ul>");
+                v_sb.AppendLine("</div>");
+            }
+
+            v_sb.AppendLine("</li>");
+        }
+
+        if (p_iLevel == 2)
+        {
+            v_sb.AppendLine("<li class=\"nav-item\">");
+
+            if (v_arrFunc_Con.Count == 0)
+            {
+                v_sb.AppendLine("<a href=\""+ p_objChuc_Nang.Func_URL +"\" class=\"nav-link\" data-key=\"t-"+ p_objChuc_Nang.Auto_ID.ToString() +"\">"+ p_objChuc_Nang.Ten_Chuc_Nang +"</a>");
+            }
+            else
+            {
+                v_sb.AppendLine("<a href=\"#F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\" class=\"nav-link collapsed\" data-bs-toggle=\"collapse\" role=\"button\" aria-expanded=\"false\" aria-controls=\"F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\" data-key=\"F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\">");
+                v_sb.AppendLine(p_objChuc_Nang.Ten_Chuc_Nang);
+                v_sb.AppendLine("</a>");
+            }
+
+            if (v_arrFunc_Con.Count > 0)
+            {
+                v_sb.AppendLine("<div class=\"collapse menu-dropdown\" id=\"F-"+ p_objChuc_Nang.Auto_ID.ToString() +"\">");
+                v_sb.AppendLine("<ul class=\"nav nav-sm flex-column\">");
+
+                foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                    v_sb.AppendLine(Generate_Menu(v_objCN_Con, p_iLevel + 1));
+
+                v_sb.AppendLine("</ul>");
+                v_sb.AppendLine("</div>");
+            }
+
+            v_sb.AppendLine("</li>");
+        }
+
+        if (p_iLevel == 3)
+        {
+            v_sb.AppendLine("<li class=\"nav-item\">");
+            v_sb.AppendLine("<a href=\""+ p_objChuc_Nang.Func_URL +"\" class=\"nav-link\" data-key=\"t-"+ p_objChuc_Nang.Auto_ID.ToString() +"\">"+ p_objChuc_Nang.Ten_Chuc_Nang +"</a>");
+            v_sb.AppendLine("</li>");
+        }
+
+        return v_sb.ToString();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            m_arrChuc_Nang = CCommonFunction.List_Chuc_Nang_By_User("admin");
+
+            m_strMenu = Generate_Menu(null, 0);
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

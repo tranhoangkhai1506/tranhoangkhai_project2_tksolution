@@ -1,0 +1,27 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingValue"
+							ScrollMode="@DropDownScrollMode.Virtual"
+							Data="@m_arrData"
+							ValueField="@(nameof(CSys_Webhook.Auto_ID))"
+							TextField="@(nameof(CSys_Webhook.Ten_Webhook_Combo))"
+							Width="100%"
+							PageSize="10"
+							ItemHeight="35"
+							Filterable="true"
+							FilterOperator="@StringFilterOperator.Contains"
+							ListHeight="260px">
+	<MultiColumnComboBoxColumns>
+		<MultiColumnComboBoxColumn Field="@nameof(CSys_Webhook.Ma_Webhook)" Title="@Get_Language_Data_Field("Mã")" Width="150px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+		<MultiColumnComboBoxColumn Field="@nameof(CSys_Webhook.Ten_Webhook)" Title="@Get_Language_Data_Field("Tên")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+	</MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+	List<CSys_Webhook> m_arrData = new();
+
+	protected override void Load_Data()
+	{
+		m_arrData = CCache_Webhook.List_Data();
+	}
+}

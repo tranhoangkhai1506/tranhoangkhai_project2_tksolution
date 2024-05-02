@@ -1,0 +1,73 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using TKS_Thuc_Tap_V11_Data_Access.Utility
+@namespace TKS_Core_V8_Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en" data-layout="twocolumn" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="~/" />
+
+    <title>@CConfig.Product_Title</title>
+
+    <meta content="TKSolution, TKELog WMS" name="description" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="/filemanagement/config/favicon.png">
+
+    <script src="/assets/js/layout.js"></script>
+
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="/assets/css/tks.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/telerik/all.css" />
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+
+    <script>
+        function Hide_Left_Menu() {
+            if (document.body.classList.contains("twocolumn-panel") == false)
+                document.body.classList.add("twocolumn-panel");
+        }
+
+        function Active_Combo_Box_Theme() {
+            var choicesExamples = document.querySelectorAll("[data-choices]");
+            Array.from(choicesExamples).forEach(function (item) {
+                var choiceData = {};
+                var isChoicesVal = item.attributes;
+
+                choiceData.shouldSort = false;
+
+                isChoicesVal["data-choices-text-disabled-true"] ? new Choices(item, choiceData).disable() : new Choices(item, choiceData);
+            });
+        }
+
+        function Set_Function_Title(p_strTitle) {
+            
+        }
+
+        function Set_Speed_Label(p_strSpeed) {
+            
+        }
+    </script>
+</head>
+<body>
+    @RenderBody()
+
+    <!-- JAVASCRIPT -->
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="/assets/libs/node-waves/waves.min.js"></script>
+    <script src="/assets/libs/feather-icons/feather.min.js"></script>
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Telerik.UI.for.Blazor/js/telerik-blazor.js"></script>
+    <script src="_content/Telerik.ReportViewer.Blazor/interop.js"></script>
+</body>
+</html>

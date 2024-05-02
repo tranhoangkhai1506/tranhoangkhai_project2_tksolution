@@ -1,0 +1,155 @@
+@inherits FBase_Info;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				<ul class="nav nav-pills card-header-pills" role="tablist">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link active" data-bs-toggle="tab" href="#thongtin" role="tab" aria-selected="true">
+							@Get_Language_Data_Field("Thông tin")
+						</a>
+					</li>
+
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#record_action_history" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Lịch sử xử lý")
+						</a>
+					</li>
+				</ul>
+
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="tab-content">
+						<div class="tab-pane active show" id="thongtin" role="tabpanel">
+							<div class="row">
+							<div class="col-lg-6">
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("ID")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Auto_ID, true)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Tên Grid")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ten_Grid, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Mã chức năng")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ma_Chuc_Nang, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Field name")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Field_Name, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Tiêu đề Column")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Tieu_De_Column, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Column Width")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Column_Width, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Field Type ID")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Field_Type_Text, false)</span>
+									</div>
+								</div>
+
+							</div>
+
+							<div class="col-lg-6">
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Ngày giờ tạo")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Created, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Người tạo")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Created_By, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Chức năng tạo")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Created_By_Function, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Ngày giờ cập nhật sau cùng")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Last_Updated, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Người cập nhật sau cùng")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Last_Updated_By, false)</span>
+									</div>
+								</div>
+
+								<div class="row mb-3">
+									<div class="col-lg-11">
+										<label class="form-label-info">@Get_Language_Data_Field("Chức năng cập nhật sau cùng")</label><br />
+										<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Last_Updated_By_Function, false)</span>
+									</div>
+								</div>
+
+							</div>
+
+							</div>
+						</div>
+
+						<div class="tab-pane" id="record_action_history" role="tabpanel">
+							<FCommon_Record_Action_History_List v_arrData="@m_arrRAH" />
+						</div>
+					</div>
+				</div>
+			</EditForm>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Grid_Field m_objData = new();
+	private List<CLog_Record_Action_History> m_arrRAH = new();
+
+	protected override void Load_Data()
+	{
+		CSys_Grid_Field_Controller v_objCtrData = new();
+		CLog_Record_Action_History_Controller v_objCtrRAH = new();
+
+		m_objData = v_objCtrData.FQ_514_GF_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		m_arrRAH = v_objCtrRAH.FCommon_Sys_sp_sel_List_Log_Record_Action_History(r_iAuto_ID);
+	}
+}

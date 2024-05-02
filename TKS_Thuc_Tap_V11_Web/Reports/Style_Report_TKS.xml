@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StyleSheet xmlns="http://schemas.telerik.com/reporting/2023/1.0">
+  <StyleRule>
+    <Style>
+      <Padding Left="2pt" Right="2pt" />
+    </Style>
+    <Selectors>
+      <TypeSelector Type="TextItemBase" />
+      <TypeSelector Type="HtmlTextBox" />
+    </Selectors>
+  </StyleRule>	
+	
+  <!--Title-->
+  <StyleRule>
+    <Style TextAlign="Center" VerticalAlign="Middle">
+      <Font Name="Tahoma" Size="14pt" Bold="True" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="lblTitle" />
+    </Selectors>
+  </StyleRule>
+  <!--Header-->
+  <StyleRule>
+    <Style TextAlign="Center" VerticalAlign="Middle">
+      <Font Name="Times New Roman" Size="11pt" Bold="True" />
+      <BorderStyle Default="Solid" Right="None" />
+		<BorderWidth Default="0.5pt" />
+	  <Padding Left="5px" Right="5px" Top="5px" Bottom="5px" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="ctbHeader" />
+    </Selectors>
+  </StyleRule>
+  <!--Body-->
+  <StyleRule>
+    <Style VerticalAlign="Middle" TextAlign="Left">
+      <Font Name="Times New Roman" Size="11pt" />
+      <BorderStyle Default="Solid" Top="None"  Right="None" />
+		<BorderWidth Default="0.5pt" />
+      <Padding Left="5px" Right="5px" Top="5px" Bottom="5px" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="ctbBody" />
+    </Selectors>
+  </StyleRule>
+  <!--Footer-->
+  <StyleRule>
+    <Style TextAlign="Right" VerticalAlign="Middle">
+      <Font Name="Times New Roman" Size="11pt" Bold="True" />
+      <BorderStyle Default="Solid" Top="None" Bottom="Solid"  Right="None" />
+		<BorderWidth Default="0.5pt" />
+      <Padding Left="5px" Right="5px" Top="5px" Bottom="5px" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="ctbFooter" />
+    </Selectors>
+  </StyleRule>
+  <!--Label-->
+  <StyleRule>
+    <Style>
+      <Font Name="Times New Roman" Size="11pt" />
+      <Padding Left="5px" Right="5px" Top="0cm" Bottom="0cm" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="lblLabel" />
+    </Selectors>
+  </StyleRule>
+  <!--Value-->
+  <StyleRule>
+    <Style>
+      <Font Name="Times New Roman" Size="11pt" Bold="True" />
+      <Padding Left="5px" Right="5px" Top="0cm" Bottom="0cm" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="lblValue" />
+    </Selectors>
+  </StyleRule>
+  <!--Label Footer-->
+  <StyleRule>
+    <Style TextAlign="Center" VerticalAlign="Middle">
+      <Font Name="Times New Roman" Size="11pt" Bold="True" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="lblLabel_Footer" />
+    </Selectors>
+  </StyleRule>
+  <!--Label Footer-->
+  <StyleRule>
+    <Style TextAlign="Center" VerticalAlign="Middle">
+      <Font Name="Times New Roman" Size="11pt" Italic="True" />
+    </Style>
+    <Selectors>
+      <StyleSelector Type="ReportItemBase" StyleName="lblFooter_I" />
+    </Selectors>
+  </StyleRule>
+</StyleSheet>

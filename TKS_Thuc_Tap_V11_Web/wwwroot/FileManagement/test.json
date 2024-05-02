@@ -1,0 +1,24 @@
+{
+  "form": "Add_Phieu_Ban_Tra_Lai_Tu_IR",
+  "data": [
+    {
+      "id_doi_tac": "WMS10899632",
+      "so_ct": "TEST0230500001",
+      "ngay_ct": "2023-05-04",
+      "ma_kh": "AGGCDCSVM108TNV",
+      "dien_giai": "TEST0230500001 test 04/05",
+      "ma_gd": 2,
+      "status": 3,
+      "r_all": 1,
+      "line_nbr": 1.0,
+      "ma_vt": "4065044",
+      "dvt": "Hộp",
+      "ma_kho": "PHC1M",
+      "so_luong": 100.0,
+      "hd_so": "A004620760HDA",
+      "hd_ln": "1.0",
+      "ma_ld": "01001",
+      "stt_rec_hd": "TEST0230500001"
+    }
+  ]
+}

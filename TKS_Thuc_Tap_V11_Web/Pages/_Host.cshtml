@@ -1,0 +1,17 @@
+﻿@page "/"
+@namespace TKS_Thuc_Tap_V11_Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    var routeUrl = "";
+    if (ViewContext.RouteData.Values.ContainsKey("path"))
+        routeUrl = ViewContext.RouteData.Values["path"].ToString().ToLower();
+
+    if (routeUrl.EndsWith("sys/dang_nhap") || routeUrl.EndsWith("sys/permission_error") || routeUrl.EndsWith("sys/dang_xuat")
+        || routeUrl.EndsWith("sys/token_expired_error") || routeUrl.EndsWith("sys/load_cache_error") || routeUrl.EndsWith("sys/queue")
+        )
+        Layout = "_Layout_Blank";
+    else
+        Layout = "_Layout";
+}
+
+<component type="typeof(App)" render-mode="ServerPrerendered" />

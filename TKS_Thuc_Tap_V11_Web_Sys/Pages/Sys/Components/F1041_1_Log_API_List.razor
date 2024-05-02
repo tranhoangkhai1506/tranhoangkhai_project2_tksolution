@@ -1,0 +1,206 @@
+@inherits FBase;
+
+<EditForm Model="@r_objFilter">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div style="width: 80px; padding-top: 8px;">
+                    <label class="form-label">@Get_Language_Data_Field("Ngày tạo"):</label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_From" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+                <div style="width: 40px; text-align: center; padding-top: 8px;">
+                    <label class="form-label">--></label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_To" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+                        <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+                    </div>
+                            
+                </div>
+                        
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+
+                @Layout_Tool_Button(grdData)
+            </div>
+        </div>
+    </div>
+</EditForm>
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+    <div class="col-lg-12">
+        @((MarkupString)r_strError)
+
+        <TelerikGrid Data="@m_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+            <GridExport>
+                <GridExcelExport FileName="Log_API_Export" AllPages="true" />
+                <GridCsvExport FileName="Log_API_Export" AllPages="true" />
+            </GridExport>
+            <GridColumns>
+                <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                <GridColumn Width="50px" TextAlign="ColumnTextAlign.Center">
+                    <Template>
+                        <button class="btn btn-link" @onclick="@(()=> Open_Info((context as CLog_API).Auto_ID))">
+                            <i class="mdi mdi-eye" style="color: purple;"></i>
+                        </button>
+                    </Template>
+                </GridColumn>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("1041", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="1041" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Field="Last_Updated" Title="Time" Width="120px"></GridColumn>
+                    <GridColumn Field="Key_No" Title="Key No" Width="120px"></GridColumn>
+                    <GridColumn Field="API_Source_Name" Title="API Source" Width="120px"></GridColumn>
+                    <GridColumn Field="API_Function_Name" Title="Function Name" Width="150px"></GridColumn>
+                    <GridColumn Field="Description" Title="Description" Width="400px"></GridColumn>
+                    <GridColumn Field="Trang_Thai_HTML" Title="Status" Width="150px">
+                        <Template>
+                            @{
+                                var data = context as CLog_API;
+                                @((MarkupString)data.Trang_Thai_HTML)
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@if (r_bIs_Show_Info == true)
+{
+    <F1041_2_Log_API_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F1041_2_Log_API_Info>
+}
+
+@code {
+    public List<CLog_API> m_arrData = new();
+    TelerikGrid<CLog_API> grdData = new();
+    CLog_API_Controller m_objCtrData = new();
+
+    protected override void Init_Data()
+    {
+        r_objFilter.Date_From = DateTime.Now.AddDays(-7);
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+
+        m_arrData = m_objCtrData.FQ_401_A_sp_sel_List_By_Created(r_objFilter.Date_From, r_objFilter.Date_To);
+    }
+
+    private void Update_Log_API_Status(CLog_API p_objLog_API, ECommon_Status_ID p_objStatus)
+    {
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+
+        try
+        {
+            //tao ket noi transaction
+            v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
+            v_conn.Open();
+            v_trans = v_conn.BeginTransaction();
+
+            CCommon_Controller.FCommon_Insert_Action_History(v_conn, v_trans, p_objLog_API.Auto_ID, "Cập nhật", "Web", r_strActive_User_Name,
+                    r_strActive_Function_Code, "Update_Log_API_Status", "Trạng Thái: " + p_objLog_API.Trang_Thai_Text + " --> " + p_objStatus.ToString());
+
+            p_objLog_API.Trang_Thai_ID = (int)p_objStatus;
+            m_objCtrData.F1041_1_sp_upd_Log_API_Trang_Thai_ID(v_conn, v_trans, p_objLog_API);
+
+            v_trans.Commit();
+        }
+        catch (Exception ex)
+        {
+            if (v_trans != null)
+                v_trans.Rollback();
+
+            throw ex;
+        }
+
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
+
+            if (v_conn != null)
+                v_conn.Close();
+        }
+
+    }
+
+    private async void Xac_Nhan_Hang_Loat_Click()
+    {
+        DateTime v_dtmStart = DateTime.Now;
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+        
+        long v_iQueue = 0;
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+
+        try
+        {
+            v_iQueue = Process_Queue("Xac_Nhan_Hang_Loat_Click");
+
+            List<CLog_API> v_arrLog_API = grdData.SelectedItems.ToList();
+            if (v_arrLog_API.Count == 0)
+                throw new Exception(Get_Language_Data_Field("Vui lòng chọn Log cần xử lý."));
+
+            foreach (CLog_API v_objLog_API in v_arrLog_API)
+            {
+                if (v_objLog_API.Trang_Thai_ID != (int)ECommon_Status_ID.Completed)
+                {
+                    switch (v_objLog_API.Trang_Thai_ID)
+                    {
+                        case (int)ECommon_Status_ID.Error:
+                            {
+                                Update_Log_API_Status(v_objLog_API, ECommon_Status_ID.Confirmed);
+                                break;
+                            }
+                        case (int)ECommon_Status_ID.Confirmed:
+                            {
+                                Update_Log_API_Status(v_objLog_API, ECommon_Status_ID.Error);
+                                break;
+                            }
+                    }
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field("Có lỗi") + ": <br/> " + ex.Message);
+        }
+        finally
+        {
+            End_Queue(v_iQueue);
+
+            //vì function này grd phụ thuộc v_arrData nên không dùng dc rebind, phải dùng hàm bên dưới để reload lại data
+            Load_Data_Init();
+            r_objLayout.Stop_Loading();
+
+            DateTime v_dtmEnd = DateTime.Now;
+            TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+            await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+        }
+    }
+}

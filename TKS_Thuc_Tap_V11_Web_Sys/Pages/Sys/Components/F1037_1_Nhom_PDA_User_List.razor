@@ -1,0 +1,159 @@
+@inherits FBase;
+
+<EditForm Model="@r_objFilter">
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="row g-3">
+                <div style="width: 150px; padding-top: 8px;">
+                    <label class="form-label">@Get_Language_Data_Field("Nhóm PDA"):</label>
+                </div>
+                <div style="width: 300px;">
+                    <TelerikMultiColumnComboBox Data="@m_arrNhom_PDA"
+                                                @bind-Value="@m_iNhom_PDA_ID"
+                                                OnChange="@OnChangeHandler"
+                                                ValueField="@nameof(CSys_Nhom_PDA.Auto_ID)"
+                                                TextField="@nameof(CSys_Nhom_PDA.Ten_Nhom_PDA)"
+                                                ScrollMode="@DropDownScrollMode.Virtual"
+                                                Width="100%"
+                                                PageSize="10"
+                                                ItemHeight="35"
+                                                Filterable="true"
+                                                FilterOperator="@StringFilterOperator.Contains"
+                                                ListHeight="260px">
+                        <MultiColumnComboBoxColumns>
+                            <MultiColumnComboBoxColumn Field="@nameof(CSys_Nhom_PDA.Ten_Nhom_PDA)" Title="Nhóm" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header"></MultiColumnComboBoxColumn>
+                        </MultiColumnComboBoxColumns>
+                    </TelerikMultiColumnComboBox>
+
+                   @*  <select class="form-control" data-choices @onchange="cboNhom_PDA_Select_Index_Changed">
+                        <option value="0">&nbsp;</option>
+                        @foreach (CSys_Nhom_PDA v_objData in m_arrNhom_PDA)
+                        {
+                            <option value="@v_objData.Auto_ID">@v_objData.Ten_Nhom_PDA</option>
+                        }
+                    </select> *@
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            @Layout_Tool_Button()
+        </div>
+    </div>
+</EditForm>
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+    <div class="col-lg-5">
+        @((MarkupString)r_strError)
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+                            @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                            {
+                                <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Edit(0))">
+                                    <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                    @Get_Language_Data_Field("Thêm")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <TelerikGrid Data="@v_arrData" Height="calc(100vh - 250px)" Resizable="true" Reorderable="true" @ref="@grdData">
+                    <GridColumns>
+                        <GridColumn Width="40px">
+                            <Template>
+                                @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                                {
+                                    <button class="btn btn-link" @onclick="@(()=> Delete_Data((context as CSys_Nhom_PDA_User).Auto_ID))">
+                                        <i class="ri-delete-bin-line align-bottom me-1"></i>
+                                    </button>
+                                }
+                            </Template>
+                        </GridColumn>
+                        @if (CCache_Grid_UI_Global.List_Data_By_Code("1037", "grdData").Count > 0)
+                        {
+                            <FCommon_General_Col_Grid m_strFCode="1037" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                        }
+                        else
+                        {
+                            <GridColumn Field="Ma_Dang_Nhap" Title="Mã đăng nhập" Width="150px"></GridColumn>
+                            <GridColumn Field="Ho_Ten" Title="Họ tên"></GridColumn>
+                        }
+                    </GridColumns>
+                </TelerikGrid>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (r_bIs_Show_Edit == true)
+{
+    <F1037_3_Nhom_PDA_User_Edit r_iAuto_ID="@r_iAuto_ID" m_iNhom_PDA_ID="@m_iNhom_PDA_ID" OnClose="@Close_Edit"></F1037_3_Nhom_PDA_User_Edit>
+}
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@code {
+    public List<CSys_Nhom_PDA_User> v_arrData = new();
+    TelerikGrid<CSys_Nhom_PDA_User> grdData = new();
+
+    private long m_iNhom_PDA_ID = 0;
+    private List<CSys_Nhom_PDA> m_arrNhom_PDA = new();
+
+    protected override void Init_Data()
+    {
+        m_arrNhom_PDA = CCache_Nhom_PDA.List_Data();
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+        CSys_Nhom_PDA_User_Controller v_objCtrData = new();
+        v_arrData = v_objCtrData.FQ_524_NPU_sp_sel_List_By_Nhom_PDA_ID(m_iNhom_PDA_ID);
+
+        Hide_Filter_Row(grdData);
+        Hide_Pageable(grdData);
+    }
+
+    protected override void Delete_Data_Entry(long p_iAuto_ID)
+    {
+        CSys_Nhom_PDA_User_Controller v_objCtrData = new();
+        v_objCtrData.FQ_524_NPU_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+
+        CSys_Nhom_PDA_User v_objData = CCache_Nhom_PDA_User.Get_Data_By_ID(p_iAuto_ID);
+        if (v_objData != null)
+            r_strDelete_Key = v_objData.Ma_Dang_Nhap;
+
+        CCache_Nhom_PDA_User.Delete_Data(p_iAuto_ID);
+    }
+
+    // public async Task cboNhom_PDA_Select_Index_Changed(ChangeEventArgs e)
+    // {
+    //     await Task.Delay(1);
+
+    //     r_objLayout.Start_Loading();
+
+    //     m_iNhom_PDA_ID = CUtility.Convert_To_Int32(e.Value);
+    //     Load_Data_Init();
+
+    //     r_objLayout.Stop_Loading();
+
+    // }
+    private async Task OnChangeHandler(object value)
+    {
+        await Task.Delay(1);
+
+        m_iNhom_PDA_ID = CUtility.Convert_To_Int64(value);
+        Load_Data_Init();
+    }
+
+
+}

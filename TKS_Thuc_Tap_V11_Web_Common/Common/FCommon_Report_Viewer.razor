@@ -1,0 +1,62 @@
+﻿@using System.Collections;
+@using Telerik.Reporting.Processing;
+@using Telerik.Reporting;
+@inherits FBase;
+
+<style>
+    .trv-report-viewer {
+        width: auto;
+        height: 600px;
+    }
+</style>
+
+<ReportViewer ViewerId="rv1" @ref="@m_objReportViewer"
+    ServiceUrl="/api/reports"
+    ReportSource="@m_objReportSource"
+    ScaleMode="@(ScaleMode.Specific)"
+    ViewMode="ViewMode.PrintPreview"
+    Scale="1.0" />
+
+@code {
+    private ReportViewer? m_objReportViewer = new();
+    private ReportSourceOptions m_objReportSource = new ReportSourceOptions();
+
+    public async Task Load_Report(string p_strReport_Name, Dictionary<string, object> p_dicParameter, bool p_blIs_Download_PDF = false)
+    {        
+        if (p_blIs_Download_PDF)
+        {
+            var reportProcessor = new ReportProcessor();
+
+            string v_strUrl = CConfig.Report_File;
+            int v_iRoot = v_strUrl.IndexOf("wwwroot");
+            string v_strRes = v_strUrl.Substring(0, v_iRoot);
+
+            var reportSource = new UriReportSource
+                {
+                    Uri = v_strRes + "Reports\\" + p_strReport_Name
+                };
+
+            foreach (KeyValuePair<string, object> item in p_dicParameter)
+            {
+                reportSource.Parameters.Add(item.Key, item.Value);
+                //v_hashTable[item.Key] = item.Value;
+            }
+
+            var result = reportProcessor.RenderReport("PDF", reportSource, null);
+
+            // return result.DocumentBytes;
+            await SavePDFReport(result.DocumentBytes);
+        }
+        else
+        {
+            m_objReportSource = await m_objReportViewer.GetReportSourceAsync();
+            m_objReportSource.Report = p_strReport_Name;
+
+            m_objReportSource.Parameters.Clear();
+            foreach (string v_strKey in p_dicParameter.Keys)
+                m_objReportSource.Parameters.Add(v_strKey, p_dicParameter[v_strKey]);
+
+            await m_objReportViewer.SetReportSourceAsync(m_objReportSource);
+        }
+    }
+}

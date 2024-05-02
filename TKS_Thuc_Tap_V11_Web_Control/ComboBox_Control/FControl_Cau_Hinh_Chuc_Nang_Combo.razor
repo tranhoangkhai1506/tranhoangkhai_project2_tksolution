@@ -1,0 +1,65 @@
+﻿@inherits FBase_Combo;
+@inject NavigationManager NavManager
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingValue"
+                            ScrollMode="@DropDownScrollMode.Virtual"
+                            Data="@m_arrData"
+                            ValueField="Ma_Chuc_Nang"
+                            TextField="Ma_Chuc_Nang"
+                            Width="100%"
+                            PageSize="10"
+                            ItemHeight="35"
+                            Filterable="true"
+                            FilterOperator="@StringFilterOperator.Contains"
+                            ListHeight="260px">
+    <MultiColumnComboBoxColumns>
+        <MultiColumnComboBoxColumn Field="Ma_Chuc_Nang" Title="@Get_Language_Data_Field("Mã chức năng")" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+    </MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+    List<CSys_Chuc_Nang> m_arrData = new();
+    public string m_strMa_Dang_Nhap = "";
+
+    protected override void Load_Data()
+    {
+        m_strMa_Dang_Nhap = CCommonFunction.Get_QueryString(NavManager, "Ma_Dang_Nhap");
+
+        m_arrData.Clear();
+
+        List<CSys_Grid_Field> v_arrField = CCache_Grid_Field.List_Data_All();
+        var v_arrDis = v_arrField.Select(it => new
+        {
+            it.Ma_Chuc_Nang
+        }).Distinct().ToList();
+
+        Dictionary<string, string> v_dicField = new();
+        foreach (var v_obj in v_arrDis)
+        {
+            if (!v_dicField.ContainsKey(v_obj.Ma_Chuc_Nang.ToUpper()))
+                v_dicField.Add(v_obj.Ma_Chuc_Nang.ToUpper(), v_obj.Ma_Chuc_Nang);
+        }
+
+        List<CSys_Chuc_Nang> v_arrChuc_Nang = CCommonFunction.List_Chuc_Nang_By_User(m_strMa_Dang_Nhap);
+        var v_arrChuc_Nang_Dis = v_arrChuc_Nang.Select(it => new
+        {
+            it.Ma_Chuc_Nang,
+            it.Ten_Chuc_Nang,
+        }).Distinct().ToList();
+
+        foreach (var v_obj in v_arrChuc_Nang_Dis)
+        {
+            if (v_dicField.ContainsKey(v_obj.Ma_Chuc_Nang.ToUpper()))
+            {
+                CSys_Chuc_Nang v_objCN = new();
+                v_objCN.Ma_Chuc_Nang = v_obj.Ma_Chuc_Nang;
+                v_objCN.Ten_Chuc_Nang = v_obj.Ten_Chuc_Nang;
+                m_arrData.Add(v_objCN);
+            }
+        }
+
+        m_arrData = m_arrData.ToList();
+
+    }
+
+}

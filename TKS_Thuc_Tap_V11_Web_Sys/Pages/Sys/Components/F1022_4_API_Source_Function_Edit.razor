@@ -1,0 +1,169 @@
+﻿@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-4">
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label-info">@Get_Language_Data_Field("Mã API Source")</label><br />
+									<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ma_API_Source, false)</span>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+
+			<div class="modal-body" style="padding-top: 0px !important;">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+							@if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+							{
+								<button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Function_Edit(0))">
+									<i class="ri-add-circle-fill align-bottom me-1"></i>
+									@Get_Language_Data_Field("Thêm")
+								</button>
+							}
+						</div>
+					</div>
+				</div>
+
+				<div class="row" style="margin-top: 10px;">
+					<div class="col-lg-12">
+						<TelerikGrid Data="@m_objData.Sys_API_Source_Function" Height="400px" Resizable="true" Reorderable="true" @ref="@grdData">
+							<GridColumns>
+								<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+								<GridColumn Width="30px">
+									<Template Context="Sys_API_Source_Function">
+										<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+											<i class="mdi mdi-cog-outline" style="color: purple;"></i>
+										</button>
+										<ul class="dropdown-menu">
+											@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+											{
+												<li>
+													<button class="dropdown-item" type="button" @onclick="@(()=> Open_Function_Edit((Sys_API_Source_Function as CSys_API_Source_Function).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+												</li>
+											}
+											@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+											{
+												<li>
+													<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((Sys_API_Source_Function as CSys_API_Source_Function).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+												</li>
+											}
+										</ul>
+									</Template>
+								</GridColumn>
+								<GridColumn Field="Ma_API_Function" Title="Mã Function" Width="100px"></GridColumn>
+								<GridColumn Field="Ten_API_Function" Title="Tên Function" Width="250px"></GridColumn>
+								<GridColumn Field="Ghi_Chu" Title="Ghi chú" Width="200px"></GridColumn>
+								<GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+							</GridColumns>
+						</TelerikGrid>
+					</div>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+@if (m_blIs_Show_Edit_Function == true)
+{
+	<F1022_4_A_API_Function_Edit p_iAPI_Source_ID="@r_iAuto_ID" p_iAPI_Source_Function_ID="@m_iAPI_Source_Function_ID" OnClose="@Close_Function"></F1022_4_A_API_Function_Edit>
+}
+
+@code {
+	private CSys_API_Source m_objData = new();
+	TelerikGrid<CSys_API_Source_Function> grdData = new();
+
+	//start form Edit con
+	private long m_iAPI_Source_Function_ID { get; set; } = 0;
+	private bool m_blIs_Show_Edit_Function { get; set; } = false;
+	//End form Edit con
+
+	protected override void Init_Data()
+	{
+	}
+
+	protected override void Load_Data()
+	{
+		Format_Grid(grdData);
+		CSys_API_Source_Controller v_objCtrData = new();
+		CSys_API_Source_Function_Controller v_objCtrlFunc = new();
+		m_objData = v_objCtrData.FQ_501_AS_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		r_bUpdate = true;
+		//m_objData.Sys_API_Source_Function = v_objCtrlFunc.F1022_3_List_Sys_API_Source_Function_By_API_Source_ID(m_objData.Auto_ID);
+		m_objData.Sys_API_Source_Function = v_objCtrlFunc.FQ_504_ASF_sp_sel_List_By_API_Source_ID(m_objData.Auto_ID);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CSys_API_Source v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objSource = v_objClone;
+		// End tracking
+
+		
+		Hide_Pageable(grdData);
+	}
+
+	protected override void Delete_Data_Entry(long p_iAuto_ID)
+	{
+		CSys_API_Source_Function_Controller v_objCtrData = new();
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CSys_API_Source_Function v_objData = v_objCtrData.FQ_504_ASF_sp_sel_Get_By_ID(p_iAuto_ID);
+		if (v_objData != null)
+			r_strDelete_Key = v_objData.Ma_API_Function;
+		// End tracking
+
+		v_objCtrData.FQ_504_ASF_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+
+		CCache_API_Source.Load_Cache_API_Source();
+		CCache_API_Source_Function.Load_Cache_API_Source_Function();
+	}
+
+
+	#region form Edit con
+
+	protected void Open_Function_Edit(long p_iAuto_ID)
+	{
+		r_strError = "";
+		m_iAPI_Source_Function_ID = p_iAuto_ID;
+		m_blIs_Show_Edit_Function = true;
+		StateHasChanged();
+	}
+
+	private void Close_Function(CEvent_Call_Back p_obj)
+	{
+		if (p_obj.Message_ID != (int)EModal_Result.Exception)
+		{
+			m_blIs_Show_Edit_Function = false;
+			Load_Data_Init();
+		}
+	}
+
+	#endregion form Edit con
+
+}

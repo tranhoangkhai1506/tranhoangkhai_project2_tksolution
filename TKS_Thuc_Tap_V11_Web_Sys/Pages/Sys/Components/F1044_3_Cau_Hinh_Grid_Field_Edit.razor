@@ -1,0 +1,176 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Tên Grid"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @ref="txtFocus" @bind="@m_objData.Ten_Grid" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Mã chức năng"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Ma_Chuc_Nang" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Field name"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Field_Name" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Tiêu đề Column"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Tieu_De_Column" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Độ Rộng (px)"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input type="number" @bind="@m_objData.Column_Width" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Field Type ID"):</label>
+								</div>
+								<div class="col-lg-8">
+									<FControl_Common_Combo_Enum m_arrData="@m_arrField_Type_ID" @bind-BindingIntValue="@m_objData.Field_Type_ID"></FControl_Common_Combo_Enum>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Parent Field"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Field_Name_Parent" class="form-control">
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Grid_Field m_objData = new();
+
+	List<CCombo_Enum> m_arrField_Type_ID = new();
+
+	protected override void Init_Data()
+	{
+		m_arrField_Type_ID.Clear();
+		m_arrField_Type_ID.Add(new CCombo_Enum { Value = (int)EGrid_Field_Type_ID.Data_Column, Text = Get_Language_Data_Field("Data Column") });
+		m_arrField_Type_ID.Add(new CCombo_Enum { Value = (int)EGrid_Field_Type_ID.Check_Box, Text = Get_Language_Data_Field("Check Box") });
+		m_arrField_Type_ID.Add(new CCombo_Enum { Value = (int)EGrid_Field_Type_ID.HTML, Text = Get_Language_Data_Field("HTML") });
+		m_arrField_Type_ID.Add(new CCombo_Enum { Value = (int)EGrid_Field_Type_ID.Band_Column, Text = Get_Language_Data_Field("Band Column") });
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Grid_Field_Controller v_objCtrData = new();
+		m_objData = v_objCtrData.FQ_514_GF_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+		{
+			m_objData = new CSys_Grid_Field();
+			m_objData.Field_Type_ID = (int)EGrid_Field_Type_ID.Data_Column;
+			m_objData.Ten_Grid = "grdData";
+			m_objData.Column_Width = 100;
+		}
+		else
+		{
+			r_bUpdate = true;
+
+			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+			CSys_Grid_Field v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+			// End tracking
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Grid_Field_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_514_GF_sp_ins_Insert(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		r_strAdd_Key = m_objData.Ten_Grid;
+		// End tracking
+
+		CCache_Grid_Field.Add_Data(m_objData);
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Grid_Field_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		v_objCtrData.FQ_514_GF_sp_upd_Update(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CSys_Grid_Field v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+		// End tracking		
+
+		CCache_Grid_Field.Update_Data(m_objData);
+	}
+}

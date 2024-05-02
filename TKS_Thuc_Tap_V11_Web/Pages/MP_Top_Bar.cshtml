@@ -1,0 +1,251 @@
+﻿@using Microsoft.JSInterop
+@using TKS_Thuc_Tap_V11_Data_Access.Controller.Cache
+@using TKS_Thuc_Tap_V11_Data_Access.Entity.DM
+@using TKS_Thuc_Tap_V11_Data_Access.Entity.Log;
+@using TKS_Thuc_Tap_V11_Data_Access.Entity.Sys
+@using TKS_Thuc_Tap_V11_Data_Access.Controller.Sys
+@using TKS_Thuc_Tap_V11_Data_Access.Utility
+@using TKS_Thuc_Tap_V11_Web
+@using System.Text
+@using TKS_Thuc_Tap_V11_Web_Common.Common;
+
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedLocalStorage sessionStorage
+@inject NavigationManager navigationManager
+
+<script>
+    function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function Set_Data_Language(p_strLang) {
+        setCookie("language", p_strLang, 5000);
+        window.location.reload();
+    }
+
+    function Set_Data_Chu_Hang_ID(p_strChu_Hang_ID) {
+        setCookie("Chu_Hang_ID", p_strChu_Hang_ID, 5000);
+    }
+
+    function On_Chu_Hang_Changed(p_strChu_Hang_ID){
+        Set_Data_Chu_Hang_ID(p_strChu_Hang_ID);
+        window.location.reload();
+    }
+
+    function Set_Data_Kho_ID(p_strKho_ID) {
+        setCookie("Kho_ID", p_strKho_ID, 5000);
+    }
+
+    function On_Kho_Changed(p_strKho_ID) {
+        Set_Data_Kho_ID(p_strKho_ID);
+        window.location.reload();
+    }
+
+    function Show_Hide_Menu() {
+        var hide_hover_menu = localStorage.getItem("hide_hover_menu");
+
+        if (hide_hover_menu != 1)
+            localStorage.setItem("hide_hover_menu", 1);
+        else
+            localStorage.setItem("hide_hover_menu", 0);
+
+        window.location.reload();
+    }
+</script>
+
+@{
+
+     
+
+    string Get_Data_Field_Language(string p_strField)
+    {
+        return p_strField;
+    }
+
+    string v_strTitle = "";
+
+    // Xử lý token, thông tin đăng nhập
+    string v_strToken_Login = CUtility.Convert_To_String(ViewContext.HttpContext.Request.Cookies[CConfig.Token_Cookie_Name]);
+    CSys_Token v_objToken = CCache_Token.Get_Data_By_Token(v_strToken_Login);
+
+    if (v_objToken == null)
+        v_objToken = new CSys_Token();
+
+    CSys_Thanh_Vien v_objThanh_Vien = CCache_Thanh_Vien.Get_Data_By_Ma_Dang_Nhap(v_objToken.Ma_Dang_Nhap);
+    if (v_objThanh_Vien == null)
+        v_objThanh_Vien = new CSys_Thanh_Vien();
+
+    CSys_Chuc_Nang v_objChuc_Nang = CCache_Chuc_Nang.Get_Data_By_Func_URL(ViewContext.HttpContext.Request.Path);
+    if (v_objChuc_Nang != null)
+    {
+        v_strTitle = v_objChuc_Nang.Ten_Chuc_Nang + " (" + v_objChuc_Nang.Ma_Chuc_Nang + ")";
+    }
+
+    // Xử lý multi language
+    string v_strData_Lang = CUtility.Convert_To_String(ViewContext.HttpContext.Request.Cookies["language"]);
+
+    if (v_strData_Lang != "vi-VN" && v_strData_Lang != "en-US" && v_strData_Lang != "jp-JA" && v_strData_Lang != "zh-CN" && v_strData_Lang != "ko-KR")
+    {
+        v_strData_Lang = "vi-VN";
+        <script>
+            Set_Data_Language('vi-VN');
+        </script>
+    }
+
+    string v_strFlag_img = "vn.svg";
+    switch (v_strData_Lang)
+    {
+        case "vi-VN": v_strFlag_img = "vn.svg"; break;
+        case "en-US": v_strFlag_img = "us.svg"; break;
+        case "jp-JA": v_strFlag_img = "jp.svg"; break;
+        case "zh-CN": v_strFlag_img = "china.svg"; break;
+        case "ko-KR": v_strFlag_img = "kr.svg"; break;
+    }
+}
+
+<header id="page-topbar">
+    <div class="layout-width">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <!-- App Search-->
+                <h5 class="mb-sm-0" style="padding-top: 15px;">
+                    <span id="txtCore_Title" style="color: white;">@v_strTitle</span>
+                </h5>
+
+                <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger shadow-none"
+                        id="topnav-hamburger-icon" style="padding-top: 30px;">
+                    <span class="hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+            </div>
+
+            <div class="d-flex align-items-center">
+
+                <div class="dropdown d-md-none topbar-head-dropdown header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle shadow-none"
+                            id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <i class="bx bx-search fs-22"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                         aria-labelledby="page-header-search-dropdown">
+                        <form class="p-3">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search ..."
+                                           aria-label="Recipient's username">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="mdi mdi-magnify"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="dropdown ms-1 topbar-head-dropdown header-item">
+                    <span class="form-label-info" id="lblSpeed" style="padding-left: 5px; padding-right: 5px; font-weight: bold; color: white;"></span>
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle shadow-none"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="header-lang-img1" src="/assets/images/flags/@v_strFlag_img" alt="Header Language" height="20"
+                             class="rounded">
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <a href="javascript:Set_Data_Language('vi-VN')" class="dropdown-item notify-item language py-2"
+                           title="Tiếng việt">
+                            <img src="/assets/images/flags/vn.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Tiếng Việt</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:Set_Data_Language('en-US')" class="dropdown-item notify-item language"
+                           title="English">
+                            <img src="/assets/images/flags/us.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">English</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:Set_Data_Language('jp-JA')" class="dropdown-item notify-item language"
+                           title="Japanese">
+                            <img src="/assets/images/flags/jp.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Japanese</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:Set_Data_Language('ko-KR')" class="dropdown-item notify-item language"
+                           title="Korean">
+                            <img src="/assets/images/flags/kr.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Korean</span>
+                        </a>
+
+                        <!-- item-->
+                        <a href="javascript:Set_Data_Language('zh-CN')" class="dropdown-item notify-item language"
+                           title="Chinese">
+                            <img src="/assets/images/flags/china.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle">Chinese</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle shadow-none"
+                            data-toggle="fullscreen">
+                        <i class='bx bx-fullscreen fs-22'></i>
+                    </button>
+                </div>
+
+                <div class="dropdown ms-sm-3 header-item topbar-user">
+                    <button type="button" class="btn shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <span class="d-flex align-items-center">
+                            <img class="rounded-circle header-profile-user" src="/assets/images/users/user-dummy-img.jpg"
+                                 alt="Header Avatar">
+                            <span class="text-start ms-xl-2">
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">@v_objThanh_Vien.Ma_Dang_Nhap</span>
+                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">@v_objThanh_Vien.Ten_Nhom_Thanh_Vien_Text</span>
+                            </span>
+                        </span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <!-- item-->
+                        <h6 class="dropdown-header">@Get_Data_Field_Language("Xin chào") @v_objThanh_Vien.Ma_Dang_Nhap!</h6>
+                        <a class="dropdown-item" href="javascript:window.location.href='/sys/thong_tin_thanh_vien';">
+                            <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">@Get_Data_Field_Language("Thông tin tài khoản")</span>
+                        </a>
+                        <a class="dropdown-item" href="javascript:window.location.href='/sys/Cau_Hinh_Grid_UI_User?Ma_Dang_Nhap=@v_objThanh_Vien.Ma_Dang_Nhap';">
+                            <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">@Get_Data_Field_Language("Cấu Hình Grid UI User")</span>
+                        </a>
+                        <a class="dropdown-item" href="/FileManagement/Config/HSSD.pdf">
+                            <i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">@Get_Data_Field_Language("Tài liệu hướng dẫn")</span>
+                        </a>
+
+                        <a class="dropdown-item" href="javascript:window.location.href='/sys/doi_mat_khau';">
+                            <i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle">@Get_Data_Field_Language("Đổi mật khẩu")</span>
+                        </a>
+                        @*
+                        <a class="dropdown-item" href="javascript:Show_Hide_Menu();">
+                            <i class="ri-blur-off-fill text-muted fs-16 align-middle me-1"></i> <span class="align-middle">@Get_Data_Field_Language("Bật / tắt tự động left menu")</span>
+                        </a>*@
+                        <div class="dropdown-divider"></div>
+
+                        <a class="dropdown-item" href="javascript:window.location.href='/sys/dang_xuat';">
+                            <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">@Get_Data_Field_Language("Đăng xuất")</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+</header>
+
+

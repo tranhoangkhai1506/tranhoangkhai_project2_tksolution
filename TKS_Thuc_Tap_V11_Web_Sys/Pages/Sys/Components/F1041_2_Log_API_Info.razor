@@ -1,0 +1,86 @@
+﻿@inherits FBase_Info;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				<ul class="nav nav-pills card-header-pills" role="tablist">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link active" data-bs-toggle="tab" href="#thongtin" role="tab" aria-selected="true">
+							@Get_Language_Data_Field("Thông tin")
+						</a>
+					</li>
+
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#record_action_history" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Lịch sử xử lý")
+						</a>
+					</li>
+				</ul>
+
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<div class="modal-body">
+				<div class="tab-content">
+					<div class="tab-pane active show" id="thongtin" role="tabpanel">
+						@*<button class="btn btn-link" @onclick="@DownloadLog" style="border-radius: 15px;border: 3px solid #4b38b3; padding: 6px; background-color:#4b38b3">
+							<span style="color: white">Download Log</span>
+						</button>*@
+						<button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@DownloadLog">
+							<i class="mdi mdi-download align-bottom me-1"></i>
+								Download Log
+						</button>
+						<div class="row">
+							<div>
+								<h5>Description:</h5>
+								<span>@((MarkupString)m_strLog)</span>
+							</div>
+							
+						</div>
+					</div>
+
+					<div class="tab-pane" id="record_action_history" role="tabpanel">
+						<FCommon_Record_Action_History_List v_arrData="@m_arrRAH" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CLog_API m_objData = new();
+	public List<CLog_Record_Action_History> m_arrRAH = new List<CLog_Record_Action_History>();
+	private string m_strLog { get; set; } = "";
+	protected override void Load_Data()
+	{
+		CLog_API_Controller v_objCtrData = new();
+		CLog_Record_Action_History_Controller v_objCtrRAH = new CLog_Record_Action_History_Controller();
+		try
+		{
+			m_objData = v_objCtrData.FQ_401_A_sp_sel_Get_By_ID(r_iAuto_ID);
+			m_arrRAH = v_objCtrRAH.FCommon_Sys_sp_sel_List_Log_Record_Action_History(r_iAuto_ID);
+
+			//doc data từ file txt log
+			string v_strLink_File = this.g_objEnvironment.WebRootPath + m_objData.Link_URL;
+			m_strLog = File.ReadAllText(v_strLink_File);
+			m_strLog = m_strLog.Replace("\",\"", "<br/>").Replace("\"", "");
+		}
+		catch (Exception ex)
+		{
+			throw ex;
+		}
+	}
+	protected async Task DownloadLog()
+	{
+		var bytes = Encoding.UTF8.GetBytes(m_strLog);
+		var stream = new MemoryStream(bytes);
+		//Chạy hàm saveAsFile trong javascript tên là myscript.js
+		await g_jsRuntime.InvokeAsync<object>("saveAsFile", "logAPI_" + m_objData.Key_No + "_" + DateTime.Now.ToString("dd/MM/yyyy") + ".txt", Convert.ToBase64String(bytes));
+	}
+
+}

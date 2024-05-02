@@ -1,0 +1,158 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Chủ hàng"):</label>
+								</div>
+								<div class="col-lg-8">
+									<FControl_Chu_Hang_Combo @bind-BindingValue="@m_objData.Chu_Hang_ID"></FControl_Chu_Hang_Combo>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Component ID"):</label>
+								</div>
+								<div class="col-lg-8">
+									<FControl_Common_Combo_Enum m_arrData="@m_arrCombo_Component" @bind-BindingIntValue="@m_objData.Component_ID"></FControl_Common_Combo_Enum>
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Field name"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Field_Name" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Is view"):</label>
+								</div>
+								<div class="col-lg-8" style="padding-top: 5px;">
+									<div class="form-check form-switch form-switch-lg form-switch-success">
+										<input type="checkbox" @bind="@m_objData.Is_View" class="form-check-input" role="switch">
+									</div>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Notes"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Notes" class="form-control">
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Cau_Hinh_Component_App m_objData = new();
+	private List<CDM_Chu_Hang> m_arrChu_Hang = new();
+
+	private List<CCombo_Enum> m_arrCombo_Component = new List<CCombo_Enum>();
+
+	protected override void Init_Data()
+	{
+		m_arrCombo_Component.Clear();
+		m_arrCombo_Component.Add(new CCombo_Enum() { Value = 1, Text = "Hihi" });
+	}
+
+	private void LoadCombo()
+	{
+		m_arrChu_Hang = CCache_Chu_Hang.List_Data();
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Cau_Hinh_Component_App_Controller v_objCtrData = new();
+		LoadCombo();
+		m_objData = v_objCtrData.FQ_506_CHCA_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CSys_Cau_Hinh_Component_App();
+		else
+		{
+			r_bUpdate = true;
+
+			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+			CSys_Cau_Hinh_Component_App v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+			// End tracking
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Cau_Hinh_Component_App_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		//m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.F1040_sp_ins_Cau_Hinh_Component_App(m_objData);
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_506_CHCA_sp_ins_Insert(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		r_strAdd_Key = m_objData.Field_Name;
+		// End tracking
+
+		CCache_Cau_Hinh_Component_App.Add_Data(m_objData);
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Cau_Hinh_Component_App_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		//v_objCtrData.F1040_sp_upd_Cau_Hinh_Component_App(m_objData);
+		v_objCtrData.FQ_506_CHCA_sp_upd_Update(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CSys_Cau_Hinh_Component_App v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+		// End tracking
+
+		CCache_Cau_Hinh_Component_App.Update_Data(m_objData);
+	}
+}

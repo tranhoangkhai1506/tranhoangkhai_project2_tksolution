@@ -1,0 +1,254 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using TKS_Thuc_Tap_V11_Data_Access.Utility
+@namespace TKS_Thuc_Tap_V11_Web.Pages
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="vi" data-layout="horizontal" data-topbar="dark" data-sidebar="light" data-sidebar-size="lg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="~/" />
+
+    <title>@CConfig.Product_Title</title>
+
+    <meta content="TKSolution, TKElog WMS" name="description" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="/filemanagement/config/favicon.png">
+
+    <script src="/assets/js/layout.js"></script>
+
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+
+    <link href="/assets/css/tks.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/telerik/all.css" />
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+
+    <script>
+
+
+        function Hide_Left_Menu() {
+            if (document.body.classList.contains("twocolumn-panel") == false) {
+                var hide_hover_menu = localStorage.getItem("hide_hover_menu");
+                if (hide_hover_menu != 1)
+                    document.body.classList.add("twocolumn-panel");
+            }
+        }
+
+        // function Active_Combo_Box_Theme() {
+        //     var choicesExamples = document.querySelectorAll("[data-choices]");
+        //     Array.from(choicesExamples).forEach(function (item) {
+        //         var choiceData = {};
+        //         var isChoicesVal = item.attributes;
+
+        //         choiceData.shouldSort = false;
+
+        //         isChoicesVal["data-choices-text-disabled-true"] ? new Choices(item, choiceData).disable() : new Choices(item, choiceData);
+        //     });
+        // }
+
+        function Set_Function_Title(p_strTitle) {
+            document.getElementById('txtCore_Title').innerHTML = p_strTitle;
+            document.title = p_strTitle;
+        }
+
+        function Set_Speed_Label(p_strSpeed) {
+            document.getElementById('lblSpeed').innerHTML = p_strSpeed;
+        }
+
+        function Set_Thong_Bao(p_arrThong_Bao) {
+            document.getElementById('count_thong_bao').innerHTML = p_arrThong_Bao.length;
+            document.getElementById('count_thong_bao1').innerHTML = p_arrThong_Bao.length;
+            document.getElementById('count_thong_bao2').innerHTML = p_arrThong_Bao.length;
+
+            let v_strHTML = '<div data-simplebar style="max-height: 300px;" class="pe-2">';
+
+            for (let i = 0; i < p_arrThong_Bao.length; i++) {
+                let v_objData = p_arrThong_Bao[i];
+                v_strHTML += '<div class="text-reset notification-item d-block dropdown-item">';
+                v_strHTML += '<div class="d-flex">';
+                v_strHTML += '<div class="flex-1">';
+                v_strHTML += '<h6 class="mt-0 mb-1 fs-13 fw-semibold">' + v_objData.mes_No +'</h6>';
+                v_strHTML += '<div class="fs-13 text-muted">';
+                v_strHTML += '<p class="mb-1">' + v_objData.message_Desc + ' 🔔</p>';
+                v_strHTML += '</div>';
+                v_strHTML += '</div>';
+                v_strHTML += '</div>';
+                v_strHTML += '</div>';
+            }
+
+            v_strHTML += '</div>';
+
+            document.getElementById('all-noti-tab').innerHTML = v_strHTML;
+        }
+
+        function Set_Convert_Data_Label_Progress(p_strContent) {
+            document.getElementById('lblConvert_Data_Progress').innerHTML = p_strContent;
+        }
+
+        function Change_Date_Placeholder() {
+            let v_arr = document.getElementsByClassName("k-datepicker");
+
+            if (v_arr.length > 0) {
+
+                $('.k-input-inner').focusout(function () {
+                    for (let i = 0; i < v_arr.length; i++) {
+                        let v_objElement = v_arr[i].getElementsByClassName('k-input-inner');
+                        let v_eleValue = v_objElement[0].value;
+                        if (v_eleValue.includes('d') || v_eleValue.includes('y') || v_eleValue.includes('M')) {
+                            v_objElement[0].value = '';
+                        }
+                    }
+                });
+
+                $('.k-input-inner').focusin(function () {
+                    for (let i = 0; i < v_arr.length; i++) {
+                        let v_objElement = v_arr[i].getElementsByClassName('k-input-inner');
+                        let v_eleValue = v_objElement[0].value;
+                        if (v_eleValue.includes('d') || v_eleValue.includes('y') || v_eleValue.includes('M')) {
+                            v_objElement[0].value = '';
+                        }
+                    }
+                });
+
+                for (let i = 0; i < v_arr.length; i++) {
+                    let v_objElement = v_arr[i].getElementsByClassName('k-input-inner');
+                    let v_eleValue = v_objElement[0].value;
+                    if (v_eleValue.includes('d') || v_eleValue.includes('y') || v_eleValue.includes('M')) {
+                        v_objElement[0].value = '';
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        window.downloadFileFromStream = async (fileName, contentStreamReference) => {
+            const arrayBuffer = await contentStreamReference.arrayBuffer();
+            const blob = new Blob([arrayBuffer]);
+            const url = URL.createObjectURL(blob);
+            const anchorElement = document.createElement('a');
+            anchorElement.href = url;
+            anchorElement.download = fileName ?? '';
+            anchorElement.click();
+            anchorElement.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function Close_ESC(componentRef) {
+        }
+
+    </script>
+
+    @*ESCKEY*@
+    <script>
+        window.ESC = {
+            registerEscKeyHandler: function (dotnetRef) {
+                window.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        dotnetRef.invokeMethodAsync('HandleEscKey');
+                    }
+                });
+            }
+        };
+    </script>
+    @*EnterKey*@
+    <script>
+        window.Enter = {
+            registerEnterKeyHandler: function (dotnetRef) {
+                window.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        var v_btn = document.querySelectorAll('button.btn.rounded-pill.btn-primary');
+                        if (v_btn.length > 0){
+                            for (var i = 0; i < v_btn.length; i++) {
+                                if (v_btn[i].textContent.toUpperCase() === 'TÌM KIẾM' || v_btn[i].textContent.toUpperCase() === 'SEARCH') {
+                                    dotnetRef.invokeMethodAsync('HandleEnterKey');
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    </script>
+
+    <script>
+        window.saveAsFile = function (filename, data) {
+            const blob = new Blob([window.atob(data)], { type: 'text/plain' });
+            const element = document.createElement('a');
+            element.href = window.URL.createObjectURL(blob);
+            element.download = filename;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+    </script>
+
+    <script>
+        function saveFileFromBytes(data, fileName) {
+
+            // Tạo đối tượng Blob từ byte array
+            const blob = new Blob([data], { type: 'application/pdf' });
+
+            // Tạo object URL từ Blob
+            const url = URL.createObjectURL(blob);
+
+            // Tạo thẻ a để trigger download file
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+
+            // Trigger click để bắt đầu download
+            a.click();
+
+            //Mở tab mới
+            window.open(url, '_blank');
+
+            // Giải phóng bộ nhớ
+            URL.revokeObjectURL(url);
+        }
+    </script>
+    @* Report Viewer dependencies *@
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/assets/js/kendo.all.min.js"></script>
+    <script src="/assets/js/kendo-ui-license.js"></script>
+    <script src="/api/reports/resources/js/telerikReportViewer"></script>
+    @*    <link rel="stylesheet" href ="https://unpkg.com/@@progress/kendo-theme-default@5.9.0/dist/all.css"/>*@
+
+</head>
+<body>
+    <div id="layout-wrapper">
+        <partial name="MP_Top_Bar" />
+        <partial name="MP_Left_Menu" />
+
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="/assets/libs/node-waves/waves.min.js"></script>
+    <script src="/assets/libs/feather-icons/feather.min.js"></script>
+    <script src="/assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="/assets/js/plugins.js"></script>
+
+    <!-- App js -->
+    <script src="/assets/js/app.js"></script>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Telerik.UI.for.Blazor/js/telerik-blazor.js"></script>
+
+    <script src="_content/Telerik.ReportViewer.Blazor/interop.js"></script>
+
+</body>
+</html>

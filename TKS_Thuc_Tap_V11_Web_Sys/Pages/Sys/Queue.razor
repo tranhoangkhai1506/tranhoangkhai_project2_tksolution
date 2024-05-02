@@ -1,0 +1,35 @@
+﻿@layout MPBlank_Layout
+@inherits FBase_Blank
+
+@page "/Sys/Queue"
+
+<div class="col-lg-12">
+	@((MarkupString)r_strError)
+
+	<TelerikGrid Data="@v_arrData" Height="calc(100vh - 20px)" Resizable="true" Reorderable="true" @ref="@grdData">
+		<GridColumns>
+			<GridColumn Field="Auto_ID" Title="ID" Width="100px"></GridColumn>
+			<GridColumn Field="Ma_Chuc_Nang" Title="Mã chức năng" Width="120px"></GridColumn>
+			<GridColumn Field="Ten_Chuc_Nang" Title="Tên chức năng" Width="200px"></GridColumn>
+			<GridColumn Field="Ten_Function" Title="Tên hàm" Width="300px"></GridColumn>
+			<GridColumn Field="Ngay_Gio_Bat_Dau" Title="Ngày Giờ Bắt Đầu" Width="120px"></GridColumn>
+			<GridColumn Field="So_Giay_Delay" Title="Thời gian" Width="80px"></GridColumn>
+			<GridColumn Field="" Title=""></GridColumn>
+		</GridColumns>
+	</TelerikGrid>
+</div>
+
+@code {
+	public List<CQueue> v_arrData = new();
+	TelerikGrid<CQueue> grdData = new();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender == true)
+		{
+			v_arrData = CUtility_Queue_DB.Arr_Queue.ToList();
+		}
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+}

@@ -1,0 +1,43 @@
+﻿﻿<Router AppAssembly="@typeof(App).Assembly"
+         AdditionalAssemblies="@m_arrAssembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code
+{
+    private IEnumerable<Assembly> m_arrAssembly { get; set; }
+
+    protected override void OnInitialized()
+    {
+        List<Assembly> v_arrAssemblies = new List<Assembly>();
+
+        Assembly v_objDM = Assembly.Load("TKS_Thuc_Tap_V11_Web_Danh_Muc");
+        v_arrAssemblies.Add(v_objDM);
+
+        Assembly v_objBC = Assembly.Load("TKS_Thuc_Tap_V11_Web_Common");
+        v_arrAssemblies.Add(v_objBC);
+
+        v_objBC = Assembly.Load("TKS_Thuc_Tap_V11_Web_Control");
+        v_arrAssemblies.Add(v_objBC);
+
+        v_objBC = Assembly.Load("TKS_Thuc_Tap_V11_Web_Dashboard");
+        v_arrAssemblies.Add(v_objBC);
+
+        v_objBC = Assembly.Load("TKS_Thuc_Tap_V11_Web_Sys");
+        v_arrAssemblies.Add(v_objBC);
+
+        m_arrAssembly = v_arrAssemblies.AsEnumerable();
+
+        base.OnInitialized();
+    }
+
+}

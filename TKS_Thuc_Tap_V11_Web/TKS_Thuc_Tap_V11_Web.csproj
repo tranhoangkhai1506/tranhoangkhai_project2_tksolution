@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+	<NoWarn>NU1701, CS8632, CS1062, CS8669, CA1416, BL0005, RZ9991, $(NoWarn);NETSDK1206</NoWarn>
+	<RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+	<RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+	<EnableNETAnalyzers>False</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\NewFolder\**" />
+    <Content Remove="Controllers\NewFolder\**" />
+    <EmbeddedResource Remove="Controllers\NewFolder\**" />
+    <None Remove="Controllers\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Append.Blazor.Printing" Version="6.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Telerik.Reporting.OpenXmlRendering" Version="17.2.23.1114" />
+    <PackageReference Include="Telerik.Reporting.Services.AspNetCore" Version="17.2.23.1114" />
+    <PackageReference Include="Telerik.ReportViewer.Blazor" Version="17.2.23.1114" />
+    <PackageReference Include="Telerik.UI.for.Blazor" Version="5.0.1" /> 
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Data_Access\TKS_Thuc_Tap_V11_Data_Access.csproj" />
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Report\TKS_Thuc_Tap_V11_Report.csproj" />
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Common\TKS_Thuc_Tap_V11_Web_Common.csproj" />
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Control\TKS_Thuc_Tap_V11_Web_Control.csproj" />
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Danh_Muc\TKS_Thuc_Tap_V11_Web_Danh_Muc.csproj" />
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Dashboard\TKS_Thuc_Tap_V11_Web_Dashboard.csproj" />
+    <ProjectReference Include="..\TKS_Thuc_Tap_V11_Web_Sys\TKS_Thuc_Tap_V11_Web_Sys.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="wwwroot\FileManagement\Export_Excel\" />
+    <Folder Include="wwwroot\FileManagement\Log\" />
+  </ItemGroup>
+
+</Project>

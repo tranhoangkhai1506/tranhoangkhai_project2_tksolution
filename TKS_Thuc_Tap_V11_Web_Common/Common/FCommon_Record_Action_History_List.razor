@@ -1,0 +1,38 @@
+﻿<div class="row">
+	<div class="col-lg-12">
+		<TelerikGrid Data="@v_arrData" Height="400px" Resizable="true" Reorderable="true" @ref="@grdData">
+			<GridExport>
+				<GridExcelExport FileName="Record_Action_History_Export" AllPages="true" />
+				<GridCsvExport FileName="Record_Action_History_Export" AllPages="true" />
+			</GridExport>
+			<GridColumns>
+				<GridColumn Field="Created" Title="Ngày" Width="120px"></GridColumn>
+				<GridColumn Field="Created_By" Title="Người tạo" Width="100px"></GridColumn>
+				<GridColumn Field="Ma_Chuc_Nang" Title="Chức năng" Width="100px"></GridColumn>
+				<GridColumn Field="Ten_Chuc_Nang" Title="Tên Chức năng" Width="200px"></GridColumn>
+				<GridColumn Field="Ten_Hanh_Dong" Title="Hành Động" Width="150px"></GridColumn>
+				<GridColumn Field="Ten_Moi_Truong" Title="Môi Trường" Width="100px"></GridColumn>
+				<GridColumn Field="Noi_Dung_Action" Title="Nội Dung" Width="300px"></GridColumn>
+				<GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+			</GridColumns>
+		</TelerikGrid>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public List<CLog_Record_Action_History> v_arrData { get; set; } = new();
+
+	TelerikGrid<CLog_Record_Action_History> grdData = new();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		CCommonFunction.Format_Grid(grdData, "", "");
+
+		var v_objState = grdData.GetState(); // giữ state để sau khi thay đổi thì set lại
+		var v_arrGrid_Props = grdData.GetType().GetProperties(); //lấy các thuộc tính của grid
+		v_arrGrid_Props.FirstOrDefault(x => x.Name == "FilterMode").SetValue(grdData, GridFilterMode.None);
+
+		await base.OnAfterRenderAsync(firstRender);
+    }
+}

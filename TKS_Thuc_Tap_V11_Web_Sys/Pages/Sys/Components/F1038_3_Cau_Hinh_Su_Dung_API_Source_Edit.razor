@@ -1,0 +1,384 @@
+@inherits FBase_Edit;
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (r_iAuto_ID != 0)
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="row mb-4">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Chủ hàng"):</label>
+                                    <FControl_Chu_Hang_Combo @bind-BindingValue="@m_objData.Chu_Hang_ID"></FControl_Chu_Hang_Combo>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-4">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("API Source ID"):</label>
+                                    <FControl_API_Source_Combo @bind-BindingValue="@m_objData.API_Source_ID"></FControl_API_Source_Combo>
+                                </div>
+                            </div>
+                                                      
+                                <div class="row mb-4">
+                                    <div class="col-lg-11">
+                                        <label class="form-label">@Get_Language_Data_Field("Mã sử dung"):</label>
+                                        <input @bind="@m_objData.Ma_Su_Dung" class="form-control">
+                                    </div>
+                                </div>
+                           
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-4">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Trạng thái"):</label>
+                                    <FControl_Common_Combo_Enum m_arrData="@m_arrTrang_Thai_ID" @bind-BindingIntValue="@m_objData.Trang_Thai_ID"></FControl_Common_Combo_Enum>
+                                   
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                                    <input @bind="@m_objData.Ghi_Chu" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+            <div class="modal-body" style="padding-top: 0px !important;">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: left;">
+                            @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                            {
+                                <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Function_Edit(0))">
+                                    <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                    @Get_Language_Data_Field("Thêm")
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-lg-12">
+                        <TelerikGrid Data="@m_objData.API_Source_Chu_Hang_Function" Height="350px" Resizable="true" Reorderable="true" @ref="@grdData">
+                            <GridColumns>
+                                <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                                <GridColumn Width="60px">
+                                    <Template Context="API_Source_Chu_Hang_Function">
+                                        <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                                            {
+                                                <li>
+                                                    <button class="dropdown-item" type="button" @onclick="@(()=> Open_Function_Edit((API_Source_Chu_Hang_Function as CSys_API_Source_Chu_Hang_Function).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                                </li>
+                                            }
+                                            @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                                            {
+                                                <li>
+                                                    <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Function((API_Source_Chu_Hang_Function as CSys_API_Source_Chu_Hang_Function)))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="Ma_API_Function" Title="Mã Function" Width="100px"></GridColumn>
+                                <GridColumn Field="Ten_API_Function" Title="Tên Function" Width="250px"></GridColumn>
+                                <GridColumn Field="Ghi_Chu" Title="Ghi chú" Width="300px"></GridColumn>
+                                <GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+                            </GridColumns>
+                        </TelerikGrid>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (m_blIs_Show_Edit_Function == true)
+{
+    <F1038_A_API_Source_Chu_Hang_Function_Edit p_iAPI_Source_Function_ID="@m_iAPI_Source_Function_ID" p_iAPI_Source_ID="@m_objData.API_Source_ID" p_arrAPI_Source_Function="@m_objData.API_Source_Chu_Hang_Function" OnClose="@Close_Function"></F1038_A_API_Source_Chu_Hang_Function_Edit>
+}
+
+@code {
+    private CSys_API_Source_Chu_Hang m_objData = new();
+    private List<CSys_API_Source> m_arrAPI_Source = new List<CSys_API_Source>();
+
+    private TelerikGrid<CSys_API_Source_Chu_Hang_Function> grdData = new();
+
+    //start form Edit con
+    private long m_iAPI_Source_Function_ID { get; set; } = 0;
+    private bool m_blIs_Show_Edit_Function { get; set; } = false;
+    //End form Edit con
+
+    private Dictionary<long, CSys_API_Source_Chu_Hang_Function> m_dicDeleted = new();
+
+    private List<CCombo_Enum> m_arrTrang_Thai_ID { get; set; } = new();
+
+    protected override void Init_Data()
+    {
+        m_arrTrang_Thai_ID.Clear();
+        m_arrTrang_Thai_ID.Add(new CCombo_Enum { Value = (int)EAPI_Source_Chu_Hang.Dang_Hoat_Dong, Text = Get_Language_Data_Field("1- Đang hoạt động") });
+        m_arrTrang_Thai_ID.Add(new CCombo_Enum { Value = (int)EAPI_Source_Chu_Hang.Dong, Text = Get_Language_Data_Field("1067 - Đóng") });
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+        CSys_API_Source_Chu_Hang_Controller v_objCtrData = new();
+        CSys_API_Source_Chu_Hang_Function_Controller v_objCtrlFunc = new();
+        m_objData = v_objCtrData.FQ_502_ASCH_sp_sel_Get_By_ID(r_iAuto_ID);
+
+        if (m_objData == null)
+        {
+            m_objData = new CSys_API_Source_Chu_Hang();
+        }
+        else
+        {
+            r_bUpdate = true;
+            //m_objData.API_Source_Chu_Hang_Function = v_objCtrlFunc.F1038_sp_sel_List_API_Source_Chu_Hang_Function_By_API_Source_Chu_Hang_ID(m_objData.Auto_ID);
+            m_objData.API_Source_Chu_Hang_Function = v_objCtrlFunc.FQ_503_ASCHF_sp_sel_List_By_API_Source_Chu_Hang_ID(m_objData.Auto_ID);
+
+            // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+            CSys_API_Source_Chu_Hang v_objClone = new();
+            CUtility.Clone_Entity(m_objData, v_objClone);
+            r_objSource = v_objClone;
+            // End tracking
+        }
+
+
+        Hide_Pageable(grdData);
+    }
+
+    protected override void Add_Data()
+    {
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        CSys_API_Source_Chu_Hang_Controller v_objCtrData = new();
+        CSys_API_Source_Chu_Hang_Function_Controller v_objCtrFunction = new();
+        StringBuilder v_sbError = new StringBuilder();
+        try
+        {
+            //tao ket noi transaction
+            v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
+            v_conn.Open();
+            v_trans = v_conn.BeginTransaction();
+
+            m_objData.Last_Updated_By = r_strActive_User_Name;
+            m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+            //m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.F1038_sp_ins_Cau_Hinh_Su_Dung_API_Source(v_conn, v_trans, m_objData);
+            m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_502_ASCH_sp_ins_Insert(v_conn, v_trans, m_objData);
+            //ghi tracking log
+            r_strAdd_Key = "Key: " + m_objData.Ma_API_Source;
+
+            //CẬP NHẬT dòng chi tiết
+            int v_iCount = 0;
+            foreach (CSys_API_Source_Chu_Hang_Function v_obj in m_objData.API_Source_Chu_Hang_Function)
+            {
+                v_iCount++;
+                try
+                {
+                    if (v_obj.Auto_ID > 0)
+                    {
+                        //update
+                        v_objCtrFunction.F1038_sp_upd_API_Source_Chu_Hang_Function(v_conn, v_trans, v_obj, m_objData.API_Source_ID);
+                    }
+                    else
+                    {
+                        //insert
+                        v_obj.API_Source_Chu_Hang_ID = r_iAuto_ID;
+                        v_objCtrFunction.F1038_sp_ins_API_Source_Chu_Hang_Function(v_conn, v_trans, v_obj, m_objData.API_Source_ID);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iCount.ToString() + " " + Get_Language_Data_Field("có lỗi") + ": " + ex.Message + ":" + v_obj.Ma_API_Function + "<br/>");
+                }
+            }
+
+            if (v_sbError.ToString().Length > 0)
+                throw new Exception(v_sbError.ToString());
+
+            v_trans.Commit();
+
+            CCache_API_Source_Chu_Hang.Load_Cache_API_Source_Chu_Hang();
+            CCache_API_Source_Chu_Hang_Function.Load_Cache_API_Source_Chu_Hang_Function();
+        }
+
+        catch (Exception ex)
+        {
+            if (v_trans != null)
+                v_trans.Rollback();
+
+            throw ex;
+        }
+
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
+
+            if (v_conn != null)
+                v_conn.Close();
+        }
+    }
+
+    protected override void Update_Data()
+    {
+        SqlConnection v_conn = null;
+        SqlTransaction v_trans = null;
+        CSys_API_Source_Chu_Hang_Controller v_objCtrData = new();
+        CSys_API_Source_Chu_Hang_Function_Controller v_objCtrFunction = new();
+        StringBuilder v_sbError = new StringBuilder();
+        try
+        {
+            //tao ket noi transaction
+            v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
+            v_conn.Open();
+            v_trans = v_conn.BeginTransaction();
+
+            m_objData.Last_Updated_By = r_strActive_User_Name;
+            m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+            //v_objCtrData.F1038_sp_upd_Cau_Hinh_Su_Dung_API_Source(v_conn, v_trans, m_objData);
+            v_objCtrData.FQ_502_ASCH_sp_upd_Update(v_conn, v_trans, m_objData);
+
+            //xóa các dòng delete di
+            foreach (int v_iAuto_ID in m_dicDeleted.Keys)
+            {
+                CSys_API_Source_Chu_Hang_Function v_objDelete = m_dicDeleted[v_iAuto_ID];
+                v_objCtrFunction.FQ_503_ASCHF_sp_del_Delete_By_ID(v_conn, v_trans, v_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+            }
+
+            //CẬP NHẬT dòng chi tiết
+            int v_iCount = 0;
+            foreach (CSys_API_Source_Chu_Hang_Function v_obj in m_objData.API_Source_Chu_Hang_Function)
+            {
+                v_iCount++;
+                try
+                {
+                    if (v_obj.Auto_ID > 0)
+                    {
+                        //update
+                        v_objCtrFunction.F1038_sp_upd_API_Source_Chu_Hang_Function(v_conn, v_trans, v_obj, m_objData.API_Source_ID);
+                    }
+                    else
+                    {
+                        //insert
+                        v_obj.API_Source_Chu_Hang_ID = r_iAuto_ID;
+                        v_objCtrFunction.F1038_sp_ins_API_Source_Chu_Hang_Function(v_conn, v_trans, v_obj, m_objData.API_Source_ID);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iCount.ToString() + " " + Get_Language_Data_Field("có lỗi") + ": " + ex.Message + ":" + v_obj.Ma_API_Function + "<br/>");
+                }
+            }
+
+            if (v_sbError.ToString().Length > 0)
+                throw new Exception(v_sbError.ToString());
+
+            // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+            CSys_API_Source_Chu_Hang v_objClone = new();
+            CUtility.Clone_Entity(m_objData, v_objClone);
+            r_objDes = v_objClone;
+            // End tracking
+
+            v_trans.Commit();
+
+            CCache_API_Source_Chu_Hang.Load_Cache_API_Source_Chu_Hang();
+            CCache_API_Source_Chu_Hang_Function.Load_Cache_API_Source_Chu_Hang_Function();
+        }
+
+        catch (Exception ex)
+        {
+            if (v_trans != null)
+                v_trans.Rollback();
+
+            throw ex;
+        }
+
+        finally
+        {
+            if (v_trans != null)
+                v_trans.Dispose();
+
+            if (v_conn != null)
+                v_conn.Close();
+        }
+    }
+
+
+    public void Delete_Function(CSys_API_Source_Chu_Hang_Function p_objData)
+    {
+        m_objData.API_Source_Chu_Hang_Function.Remove(p_objData);
+
+        //add vào để xóa các dòng function
+        if (p_objData.Auto_ID > 0)
+            m_dicDeleted.Add(p_objData.Auto_ID, p_objData);
+
+        grdData.Rebind();
+    }
+
+
+
+    #region form Edit con
+
+    protected void Open_Function_Edit(long p_iAuto_ID)
+    {
+        r_strError = "";
+        try
+        {
+            if (m_objData.API_Source_ID != 0)
+            {
+                m_iAPI_Source_Function_ID = p_iAuto_ID;
+                m_blIs_Show_Edit_Function = true;
+            }
+            else
+                throw new Exception("Vui lòng chọn API source.");
+        }
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+        StateHasChanged();
+    }
+
+    private void Close_Function(CEvent_Call_Back p_obj)
+    {
+        if (p_obj.Message_ID != (int)EModal_Result.Exception)
+        {
+            m_blIs_Show_Edit_Function = false;
+            grdData.Rebind();
+        }
+    }
+
+    #endregion form Edit con
+}

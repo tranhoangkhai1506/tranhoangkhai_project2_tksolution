@@ -1,0 +1,167 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Loại Thread"):</label>
+								</div>
+
+								<div class="col-lg-8">
+									<FControl_Common_Combo_Enum m_arrData="@m_arrThread_Type_ID" @bind-BindingIntValue="@m_objData.Thread_Type_ID"></FControl_Common_Combo_Enum>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Số giây delay"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input type="number" @bind="@m_objData.Delay_Second" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Nhóm Thread"):</label>
+								</div>
+								<div class="col-lg-8">
+									<FControl_Common_Combo_Enum m_arrData="@m_arrSTT_Thread_ID" @bind-BindingIntValue="@m_objData.STT_Thread_ID"></FControl_Common_Combo_Enum>
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Mã sử dụng"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Ma_Su_Dung" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Ghi_Chu" class="form-control">
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Auto_Thread m_objData = new();
+	private List<CCombo_Enum> m_arrThread_Type_ID { get; set; } = new();
+	private List<CCombo_Enum> m_arrSTT_Thread_ID { get; set; } = new();
+
+
+	protected override void Init_Data()
+	{
+		m_arrThread_Type_ID.Clear();
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Lay_Du_Lieu_Tu_API_Source, Text = Get_Language_Data_Field("1 - Lấy dữ liệu từ API Source") });
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Send_Data_Webhook, Text = Get_Language_Data_Field("2 - Send_Data_Webhook") });
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Chay_Luong_Threath_Job, Text = Get_Language_Data_Field("3 - Chạy luồng thread job") });
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Clear_Table_Temp, Text = Get_Language_Data_Field("5 - Clear table temp") });
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Auto_Chay_Cac_Rule_Khai_Bao, Text = Get_Language_Data_Field("6 - Auto chạy các rule khai báo") });
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Auto_Xoa_Log_File, Text = Get_Language_Data_Field("7 - Auto xóa log file") });
+		m_arrThread_Type_ID.Add(new CCombo_Enum { Value = (int)EThread_Type_ID.Auto_Chay_Daily_schedule_Joy, Text = Get_Language_Data_Field("8 - Auto chạy daily schedule job") });
+
+		m_arrSTT_Thread_ID.Clear();
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_1, Text = Get_Language_Data_Field("Thread 1") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_2, Text = Get_Language_Data_Field("Thread 2") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_3, Text = Get_Language_Data_Field("Thread 3") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_4, Text = Get_Language_Data_Field("Thread 4") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_5, Text = Get_Language_Data_Field("Thread 5") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_6, Text = Get_Language_Data_Field("Thread 6") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_7, Text = Get_Language_Data_Field("Thread 7") });
+		m_arrSTT_Thread_ID.Add(new CCombo_Enum { Value = (int)ESTT_Threath.Thread_8, Text = Get_Language_Data_Field("Thread 8") });
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Auto_Thread_Controller v_objCtrData = new();
+		m_objData = v_objCtrData.FQ_505_AT_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CSys_Auto_Thread();
+		else
+		{
+			r_bUpdate = true;
+
+			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+			CSys_Auto_Thread v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+			// End tracking
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Auto_Thread_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		//m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.F1034_sp_ins_Background_Thread_Job(m_objData);
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_505_AT_sp_ins_Insert(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		r_strAdd_Key = m_objData.Auto_ID.ToString();
+		// End tracking
+
+		CCache_Auto_Thread.Add_Data(m_objData);
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Auto_Thread_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		//v_objCtrData.F1034_sp_upd_Background_Thread_Job(m_objData);
+		v_objCtrData.FQ_505_AT_sp_upd_Update(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CSys_Auto_Thread v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+		// End tracking
+
+		CCache_Auto_Thread.Update_Data(m_objData);
+	}
+}

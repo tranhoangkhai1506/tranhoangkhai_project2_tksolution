@@ -1,0 +1,236 @@
+﻿@inherits FBase_Info;
+
+<div class="profile-foreground position-relative mx-n4 mt-n4">
+    <div class="profile-wid-bg">
+        <img src="~/assets/images/profile-bg.jpg" alt="" class="profile-wid-img" />
+    </div>
+</div>
+<div class="pt-4 mb-4 mb-lg-3 pb-lg-4">
+    <div class="row g-4">
+        <div class="col-auto">
+            <div class="avatar-lg">
+                <img src="/assets/images/users/user-dummy-img.jpg" alt="user-img"
+                    class="img-thumbnail rounded-circle" />
+            </div>
+        </div>
+        <!--end col-->
+        <div class="col">
+            <div class="p-2">
+                <h3 class="text-white mb-1">@r_objUser.Ma_Dang_Nhap</h3>
+                <p class="text-white-75">@r_objUser.Ho_Ten</p>
+                <div class="hstack text-white-50 gap-1">
+                    <div class="me-2">
+                        <i class="ri-map-pin-user-line me-1 text-white-75 fs-16 align-middle"></i>
+                        @r_objUser.Ten_Nhom_Thanh_Vien_Text
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!--end row-->
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div>
+            <div class="d-flex">
+                <!-- Nav tabs -->
+                <ul class="nav nav-pills animation-nav profile-nav gap-2 gap-lg-3 flex-grow-1"
+                    role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link fs-14 active" data-bs-toggle="tab" href="#overview-tab"
+                            role="tab">
+                            <i class="ri-airplay-fill d-inline-block d-md-none"></i> <span
+                                class="d-none d-md-inline-block">@Get_Language_Data_Field("Tổng quan")</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-14" data-bs-toggle="tab" href="#activities"
+                            role="tab">
+                            <i class="ri-list-unordered d-inline-block d-md-none"></i> <span
+                                class="d-none d-md-inline-block">@Get_Language_Data_Field("Nhật ký đăng nhập")</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-14" data-bs-toggle="tab" href="#list_chuc_nang" role="tab">
+                            <i class="ri-price-tag-line d-inline-block d-md-none"></i> <span
+                                class="d-none d-md-inline-block">@Get_Language_Data_Field("Tính năng được truy cập")</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <!-- Tab panes -->
+            <div class="tab-content pt-4 text-muted">
+                <div class="tab-pane active" id="overview-tab" role="tabpanel">
+                    <div class="row">
+                        <div class="col-xxl-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-5">@Get_Language_Data_Field("Hoàn thành hồ sơ")</h5>
+                                    <div
+                                        class="progress animated-progress custom-progress progress-label">
+                                        <div class="progress-bar bg-danger" role="progressbar"
+                                            style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                            aria-valuemax="100">
+                                            <div class="label">100%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">@Get_Language_Data_Field("Thông tin")</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="ps-0" scope="row">@Get_Language_Data_Field("Họ tên") :</th>
+                                                    <td class="text-muted">@CUtility.Get_Label_Text(r_objUser.Ho_Ten, false)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="ps-0" scope="row">@Get_Language_Data_Field("Điện thoại") :</th>
+                                                    <td class="text-muted">@CUtility.Get_Label_Text(r_objUser.Dien_Thoai, false)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="ps-0" scope="row">@Get_Language_Data_Field("Email") :</th>
+                                                    <td class="text-muted">@CUtility.Get_Label_Text(r_objUser.Email, false)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="ps-0" scope="row">@Get_Language_Data_Field("Trạng thái") :</th>
+                                                    <td class="text-muted">@((MarkupString)r_objUser.Trang_Thai_HTML)
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="ps-0" scope="row">@Get_Language_Data_Field("Ngày giờ tạo") :</th>
+                                                    <td class="text-muted">@CUtility.Get_Label_Text(r_objUser.Created, false)</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div><!-- end card body -->
+                            </div><!-- end card -->
+                            <!--end card-->
+
+                        </div>
+                        <!--end col-->
+                        <div class="col-xxl-9">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-3">@Get_Language_Data_Field("Ghi chú")</h5>
+                                    <p>Xin chào @r_objUser.Ma_Dang_Nhap</p>
+                                    <p>Chào mừng bạn đến với hệ thống. Hiện không có thông tin giới thiệu nào về bạn</p>
+                                    <div class="row">
+                                        <div class="col-6 col-md-4">
+                                            <div class="d-flex mt-4">
+                                                <div
+                                                    class="flex-shrink-0 avatar-xs align-self-center me-3">
+                                                    <div
+                                                        class="avatar-title bg-light rounded-circle fs-16 text-primary shadow">
+                                                        <i class="ri-user-2-fill"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 overflow-hidden">
+                                                    <p class="mb-1">@Get_Language_Data_Field("Nhóm bạn trực thuộc")</p>
+                                                    <h6 class="text-truncate mb-0">@CUtility.Get_Label_Text(r_objUser.Ten_Nhom_Thanh_Vien_Text, false)</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--end col-->
+                                    </div>
+                                    <!--end row-->
+                                </div>
+                                <!--end card-body-->
+                            </div><!-- end card -->
+
+                        </div>
+                        <!--end col-->
+                    </div>
+                    <!--end row-->
+                </div>
+                <div class="tab-pane fade" id="activities" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+	                            <div class="col-lg-12">
+		                            @((MarkupString)r_strError)
+
+                                    <TelerikGrid Data="@v_arrNKDT" Height="calc(100vh - 315px)" Resizable="true" Reorderable="true" @ref="@grdNKDT">
+			                            <GridColumns>
+                                            <GridColumn Field="Created" Title="Ngày giờ tạo" Width="120px"></GridColumn>
+				                            <GridColumn Field="IP" Title="IP" Width="200px"></GridColumn>
+				                            <GridColumn Field="User_Agent" Title="User agent"></GridColumn>
+			                            </GridColumns>
+		                            </TelerikGrid>
+	                            </div>
+                            </div>
+                        </div>
+                        <!--end card-body-->
+                    </div>
+                    <!--end card-->
+                </div>
+
+                <div class="tab-pane fade" id="list_chuc_nang" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    @((MarkupString)r_strError)
+
+                                    <TelerikGrid Data="@v_arrFunction_History" Height="calc(100vh - 315px)" Resizable="true" Reorderable="true" @ref="@grdFunction_History">
+                                        <GridColumns>
+                                            <GridColumn Field="Created" Title="Ngày giờ tạo" Width="120px"></GridColumn>
+                                            <GridColumn Field="Ma_Chuc_Nang" Title="Mã CN" Width="100px"></GridColumn>
+                                            <GridColumn Field="Ten_Chuc_Nang" Title="Tên Chức Năng"></GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end card-body-->
+                    </div>
+                    <!--end card-->
+                </div>
+                <!--end tab-pane-->
+            </div>
+            <!--end tab-content-->
+        </div>
+    </div>
+    <!--end col-->
+</div>
+
+@code {
+    public List<CLog_Nhat_Ky_Dang_Nhap> v_arrNKDT = new();
+    TelerikGrid<CLog_Nhat_Ky_Dang_Nhap> grdNKDT = new();
+
+    public List<CLog_Nhat_Ky_Truy_Cap_Chuc_Nang> v_arrFunction_History = new();
+    TelerikGrid<CLog_Nhat_Ky_Truy_Cap_Chuc_Nang> grdFunction_History = new();
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        CLog_Nhat_Ky_Dang_Nhap_Controller v_objCtrData = new();
+        CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller v_objCtrFH = new();
+
+        v_arrNKDT = v_objCtrData.F1006_sp_sel_List_Log_Nhat_Ky_Dang_Nhap_By_User(r_strActive_User_Name);
+
+        
+        v_arrFunction_History = v_objCtrFH.F1006_sp_sel_List_Log_Nhat_Ky_Truy_Cap_Chuc_Nang_By_User(r_strActive_User_Name);
+
+        Format_Grid(grdNKDT);
+        Hide_Filter_Row(grdNKDT);
+        Hide_Pageable(grdNKDT);
+
+        Format_Grid(grdFunction_History);
+        Hide_Filter_Row(grdFunction_History);
+        Hide_Pageable(grdFunction_History);
+    }
+}

@@ -1,0 +1,186 @@
+﻿@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Mã API Source"):</label>
+                                    <input @ref="txtFocus" @bind="@m_objData.Ma_API_Source" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Password"):</label>
+                                    <input @bind="@m_objData.Password" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("ClientID 2"):</label>
+                                    <input @bind="@m_objData.Client_ID_2" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Tên API Source"):</label>
+                                    <input @bind="@m_objData.Ten_API_Source" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Token 1"):</label>
+                                    <input @bind="@m_objData.Token_1" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Url Folder Download"):</label>
+                                    <input @bind="@m_objData.Url_Folder_Download" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Link API"):</label>
+                                    <input @bind="@m_objData.Link_API" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Token 2"):</label>
+                                    <input @bind="@m_objData.Token_2" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Url Folder Upload"):</label>
+                                    <input @bind="@m_objData.Url_Folder_Upload" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("User name"):</label>
+                                    <input @bind="@m_objData.User_Name" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("ClientID 1"):</label>
+                                    <input @bind="@m_objData.Client_ID_1" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Url Folder Download BAK"):</label>
+                                    <input @bind="@m_objData.Url_Folder_Download_BAK" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Url Folder Upload BAK"):</label>
+                                    <input @bind="@m_objData.Url_Folder_Upload_BAK" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-3">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                                    <input @bind="@m_objData.Ghi_Chu" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data" style="margin-right: 37px;">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CSys_API_Source m_objData = new();
+
+
+    protected override void Init_Data()
+    {
+    }
+
+    protected override void Load_Data()
+    {
+        CSys_API_Source_Controller v_objCtrData = new();
+        m_objData = v_objCtrData.FQ_501_AS_sp_sel_Get_By_ID(r_iAuto_ID);
+
+        r_bUpdate = true;
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        CSys_API_Source v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objSource = v_objClone;
+        // End tracking
+    }
+
+
+    protected override void Update_Data()
+    {
+        CSys_API_Source_Controller v_objCtrData = new();
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+        //v_objCtrData.F1022_sp_upd_API_Source(m_objData);
+        v_objCtrData.FQ_501_AS_sp_upd_Update(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        CSys_API_Source v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objDes = v_objClone;
+        // End tracking
+
+        CCache_API_Source.Load_Cache_API_Source();
+        CCache_API_Source_Function.Load_Cache_API_Source_Function();
+    }
+  
+
+}

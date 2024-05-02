@@ -1,0 +1,1141 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<ul class="nav nav-pills card-header-pills" role="tablist" style="padding-left:30px;">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link active" data-bs-toggle="tab" href="#thong_tin_1" role="tab" aria-selected="true">
+							@Get_Language_Data_Field("Thông tin 1")
+						</a>
+					</li>
+
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#thong_tin_2" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Thông tin 2")
+						</a>
+					</li>
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#thong_tin_3" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Thông tin 3")
+						</a>
+					</li>
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#thong_tin_4" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Thông tin 4")
+						</a>
+					</li>
+				</ul>
+
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+
+
+
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+
+				<div class="modal-content">
+					<div class="modal-body">
+						<div class="tab-content">
+							<div class="tab-pane active show" id="thong_tin_1" role="tabpanel">
+								<div class="row">
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("Nhóm PDA"):</label>
+												 
+												<FControl_Nhom_PDA_Combo @bind-BindingValue="@m_objData.Nhom_PDA_ID"></FControl_Nhom_PDA_Combo>
+												@* <select @ref="txtFocus" @bind="@m_objData.Nhom_PDA_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Nhom_PDA v_obj in m_arrNhom_PDA)
+													{
+														<option value="@v_obj.Auto_ID">@v_obj.Ten_Nhom_PDA</option>
+													}
+												</select> *@
+											</div>
+										</div>
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M01 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M01_ID"></FControl_Chuc_Nang_App_Combo>
+
+
+												@* <select @bind="@m_objData.FApp_M01_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M01 Label"):</label>
+												<input @bind="@m_objData.FApp_M01_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M02 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M02_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M02_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M02 Label"):</label>
+												<input @bind="@m_objData.FApp_M02_Label" class="form-control">
+											</div>
+										</div>
+
+										
+
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M03 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M03_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M03_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M03 Label"):</label>
+												<input @bind="@m_objData.FApp_M03_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M04 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M04_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M04_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M04 Label"):</label>
+												<input @bind="@m_objData.FApp_M04_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M05 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M05_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M05_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M05 Label"):</label>
+												<input @bind="@m_objData.FApp_M05_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M06 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M06_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M06_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M06 Label"):</label>
+												<input @bind="@m_objData.FApp_M06_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M07 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M06_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M07_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M07 Label"):</label>
+												<input @bind="@m_objData.FApp_M07_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M08 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M08_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M08_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M08 Label"):</label>
+												<input @bind="@m_objData.FApp_M08_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M09 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M09_ID"></FControl_Chuc_Nang_App_Combo>
+
+												
+												@* <select @bind="@m_objData.FApp_M09_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M09 Label"):</label>
+												<input @bind="@m_objData.FApp_M09_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M10 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M10_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M10_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M10 Label"):</label>
+												<input @bind="@m_objData.FApp_M10_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M11 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M11_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M11_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M11 Label"):</label>
+												<input @bind="@m_objData.FApp_M11_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<div class="tab-pane" id="thong_tin_2" role="tabpanel">
+								<div class="row">
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M12 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M12_ID"></FControl_Chuc_Nang_App_Combo>
+
+											@* 	<select @bind="@m_objData.FApp_M12_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M12 Label"):</label>
+												<input @bind="@m_objData.FApp_M12_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M13 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M13_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M13_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M13 Label"):</label>
+												<input @bind="@m_objData.FApp_M13_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M14 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M14_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M14_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M14 Label"):</label>
+												<input @bind="@m_objData.FApp_M14_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M15 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M15_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M15_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M15 Label"):</label>
+												<input @bind="@m_objData.FApp_M15_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M16 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M16_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M16_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M16 Label"):</label>
+												<input @bind="@m_objData.FApp_M16_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M17 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M17_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M17_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M17 Label"):</label>
+												<input @bind="@m_objData.FApp_M17_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M18 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M18_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M18_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M18 Label"):</label>
+												<input @bind="@m_objData.FApp_M18_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M19 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M19_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M19_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M19 Label"):</label>
+												<input @bind="@m_objData.FApp_M19_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M20 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M20_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M20_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M20 Label"):</label>
+												<input @bind="@m_objData.FApp_M20_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M21 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M21_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M21_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M21 Label"):</label>
+												<input @bind="@m_objData.FApp_M21_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M22 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M22_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M22_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M22 Label"):</label>
+												<input @bind="@m_objData.FApp_M22_Label" class="form-control">
+											</div>
+										</div>
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M23 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M23_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M23_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M23 Label"):</label>
+												<input @bind="@m_objData.FApp_M23_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<div class="tab-pane" id="thong_tin_3" role="tabpanel">
+								<div class="row">
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M24 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M24_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M24_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M24 Label"):</label>
+												<input @bind="@m_objData.FApp_M24_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M25 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M25_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M25_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M25 Label"):</label>
+												<input @bind="@m_objData.FApp_M25_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M26 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M26_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M26_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M26 Label"):</label>
+												<input @bind="@m_objData.FApp_M26_Label" class="form-control">
+											</div>
+										</div>
+
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M27 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M27_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M27_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M27 Label"):</label>
+												<input @bind="@m_objData.FApp_M27_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M28 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M28_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M28_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M28 Label"):</label>
+												<input @bind="@m_objData.FApp_M28_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M29 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M29_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M29_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M29 Label"):</label>
+												<input @bind="@m_objData.FApp_M29_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M30 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M30_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M30_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M30 Label"):</label>
+												<input @bind="@m_objData.FApp_M30_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M31 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M31_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M31_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M31 Label"):</label>
+												<input @bind="@m_objData.FApp_M31_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M32 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M32_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M32_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M32 Label"):</label>
+												<input @bind="@m_objData.FApp_M32_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M33 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M33_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M33_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M33 Label"):</label>
+												<input @bind="@m_objData.FApp_M33_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M34 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M34_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M34_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M34 Label"):</label>
+												<input @bind="@m_objData.FApp_M34_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M35 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M35_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M35_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M35 Label"):</label>
+												<input @bind="@m_objData.FApp_M35_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+
+							<div class="tab-pane" id="thong_tin_4" role="tabpanel">
+								<div class="row">
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M36 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M36_ID"></FControl_Chuc_Nang_App_Combo>
+												@* <select @bind="@m_objData.FApp_M36_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M36 Label"):</label>
+												<input @bind="@m_objData.FApp_M36_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M37 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M37_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M37_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M37 Label"):</label>
+												<input @bind="@m_objData.FApp_M37_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M38 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M38_ID"></FControl_Chuc_Nang_App_Combo>
+
+											@* 	<select @bind="@m_objData.FApp_M38_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M38 Label"):</label>
+												<input @bind="@m_objData.FApp_M38_Label" class="form-control">
+											</div>
+										</div>
+
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M39 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M39_ID"></FControl_Chuc_Nang_App_Combo>
+
+											@* 	<select @bind="@m_objData.FApp_M39_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M39 Label"):</label>
+												<input @bind="@m_objData.FApp_M39_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M40 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M40_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M40_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M40 Label"):</label>
+												<input @bind="@m_objData.FApp_M40_Label" class="form-control">
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M41 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M41_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M41_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M41 Label"):</label>
+												<input @bind="@m_objData.FApp_M41_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M42 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M42_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M42_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M42 Label"):</label>
+												<input @bind="@m_objData.FApp_M42_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M43 ID"):</label>
+												<FControl_Chuc_Nang_App_Combo m_arrData="@m_arrFunction" @bind-BindingIntValue="@m_objData.FApp_M43_ID"></FControl_Chuc_Nang_App_Combo>
+
+												@* <select @bind="@m_objData.FApp_M43_ID" class="form-control" data-choices>
+													<option value="0" selected="selected">&nbsp;</option>
+													@foreach (CSys_Chuc_Nang_App v_obj in m_arrFunction)
+													{
+														<option value="@v_obj.FApp_ID">@v_obj.FApp_Label</option>
+													}
+												</select> *@
+											</div>
+										</div>
+
+										<div class="row mb-3">
+											<div class="col-lg-11">
+												<label class="form-label">@Get_Language_Data_Field("FApp M43 Label"):</label>
+												<input @bind="@m_objData.FApp_M43_Label" class="form-control">
+											</div>
+										</div>
+									</div>
+
+								</div>
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data" style="margin-right: 25px;">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Chuc_Nang_App m_objData = new();
+
+	[Parameter]
+	public List<CSys_Chuc_Nang_App> m_arrFunction{ get; set; } = new();
+	//private List<CSys_Nhom_PDA> m_arrNhom_PDA = new();
+
+	protected override void Init_Data()
+	{
+		LoadCBO();
+	}
+
+	private void LoadCBO()
+	{
+		CSys_Chuc_Nang_App_Controller v_objCtrData = new();
+		//CSys_Nhom_PDA_Controller v_objCtrlNhom_PDA = new();
+		m_arrFunction = v_objCtrData.F1023_sp_sel_List_FApp_Func();
+		//m_arrNhom_PDA = v_objCtrlNhom_PDA.FQ_523_NP_sp_sel_List_For_Cache();
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Chuc_Nang_App_Controller v_objCtrData = new();
+		//LoadCBO();
+
+		m_objData = v_objCtrData.FQ_508_CNA_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CSys_Chuc_Nang_App();
+		else
+		{
+			r_bUpdate = true;
+
+			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+			CSys_Chuc_Nang_App v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+			// End tracking
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Chuc_Nang_App_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		//m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.F1023_sp_ins_Cau_Hinh_Chuc_Nang_App(m_objData);
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_508_CNA_sp_ins_Insert(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		r_strAdd_Key = m_objData.Auto_ID.ToString();
+		// End tracking
+		CCache_Chuc_Nang_App.Add_Data(m_objData);
+
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Chuc_Nang_App_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		//v_objCtrData.F1023_sp_upd_Cau_Hinh_Chuc_Nang_App(m_objData);
+		v_objCtrData.FQ_508_CNA_sp_upd_Update(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CSys_Chuc_Nang_App v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+		// End tracking
+		CCache_Chuc_Nang_App.Update_Data(m_objData);
+
+	}
+}

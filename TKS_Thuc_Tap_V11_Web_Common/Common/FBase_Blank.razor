@@ -1,0 +1,30 @@
+﻿@inject IJSRuntime JsRuntime
+@inject IWebHostEnvironment Environment
+
+@code {
+    [CascadingParameter]
+    public MPBlank_Layout r_objLayout { get; set; }
+
+    public string r_strError = "";
+    public string r_strLanguage = "";
+
+    protected string Get_Language_Data_Field(string p_strField)
+    {
+        if (r_strLanguage != "vi-VN" && r_strLanguage != "en-US" && r_strLanguage != "jp-JA" && r_strLanguage != "zh-CN" && r_strLanguage != "ko-KR")
+            r_strLanguage = "vi-VN";
+
+        return CCache_Language.Get_String_Label_By_Field(p_strField, r_strLanguage);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            CCookie v_objCookie = new CCookie(JsRuntime);
+            r_strLanguage = await v_objCookie.GetValue("language");
+
+            if (r_strLanguage != "vi-VN" && r_strLanguage != "en-US" && r_strLanguage != "jp-JA" && r_strLanguage != "zh-CN" && r_strLanguage != "ko-KR")
+                r_strLanguage = "vi-VN";
+        }
+    }
+}

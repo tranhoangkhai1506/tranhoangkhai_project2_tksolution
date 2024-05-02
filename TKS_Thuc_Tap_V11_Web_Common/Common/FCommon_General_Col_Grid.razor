@@ -1,0 +1,37 @@
+﻿@inherits FBase;
+
+@m_objRender_Col
+
+@code {
+	[Parameter]
+	public string m_strFCode { get; set; } = "";
+
+	[Parameter]
+	public string m_strTen_Grid { get; set; } = "";
+
+	RenderFragment m_objRender_Col { get; set; }
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+	}
+
+	protected override void Load_Data()
+	{
+		
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			string v_strActive_User_Name = await CSession.Get_Active_User_Name(g_objSession_Storage);
+			m_objRender_Col = General_Col_Grid(v_strActive_User_Name, m_strFCode, m_strTen_Grid);
+		}
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+}

@@ -1,0 +1,151 @@
+@inherits FBase;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-2 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Khách hàng"):</label>
+								</div>
+								<div class="col-lg-4">
+									<FControl_Common_Combo_Enum m_arrData="@m_arrKhach_Hang_ID" @bind-BindingIntValue="@m_objData.Khach_Hang_ID"></FControl_Common_Combo_Enum>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-2 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Mã chức năng"):</label>
+								</div>
+								<div class="col-lg-4">
+									<input @bind="@m_objData.Ma_Chuc_Nang" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-2 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Ngôn ngữ"):</label>
+								</div>
+								<div class="col-lg-4">
+									<FControl_Common_Combo_Text m_arrData="@m_arrNgon_ngu" @bind-BindingStringValue="@m_objData.Ngon_Ngu"></FControl_Common_Combo_Text>
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-2 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Nội dung"):</label>
+								</div>
+								<div class="col-lg-10">
+									<TelerikEditor @bind-Value="@m_objData.Noi_Dung"
+												   Tools="@Tools"
+												   Height="300px">
+									</TelerikEditor>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	public List<IEditorTool> Tools { get; set; } =
+		new List<IEditorTool>()
+			{
+			new EditorButtonGroup(new Bold(), new Italic(), new Underline()),
+			new EditorButtonGroup(new AlignLeft(), new AlignCenter(), new AlignRight()),
+			new UnorderedList(),
+			new EditorButtonGroup(new CreateLink(), new Unlink(), new InsertImage()),
+			new InsertTable(),
+			new EditorButtonGroup(new AddRowBefore(), new AddRowAfter(), new MergeCells(), new SplitCell()),
+			new Format(),
+			new FontSize(),
+			new FontFamily()
+			};
+
+	private CSys_Help_Guide m_objData = new();
+
+	List<CCombo_Enum> m_arrKhach_Hang_ID { get; set; } = new();
+	List<CCombo_Enum> m_arrNgon_ngu { get; set; } = new();
+
+	protected override void Init_Data()
+	{
+		m_arrKhach_Hang_ID.Clear();
+		m_arrKhach_Hang_ID.Add(new CCombo_Enum { Value = 1, Text = Get_Language_Data_Field("TKS") });
+
+		m_arrNgon_ngu.Clear();
+		m_arrNgon_ngu.Add(new CCombo_Enum { Text_Value = Get_Language_Data_Field("vi-VN"), Text = Get_Language_Data_Field("vi-VN") });
+		m_arrNgon_ngu.Add(new CCombo_Enum { Text_Value = Get_Language_Data_Field("en-US"), Text = Get_Language_Data_Field("en-US") });
+		m_arrNgon_ngu.Add(new CCombo_Enum { Text_Value = Get_Language_Data_Field("ja-JP"), Text = Get_Language_Data_Field("ja-JP") });
+		m_arrNgon_ngu.Add(new CCombo_Enum { Text_Value = Get_Language_Data_Field("zh-CN"), Text = Get_Language_Data_Field("zh-CN") });
+		m_arrNgon_ngu.Add(new CCombo_Enum { Text_Value = Get_Language_Data_Field("ko-KR"), Text = Get_Language_Data_Field("ko-KR") });
+
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Help_Guide_Controller v_objCtrData = new();
+		m_objData = v_objCtrData.FQ_518_HG_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CSys_Help_Guide();
+		else
+		{
+			r_bUpdate = true;
+
+			CSys_Help_Guide v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Help_Guide_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_518_HG_sp_ins_Insert(m_objData);
+
+		r_strAdd_Key = m_objData.Ma_Chuc_Nang;
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Help_Guide_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		v_objCtrData.FQ_518_HG_sp_upd_Update(m_objData);
+
+		CSys_Help_Guide v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+	}
+}

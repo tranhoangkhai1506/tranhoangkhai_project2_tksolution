@@ -1,0 +1,232 @@
+@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Mã chức năng"):</label>
+									<input @ref="txtFocus" @bind="@m_objData.Ma_Chuc_Nang" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Tên chức năng"):</label>
+									<input @bind="@m_objData.Ten_Chuc_Nang" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Sort priority"):</label>
+									<input type="number" @bind="@m_objData.Sort_Priority" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("URL Function"):</label>
+									<input @bind="@m_objData.Func_URL" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("URL Image"):</label>
+									<input @bind="@m_objData.Image_URL" class="form-control">
+
+								</div>
+							</div>
+						</div>
+					
+						<div class="col-lg-4">
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Is view"):</label>
+									<div class="form-check form-switch form-switch-lg form-switch-success">
+										<input type="checkbox" @bind="@m_objData.Is_View" class="form-check-input" role="switch">
+									</div>
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Is new"):</label>
+									<div class="form-check form-switch form-switch-lg form-switch-success">
+										<input type="checkbox" @bind="@m_objData.Is_New" class="form-check-input" role="switch">
+									</div>
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Is edit"):</label>
+									<div class="form-check form-switch form-switch-lg form-switch-success">
+										<input type="checkbox" @bind="@m_objData.Is_Edit" class="form-check-input" role="switch">
+									</div>
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Is delete"):</label>
+									<div class="form-check form-switch form-switch-lg form-switch-success">
+										<input type="checkbox" @bind="@m_objData.Is_Delete" class="form-check-input" role="switch">
+									</div>
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Is Export"):</label>
+									<div class="form-check form-switch form-switch-lg form-switch-success">
+										<input type="checkbox" @bind="@m_objData.Is_Export" class="form-check-input" role="switch">
+									</div>
+
+								</div>
+							</div>
+						</div>
+					
+						<div class="col-lg-4">
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Khách hàng"):</label>
+									<input @bind="@m_objData.Khach_Hang_ID" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Chức năng parent"):</label>
+									<TelerikMultiColumnComboBox @bind-Value="@m_objData.Chuc_Nang_Parent_ID"
+																ScrollMode="@DropDownScrollMode.Virtual"
+																Data="@m_arrData"
+																ValueField="@(nameof(CSys_Chuc_Nang.Auto_ID))"
+																TextField="@(nameof(CSys_Chuc_Nang.Ten_Chuc_Nang))"
+																Width="100%"
+																PageSize="10"
+																ItemHeight="35"
+																Filterable="true"
+																FilterOperator="@StringFilterOperator.Contains"
+																ListHeight="260px">
+										<MultiColumnComboBoxColumns>
+											<MultiColumnComboBoxColumn Field="@nameof(CSys_Chuc_Nang.Ma_Chuc_Nang)" Title="@Get_Language_Data_Field("Mã")" Width="120px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+											<MultiColumnComboBoxColumn Field="@nameof(CSys_Chuc_Nang.Ten_Chuc_Nang)" Title="@Get_Language_Data_Field("Tên")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+										</MultiColumnComboBoxColumns>
+									</TelerikMultiColumnComboBox>
+									
+								</div>
+							</div>
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
+									<label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+									<input @bind="@m_objData.Ghi_Chu" class="form-control">
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</EditForm>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data" style="margin-right: 25px;">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private CSys_Chuc_Nang m_objData = new();
+
+	[Parameter]
+	public int m_iNhom_Chuc_Nang_ID { get; set; } = 0;
+
+	[Parameter]
+	public long m_iChuc_Nang_Parent_ID { get; set; } = 0;
+
+	List<CSys_Chuc_Nang> m_arrData = new();
+
+	protected override void Init_Data()
+	{
+		m_arrData.Clear();
+		m_arrData = CCache_Chuc_Nang.Arr_Data.Where(it => it.Auto_ID != r_iAuto_ID).ToList();
+	}
+
+	protected override void Load_Data()
+	{
+		CSys_Chuc_Nang_Controller v_objCtrData = new();
+		m_objData = v_objCtrData.FQ_507_CN_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CSys_Chuc_Nang();
+		else
+		{
+			r_bUpdate = true;
+
+			CSys_Chuc_Nang v_objClone = new CSys_Chuc_Nang();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+		}
+
+		m_objData.Nhom_Chuc_Nang_ID = m_iNhom_Chuc_Nang_ID;
+		m_objData.Chuc_Nang_Parent_ID = m_iChuc_Nang_Parent_ID;
+	}
+
+	protected override void Add_Data()
+	{
+		CSys_Chuc_Nang_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_507_CN_sp_ins_Insert(m_objData);
+
+		r_strAdd_Key = m_objData.Ma_Chuc_Nang;
+
+		CCache_Chuc_Nang.Add_Data(m_objData);
+	}
+
+	protected override void Update_Data()
+	{
+		CSys_Chuc_Nang_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+		v_objCtrData.FQ_507_CN_sp_upd_Update(m_objData);
+
+		CSys_Chuc_Nang v_objClone = new CSys_Chuc_Nang();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+
+		CCache_Chuc_Nang.Update_Data(m_objData);
+	}
+}

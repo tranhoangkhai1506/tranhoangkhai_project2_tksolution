@@ -1,0 +1,118 @@
+@inherits FBase;
+
+@Layout_Default_Filter(grdData, "")
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+    <div class="col-lg-12">
+        @((MarkupString)r_strError)
+
+        <TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+            <GridExport>
+                <GridExcelExport FileName="Daily_Schedule_Job_Export" AllPages="true" />
+                <GridCsvExport FileName="Daily_Schedule_Job_Export" AllPages="true" />
+            </GridExport>
+            <GridColumns>
+                <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                <GridColumn Width="60px">
+                    <Template>
+                        <button class="btn btn-link" @onclick="@(()=> Open_Info((context as CSys_Daily_Schedule_Job).Auto_ID))">
+                            <i class="mdi mdi-eye" style="color: purple;"></i>
+                        </button>
+                        &nbsp;
+                        <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                            {
+                                <li>
+                                    <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CSys_Daily_Schedule_Job).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                </li>
+                            }
+                            @if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+                            {
+                                <li>
+                                    <button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CSys_Daily_Schedule_Job).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+                                </li>
+                            }
+                        </ul>
+                    </Template>
+                </GridColumn>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("1035", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="1035" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Field="Ma_Chu_Hang" Title="Chủ hàng" Width="100px"></GridColumn>
+                    <GridColumn Field="Ngay_Gio_Xu_Ly" Title="Giờ xử lý" Width="120px"></GridColumn>
+                    <GridColumn Field="Schedule_Job_ID" Title="Schedule Job ID" Width="130px"></GridColumn>
+                    <GridColumn Field="Email_Nhan" Title="Email nhận" Width="100px"></GridColumn>
+                    <GridColumn Field="Trang_Thai_HTML" Title="Trạng thái" Width="100px">
+                        <HeaderTemplate>
+                            @Get_Language_Data_Field("Trạng Thái")
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var data = context as CSys_Daily_Schedule_Job;
+                                @((MarkupString)data.Trang_Thai_HTML)
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="Ghi_Chu" Title="Ghi chú" Width="200px"></GridColumn>
+                    <GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+@if (r_bIs_Show_Info == true)
+{
+    <F1035_2_Daily_Schedule_Job_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F1035_2_Daily_Schedule_Job_Info>
+}
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide r_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@if (r_bIs_Show_Edit == true)
+{
+    <F1035_3_Daily_Schedule_Job_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F1035_3_Daily_Schedule_Job_Edit>
+}
+
+@code {
+    public List<CSys_Daily_Schedule_Job> v_arrData = new();
+    TelerikGrid<CSys_Daily_Schedule_Job> grdData = new();
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+        CSys_Daily_Schedule_Job_Controller v_objCtrData = new();
+        v_arrData = v_objCtrData.FQ_510_DSJ_sp_sel_List_By_Created(r_objFilter.Date_From, r_objFilter.Date_To);
+
+
+    }
+
+    protected override void Delete_Data_Entry(long p_iAuto_ID)
+    {
+        CSys_Daily_Schedule_Job_Controller v_objCtrData = new();
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        CSys_Daily_Schedule_Job v_objData = v_objCtrData.FQ_510_DSJ_sp_sel_Get_By_ID(p_iAuto_ID);
+        if (v_objData != null)
+            r_strDelete_Key = CUtility.Tao_Key(v_objData.Chu_Hang_ID, v_objData.Schedule_Job_ID); //lấy Key là Chủ hàng ID + Kho ID + Job ID
+                                                                                                                    // End tracking
+
+        v_objCtrData.FQ_510_DSJ_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+
+        CCache_Daily_Schedule_Job.Delete_Data(p_iAuto_ID);
+    }
+}

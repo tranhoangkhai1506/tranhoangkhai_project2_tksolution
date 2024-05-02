@@ -1,0 +1,92 @@
+@inherits FBase;
+
+<div class="row">
+    <div class="col-lg-12">
+        @((MarkupString)r_strError)
+
+        <TelerikGrid Data="@v_arrData" Height="calc(100vh - 120px)" Resizable="true" Reorderable="true" @ref="@grdData">
+            <GridExport>
+                <GridExcelExport FileName="Reset_Mat_Khau_Thanh_Vien_Export" AllPages="true" />
+                <GridCsvExport FileName="Reset_Mat_Khau_Thanh_Vien_Export" AllPages="true" />
+            </GridExport>
+            <GridColumns>
+                <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("1025", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="1025" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Width="60px">
+                        <Template>
+                            <button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="mdi mdi-cog-outline" style="color: purple;"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                @if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+                                {
+                                    <li>
+                                        <button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CSys_Thanh_Vien).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+                                    </li>
+                                }
+                            </ul>
+                        </Template>
+                    </GridColumn>
+                    @if (CCache_Grid_UI_Global.List_Data_By_Code("1025", "grdData").Count > 0)
+                    {
+                        <FCommon_General_Col_Grid m_strFCode="1025" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                    }
+                    else
+                    {
+                        <GridColumn Field="Ma_Dang_Nhap" Title="Mã đăng nhập" Width="100px"></GridColumn>
+                        <GridColumn Field="Ho_Ten" Title="Họ tên" Width="150px"></GridColumn>
+                        <GridColumn Field="Email" Title="Email" Width="150px"></GridColumn>
+                        <GridColumn Field="Dien_Thoai" Title="Điện thoại" Width="100px"></GridColumn>
+
+                        <GridColumn Field="Trang_Thai_HTML" Title="Trạng thái" Width="100px">
+                            <Template>
+                                @{
+                                    var dataItem = context as CSys_Thanh_Vien;
+                                    <span>@((MarkupString)dataItem.Trang_Thai_HTML)</span>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="Ten_Nhom_Thanh_Vien_Text" Title="Nhóm thành viên" Width="150px"></GridColumn>
+                        <GridColumn Field="Ghi_Chu" Title="Ghi chú" Width="200px"></GridColumn>
+                        <GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+                    }
+                }
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@if (r_bIs_Show_Edit == true)
+{
+    <F1025_3_Reset_Mat_Khau_Thanh_Vien_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F1025_3_Reset_Mat_Khau_Thanh_Vien_Edit>
+}
+
+@code {
+    public List<CSys_Thanh_Vien> v_arrData = new();
+    TelerikGrid<CSys_Thanh_Vien> grdData = new();
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrlThanh_Vien = new();
+        v_arrData = v_objCtrlThanh_Vien.F1025_sp_sel_List_Sys_Thanh_Vien();
+
+        Format_Grid(grdData);
+    }
+
+}

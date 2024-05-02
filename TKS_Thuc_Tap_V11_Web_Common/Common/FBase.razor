@@ -1,0 +1,2012 @@
+﻿@using Telerik.DataSource;
+@inject ProtectedLocalStorage m_objLocalStorage
+
+@code {
+    [CascadingParameter]
+    public MainLayout r_objLayout { get; set; }
+
+    [Inject]
+    public IJSRuntime g_jsRuntime { get; set; }
+
+    [Inject]
+    public IWebHostEnvironment g_objEnvironment { get; set; }
+
+    [Inject]
+    public ProtectedLocalStorage g_objSession_Storage { get; set; }
+
+    [Inject]
+    public IHttpContextAccessor g_objContext { get; set; }
+
+    [Inject]
+    public NavigationManager g_objNavigation_Manager { get; set; }
+
+    // For tracking
+    protected bool r_bIs_Tracking_Edit = false;
+    protected bool r_bIs_Tracking_Info = false;
+
+    // Hide / Show form
+    protected bool r_bIs_Show_Info = false;
+    protected bool r_bIs_Show_Info_Drill_Down = false;
+    public bool r_bIs_Show_Edit = false;
+    public bool r_bIs_Import_Excel_Edit = false;
+    public bool r_bIs_Show_Filter = false;
+    public bool r_bIs_Show_Help_Guide = false;
+    public bool r_bIs_Show_Import_Excel = false;
+    public bool r_bIs_Show_Message_Info = false;
+    public string r_strDrill_Down_Field = "";
+    // public bool r_blIs_Show_Report = false;
+    public bool r_bIs_Show_Import_File = false;
+
+    // Error, message
+    public string r_strError = "";
+
+    [Parameter]
+    public string r_strMessage_Header { get; set; } = "";
+
+    [Parameter]
+    public string r_strMessage_Info { get; set; } = "";
+
+    // Các object cho các form global
+    [Parameter]
+    public CImport_Excel r_objImport_Excel { get; set; } = new CImport_Excel();
+    public CFilter r_objFilter = new CFilter();
+
+    // Phục vụ cho edit
+    [Parameter]
+    public long r_iAuto_ID { get; set; } = 0;
+    protected bool r_bUpdate = false;
+    protected object r_objSource = null;
+    protected object r_objDes = null;
+    protected string r_strDelete_Key = "";
+    protected string r_strAdd_Key = "";
+    protected string r_strComplete_Key = "";
+
+    // Phục vụ cho callbackevent
+    public CEvent_Call_Back r_objCallback_Event = new();
+
+    // Session, Cookie
+    public string r_strActive_Function_Code = "";
+    public string r_strActive_Function_Name = "";
+    public string r_strActive_User_Name = "";
+    public string r_strFull_Name = "";
+    public string r_strLanguage = "";
+    public long r_iChu_Hang_ID = 0;
+    public CSys_Thanh_Vien r_objUser = new();
+    public CSys_Chuc_Nang r_objChuc_Nang = new();
+
+    // Element giao diện
+    protected ElementReference txtFocus;   
+
+    protected override async Task OnInitializedAsync()
+    {
+        r_strError = "";
+        r_objCallback_Event = new();
+
+        Init_Data();
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller v_objCtrFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller();
+
+        if (firstRender == true)
+        {
+            DateTime v_dtmStart = DateTime.Now;
+
+            r_objLayout.Start_Loading();
+
+            if (CCache_Common_Controller.Is_Completed_Load_Cache == false)
+            {
+                try
+                {
+                    g_objNavigation_Manager.NavigateTo("/sys/load_cache_error", true);
+                }
+                catch (Exception){}
+
+                return;
+            }
+
+            try
+            {
+                // Lấy các thông tin về session cookie
+                r_strActive_User_Name = await CSession.Get_Active_User_Name(g_objSession_Storage);
+                r_strFull_Name = await CSession.Get_Active_Full_Name(g_objSession_Storage);
+
+                CCookie v_objCookie = new CCookie(g_jsRuntime);
+                r_strLanguage = await v_objCookie.GetValue("language");
+
+                if (r_strLanguage != "vi-VN" && r_strLanguage != "en-US" && r_strLanguage != "jp-JA" && r_strLanguage != "zh-CN" && r_strLanguage != "ko-KR")
+                    r_strLanguage = "vi-VN";
+
+                r_iChu_Hang_ID = CUtility.Convert_To_Int64(await v_objCookie.GetValue("Chu_Hang_ID"));
+
+                // Lấy thông tin user
+                r_objUser = CCache_Thanh_Vien.Get_Data_By_Ma_Dang_Nhap(r_strActive_User_Name);
+                if (r_objUser == null)
+                    r_objUser = new CSys_Thanh_Vien();
+
+                string v_strPath = g_objNavigation_Manager.ToAbsoluteUri(g_objNavigation_Manager.Uri).AbsolutePath;
+                CSys_Chuc_Nang v_objChuc_Nang = CCache_Chuc_Nang.Get_Data_By_Func_URL(v_strPath);
+                if (v_objChuc_Nang != null)
+                {
+                    r_strActive_Function_Code = v_objChuc_Nang.Ma_Chuc_Nang;
+                    r_strActive_Function_Name = v_objChuc_Nang.Ten_Chuc_Nang;
+                }
+
+                // Lấy chức năng đang active để làm căn cứ cho việc phân quyền
+                r_objChuc_Nang = CCommonFunction.Get_Chuc_Nang_By_User(r_strActive_User_Name, r_strActive_Function_Code);
+
+                // Nếu không có quyền cơ bản là quyền view thì báo error bạn không có quyền truy cập
+                if (r_objChuc_Nang.Is_Have_View_Permission == false)
+                {
+                    try
+                    {
+                        g_objNavigation_Manager.NavigateTo("/sys/Permission_Error", true);
+                    }
+                    catch (Exception) { }
+
+                    return;
+                }
+
+                // Xử lý ngày filter trước khi load data init
+                CSys_Filter_Date_Default v_objFDD = CCache_Filter_Date_Default.Get_Data_By_Code(r_strActive_Function_Code);
+                if (v_objFDD != null)
+                {
+                    r_objFilter.Date_From = DateTime.Now.AddDays(0 - v_objFDD.Duration_Days_From);
+                    r_objFilter.Date_To = DateTime.Now.AddDays(v_objFDD.Duration_Days_To);
+                }
+
+                Load_Data_Init();
+                await Load_Data_Init_Async();
+
+                // Insert history
+                CLog_Nhat_Ky_Truy_Cap_Chuc_Nang v_objFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang()
+                    {
+                        Ma_Chuc_Nang = r_strActive_Function_Code,
+                        Ma_Dang_Nhap = r_strActive_User_Name,
+                        Ten_Chuc_Nang = r_strActive_Function_Name
+                    };
+
+                string v_strLang_Name = Get_Language_Data_Field(v_objFH.Ma_Chuc_Nang);
+                if (v_strLang_Name == v_objFH.Ma_Chuc_Nang)
+                    v_strLang_Name = v_objFH.Ten_Chuc_Nang;
+
+                v_objFH.Ten_Chuc_Nang = v_strLang_Name;
+
+                if (r_bIs_Show_Help_Guide == true)
+                    v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Xem help guide");
+
+                if (r_bIs_Tracking_Info == true)
+                    v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Xem Info") + " #" + r_iAuto_ID.ToString();
+
+                if (r_bIs_Show_Import_Excel == true)
+                    v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Import excel");
+
+                if (r_bIs_Tracking_Edit == true && r_iAuto_ID != 0)
+                    v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Hiệu chỉnh") + " #" + r_iAuto_ID.ToString();
+
+                if (r_bIs_Tracking_Edit == true && r_iAuto_ID == 0)
+                    v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Thêm mới");
+
+                if (r_bIs_Show_Message_Info == true)
+                    v_objFH.Ten_Chuc_Nang = v_objFH.Ten_Chuc_Nang + " - " + Get_Language_Data_Field("Message excel import dialog");
+
+                v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
+
+                // TienPV tắt ngày 21/12/2023 vì menu đã chuyển qua dạng mega, ko xài trái, phải kia nữa. Khi nào xài thì bật lại d8oa5n code này.
+                //await g_jsRuntime.InvokeVoidAsync("Hide_Left_Menu");
+
+                // Xử lý multi language cho chức năng
+                string v_strFunction_Title = r_objChuc_Nang.Ten_Chuc_Nang + " (" + r_objChuc_Nang.Ma_Chuc_Nang + ")";
+
+                string v_strCN_Lang = CCache_Language.Get_String_Label_By_Field(r_objChuc_Nang.Ma_Chuc_Nang, r_strLanguage);
+                if (v_strCN_Lang == r_objChuc_Nang.Ma_Chuc_Nang)
+                    v_strCN_Lang = CCache_Language.Get_String_Label_By_Field(r_objChuc_Nang.Ten_Chuc_Nang, r_strLanguage);
+
+                if (v_strCN_Lang != r_objChuc_Nang.Ma_Chuc_Nang)
+                    v_strFunction_Title = v_strCN_Lang + " (" + r_objChuc_Nang.Ma_Chuc_Nang + ")";
+
+                try
+                {
+                    await g_jsRuntime.InvokeVoidAsync("Set_Function_Title", v_strFunction_Title);
+                }
+                catch (Exception){}
+
+                await g_jsRuntime.InvokeVoidAsync("ESC.registerEscKeyHandler", DotNetObjectReference.Create(this));
+                // if(CConfig.Khach_Hang_ID != (int)EKhach_Hang_ID.TLG && CConfig.Khach_Hang_ID != (int)EKhach_Hang_ID.NewlandVJ_LA)
+                // {
+                //     await g_jsRuntime.InvokeVoidAsync("Enter.registerEnterKeyHandler", DotNetObjectReference.Create(this));                    
+                // }
+                //await g_jsRuntime.InvokeVoidAsync("addKeyDownEventListener");
+                // var componentRef = DotNetObjectReference.Create(this);
+                //await g_jsRuntime.InvokeAsync<object>("Close_ESC", new object[] { componentRef });
+
+
+            }
+
+            catch (Exception ex)
+            {
+                r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+            }
+
+            r_objLayout.Stop_Loading();
+
+            if (txtFocus.Id != null)
+                await txtFocus.FocusAsync();
+
+            //await g_jsRuntime.InvokeVoidAsync("Active_Combo_Box_Theme");
+
+            DateTime v_dtmEnd = DateTime.Now;
+            TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+            try
+            {
+                await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+                await g_jsRuntime.InvokeVoidAsync("Change_Date_Placeholder");
+            }
+            catch (Exception) { }
+        }
+
+        //await g_jsRuntime.InvokeVoidAsync("setModalDraggableAndResizable");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    #region Hàm inherit
+    protected virtual void Init_Data()
+    {
+
+    }
+
+    protected virtual void Load_Data()
+    {
+        r_strError = "";
+    }
+
+    protected virtual async Task Load_Data_Async()
+    {
+        await Task.Delay(1);
+    }
+
+    protected virtual void Import_Excel_Entry(CExcel_Controller v_objCtrExcel, ref int p_iCount_Sucess, ref int p_iCount_Error)
+    {
+
+    }
+
+    protected virtual void Import_File_Entry(FileInfo p_objFile, ref int p_iCount_Sucess, ref int p_iCount_Error)
+    {
+
+    }
+
+    protected virtual void Delete_Data_Entry(long p_iAuto_ID)
+    {
+
+    }
+
+    protected virtual void Add_Data()
+    {
+
+    }
+
+    protected virtual void Update_Data()
+    {
+
+    }
+
+    protected virtual void On_Close_Edit_Process(CEvent_Call_Back p_objEvent)
+    {
+
+    }
+
+    //HienTTB them 30/05/2023
+    protected virtual void Complete_ASN_Manual_Data_Entry(long p_iAuto_ID)
+    {
+
+    }
+    #endregion
+
+    #region Hàm protected xử lý try, catch, chính xác cho các hàm inherit
+    protected void Import_Excel()
+    {
+        CLog_Import_Excel_Controller v_objCtrImport_Excel = new CLog_Import_Excel_Controller();
+
+        DateTime v_dtmStart = DateTime.Now;
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+
+        int v_iCount_Success = 0;
+        int v_iCount_Error = 0;
+        long v_iQueue_ID = 0;
+
+        CExcel_Controller v_objCtrExcel = null;
+
+        try
+        {
+            v_iQueue_ID = Process_Queue("Import Excel");
+
+            FileInfo fileInfo = new FileInfo(r_objImport_Excel.Path_File);
+            v_objCtrExcel = new CExcel_Controller(fileInfo);
+
+            Import_Excel_Entry(v_objCtrExcel, ref v_iCount_Success, ref v_iCount_Error);
+
+            int v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.Thanh_Cong;
+            string v_strGhi_Chu = "";
+
+            if (v_iCount_Success > 0 && v_iCount_Error > 0)
+            {
+                v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.Thanh_Cong_1_Phan;
+                v_strGhi_Chu = "Thành công: " + v_iCount_Success.ToString() + " row. Thất bại: " + v_iCount_Error.ToString() + " row.";
+            }
+
+            if (v_iCount_Success == 0 && v_iCount_Error > 0)
+                v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.That_Bai;
+
+            if (v_iCount_Success == 0 && v_iCount_Error == 0)
+                v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.That_Bai;
+
+            CLog_Import_Excel v_objIE = new CLog_Import_Excel()
+                {
+                    Ma_Chuc_Nang = r_objChuc_Nang.Ma_Chuc_Nang,
+                    Ten_Chuc_Nang = r_objChuc_Nang.Ten_Chuc_Nang,
+                    Link_URL = "/FileManagement/Import_Excel/" + DateTime.Now.ToString("yyyyMMdd") + "/" + fileInfo.Name,
+                    Trang_Thai_ID = v_iTrang_Thai_ID,
+                    Ghi_Chu = v_strGhi_Chu,
+                    Last_Updated_By = r_strActive_User_Name,
+                    Last_Updated_By_Function = r_strActive_Function_Code
+                };
+
+            v_objCtrImport_Excel.FQ_422_IE_sp_ins_Insert(v_objIE);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            if (v_objCtrExcel != null)
+                v_objCtrExcel.Close();
+
+            End_Queue(v_iQueue_ID);
+        }
+
+        Load_Data_Init();
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+    protected void Import_File()
+    {
+        CLog_Import_Excel_Controller v_objCtrImport_Excel = new CLog_Import_Excel_Controller();
+
+        DateTime v_dtmStart = DateTime.Now;
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+
+        int v_iCount_Success = 0;
+        int v_iCount_Error = 0;
+        long v_iQueue_ID = 0;
+
+        try
+        {
+            v_iQueue_ID = v_iQueue_ID = Process_Queue("Import File");
+
+            FileInfo fileInfo = new FileInfo(r_objImport_Excel.Path_File);
+            Import_File_Entry(fileInfo, ref v_iCount_Success, ref v_iCount_Error);
+
+            int v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.Thanh_Cong;
+            string v_strGhi_Chu = "";
+
+            if (v_iCount_Success > 0 && v_iCount_Error > 0)
+            {
+                v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.Thanh_Cong_1_Phan;
+                v_strGhi_Chu = "Thành công: " + v_iCount_Success.ToString() + " row. Thất bại: " + v_iCount_Error.ToString() + " row.";
+            }
+
+            if (v_iCount_Success == 0 && v_iCount_Error > 0)
+                v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.That_Bai;
+
+            if (v_iCount_Success == 0 && v_iCount_Error == 0)
+                v_iTrang_Thai_ID = (int)ETrang_Thai_Import_Excel_ID.That_Bai;
+
+            CLog_Import_Excel v_objIE = new CLog_Import_Excel()
+                {
+                    Ma_Chuc_Nang = r_objChuc_Nang.Ma_Chuc_Nang,
+                    Ten_Chuc_Nang = r_objChuc_Nang.Ten_Chuc_Nang,
+                    Link_URL = "/FileManagement/Import_Excel/" + DateTime.Now.ToString("yyyyMMdd") + "/" + fileInfo.Name,
+                    Trang_Thai_ID = v_iTrang_Thai_ID,
+                    Ghi_Chu = v_strGhi_Chu,
+                    Last_Updated_By = r_strActive_User_Name,
+                    Last_Updated_By_Function = r_strActive_Function_Code
+                };
+
+            v_objCtrImport_Excel.FQ_422_IE_sp_ins_Insert(v_objIE);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+
+        Load_Data_Init();
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+    public void Load_Data_Init()
+    {
+        long v_iQueue_ID = 0;
+        try
+        {
+            v_iQueue_ID = Process_Queue("Load Data");
+            Load_Data();
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+    }
+
+    protected async Task Load_Data_Init_Async()
+    {
+        long v_iQueue_ID = 0;
+
+        try
+        {
+            v_iQueue_ID = Process_Queue("Load Data Async");
+            await Load_Data_Async();
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+    }
+
+    public async Task Save_Data()
+    {
+        DateTime v_dtmStart = DateTime.Now;
+
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+
+        r_objCallback_Event.Message_ID = (int)EModal_Result.Close_And_Reload_Data;
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+        long v_iQueue_ID = 0;
+
+        try
+        {
+            if (r_bUpdate == true)
+            {
+                v_iQueue_ID = Process_Queue("Update Data");
+                Update_Data();
+
+                string v_strEdit_Log = CUtility.Compare_Entity(r_objSource, r_objDes);
+
+                if (r_objSource == null)
+                    throw new Exception(Get_Language_Data_Field("Chưa get object phục vụ cho việc log CRUD, liên hệ bên phát triển phần mềm để fix, Lỗi này chỉ thông báo chứ không ảnh hưởng dữ liệu của bạn."));
+
+                if (r_objDes == null)
+                    throw new Exception(Get_Language_Data_Field("Chưa get object phục vụ cho việc log CRUD, liên hệ bên phát triển phần mềm để fix, Lỗi này chỉ thông báo chứ không ảnh hưởng dữ liệu của bạn."));
+
+                CCommon_Controller.FCommon_Insert_Action_History(r_iAuto_ID, Get_Language_Data_Field("Hiệu chỉnh"), "Web",
+                    r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, v_strEdit_Log);
+
+            }
+            else
+            {
+                v_iQueue_ID = Process_Queue("Add Data");
+                Add_Data();
+
+                if (r_strAdd_Key == "")
+                    throw new Exception(Get_Language_Data_Field("Chưa get key add date phục vụ cho log CRUD, liên hệ bên phát triển phần mềm để fix, Lỗi này chỉ thông báo chứ không ảnh hưởng dữ liệu của bạn."));
+
+                CCommon_Controller.FCommon_Insert_Action_History(r_iAuto_ID, Get_Language_Data_Field("Thêm mới"), "Web",
+                    r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + r_strAdd_Key);
+            }
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field(ex.Message));
+            r_objCallback_Event.Message_ID = (int)EModal_Result.Exception;
+
+            if (txtFocus.Id != null)
+                await txtFocus.FocusAsync();
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+
+        await OnClose.InvokeAsync(r_objCallback_Event);
+    }
+
+    public async Task Delete_Data(long p_iAuto_ID)
+    {
+        DateTime v_dtmStart = DateTime.Now;
+
+        r_objLayout.Start_Loading();
+        long v_iQueue_ID = 0;
+
+        try
+        {
+            r_strError = "";
+            r_strDelete_Key = "";
+
+            if (p_iAuto_ID != 0)
+            {
+                bool v_bIs_Confirmed = await g_jsRuntime.InvokeAsync<bool>("confirm", Get_Language_Data_Field("Bạn chắc chắn muốn xóa dòng dữ liệu này?"));
+
+                if (v_bIs_Confirmed)
+                {
+                    v_iQueue_ID = Process_Queue("Delete Data");
+
+                    Delete_Data_Entry(p_iAuto_ID);
+
+                    Load_Data_Init();
+
+                    if (r_strDelete_Key == "")
+                        throw new Exception(Get_Language_Data_Field("Chưa get key phục vụ, liên hệ bên phát triển phần mềm để fix, Lỗi này chỉ thông báo chứ không ảnh hưởng dữ liệu của bạn."));
+
+                    CCommon_Controller.FCommon_Insert_Action_History(p_iAuto_ID, Get_Language_Data_Field("Xoá"), "Web",
+                        r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + r_strDelete_Key + ", ID: " + p_iAuto_ID.ToString());
+                }
+            }
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+
+    #endregion
+
+    #region Hàm protected xử lý luôn
+    protected async Task Tim_Kiem_Click()
+    {
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+        r_strError = "";
+        DateTime v_dtmStart = DateTime.Now;
+        r_objLayout.Start_Loading();
+
+        Load_Data_Init();
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+    public Task Modal_Cancel()
+    {
+        r_objCallback_Event.Message_ID = (int)EModal_Result.Close_Cancel;
+
+        return OnClose.InvokeAsync(r_objCallback_Event);
+    }
+
+    public DataTable Convert_Data_To_DataTable<T>(IEnumerable<T> items,
+       List<CCol_Grid_Property> p_arrCol_Grid)
+    {
+        DataTable dataTable = new DataTable(typeof(T).Name);
+
+        //Get all the properties
+        PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        Dictionary<string, PropertyInfo> v_dicPro = new();
+        foreach (PropertyInfo prop in Props)
+        {
+            v_dicPro.Add(prop.Name, prop);
+        }
+
+        Dictionary<string, CCol_Grid_Property> v_dicCol = new();
+        foreach (CCol_Grid_Property v_objCol in p_arrCol_Grid)
+        {
+            v_dicCol.Add(v_objCol.Field_Name.ToLower(), v_objCol);
+        }       
+
+        foreach (var v_objProp in p_arrCol_Grid)
+        {
+            CCol_Grid_Property v_objCol = v_dicCol[v_objProp.Field_Name.ToLower()];
+            //Setting column names as Property names
+            if (v_dicCol.ContainsKey(v_objProp.Field_Name.ToLower()))
+            {
+                string v_strType_Name = v_objCol.Type_Name.ToLower();
+                if (v_strType_Name == "system.int16" || v_strType_Name == "system.int32" || v_strType_Name == "system.int64"
+                    || v_strType_Name == "system.double" || v_strType_Name == "system.datetime")
+                {
+                    if (v_strType_Name == "system.datetime")
+                        dataTable.Columns.Add(v_objCol.Field_Name, typeof(DateTime));
+
+                    if (v_strType_Name == "system.int16" || v_strType_Name == "system.int32" || v_strType_Name == "system.int64"
+                        || v_strType_Name == "system.double" || v_strType_Name == "system.decimal")
+                    {
+                        dataTable.Columns.Add(v_objCol.Field_Name, typeof(double));
+                    }
+                }
+                else
+                    dataTable.Columns.Add(v_objCol.Field_Name);
+            }
+            else
+                dataTable.Columns.Add(v_objCol.Field_Name);
+        }
+
+        //bắt đầu đọc data       
+
+        foreach (T item in items)
+        {
+            var values = new object[p_arrCol_Grid.Count];
+
+            for (int i = 0; i < p_arrCol_Grid.Count; i++)
+            {
+                PropertyInfo v_objInfo = v_dicPro[p_arrCol_Grid[i].Field_Name];
+                //inserting property values to datatable rows
+                values[i] = v_objInfo.GetValue(item, null);
+            }
+
+            //for (int v_j = 0; v_j < 300000; v_j++)
+            dataTable.Rows.Add(values);
+        }
+
+        //tạo 1 object footer(tính total)
+        object[] v_objTotal = new object[p_arrCol_Grid.Count];
+        bool v_blSet_Total = false;
+        foreach (T item in items)
+        {
+            for (int i = 0; i < p_arrCol_Grid.Count; i++)
+            {
+                PropertyInfo v_objInfo = v_dicPro[p_arrCol_Grid[i].Field_Name];
+                //inserting property values to datatable rows
+                string v_strType_Name = p_arrCol_Grid[i].Type_Name.ToLower();
+
+                if (v_strType_Name == "system.double" || v_strType_Name == "system.decimal")
+                {
+                    double v_dblValue = CUtility.Convert_To_Double(v_objInfo.GetValue(item, null));
+                    v_objTotal[i] = CUtility.Convert_To_Double(v_objTotal[i]) + v_dblValue;
+                }
+                else
+                {
+                    if (v_strType_Name == "system.string" && v_blSet_Total == false)
+                    {
+                        v_objTotal[i] = "Total";
+                        v_blSet_Total = true;
+                    }
+                }
+            }
+
+        }
+
+        dataTable.Rows.Add(v_objTotal);
+        return dataTable;
+    }
+
+    public async Task Export_Excel_Custom<T>(TelerikGrid<T> p_grdGrid)
+    {
+        CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller v_objCtrFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller();
+        CExcel_Controller v_objCtrlExcel = null;
+        DateTime v_dtmStart = DateTime.Now;
+
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+        long v_iQueue_ID = 0;
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+
+        try
+        {
+            v_iQueue_ID = v_iQueue_ID = Process_Queue("Export Excel Custom");
+
+            var v_objState = p_grdGrid.GetState(); // giữ state để sau khi thay đổi thì set lại
+            var v_arrColState = v_objState.ColumnStates;// lấy tất các column hiện có của Grid
+
+            // tìm xem trên lưới có fileter không, nếu có thì lấy data filter export thui
+            var v_objReq = new DataSourceRequest();
+            v_objReq.Filters = new List<IFilterDescriptor>();
+            v_objReq.Filters.AddRange(v_objState.FilterDescriptors);
+            // var v_arrData_Export = p_grdGrid.Data.ToDataSourceResult(v_objReq);
+            var v_arrData_Export = (p_grdGrid.Data.ToDataSourceResult(v_objReq).Data as IEnumerable<T>).ToList();
+
+            List<CCol_Grid_Property> v_arrCol_Grid = new();
+            List<CCol_Grid_Property> v_arrCol_Grid_Band = new();
+            int v_iCol_Index = 0;
+            foreach (var v_objCol in v_arrColState)
+            {
+                CCol_Grid_Property v_objCol_Grid = new();
+                var v_arrProps = v_objCol.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic).ToList();//get các object ẩn
+                if (v_arrProps.Count > 0)
+                {
+                    var obj = v_arrProps.FirstOrDefault(x => x.Name == "Column"); //lấy object Column
+                    if (obj != null)
+                    {
+                        var data = obj.GetValue(v_objCol) as Telerik.Blazor.Common.Columns.IColumn;
+                        if (CUtility.Convert_To_String(v_objCol.Field) != "")
+                        {
+                            var dataType = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == "PropertyType").GetValue(data); //lấy kiểu dữ liệu của column
+                            string v_strType_Name = dataType.ToString(); // lấy tên của kiểu dữ liệu ("System.String", "System.Int32", ...)
+
+                            v_iCol_Index++;
+                            v_objCol_Grid.Field_Name = v_objCol.Field;
+                            v_objCol_Grid.Type_Name = v_strType_Name;
+                            v_objCol_Grid.Title = data.Title;
+                            v_objCol_Grid.Width_Col = data.Width;
+                            v_objCol_Grid.Pos_Index = v_iCol_Index;
+                            v_objCol_Grid.Props_Info = obj;
+                            v_arrCol_Grid.Add(v_objCol_Grid);
+                        }
+                        else
+                        {
+                            if(CUtility.Convert_To_String(data.Title) != "")
+                            {
+                                v_objCol_Grid.Title = data.Title;
+                                v_objCol_Grid.Pos_Index = v_iCol_Index;
+                                v_objCol_Grid.SL_Col_Band = data.ColumnsCollection.Count;
+                                v_arrCol_Grid_Band.Add(v_objCol_Grid);
+                            }
+                        }
+                    }
+                }
+            }
+
+            string v_strPath_File = this.g_objEnvironment.WebRootPath + CConfig.Template_URL + "Export_Template.xlsx";
+            FileInfo fileInfo = new FileInfo(v_strPath_File);
+            v_objCtrlExcel = new CExcel_Controller(fileInfo);
+            //chuyển data từ grd sang data table
+            DataTable v_dt = Convert_Data_To_DataTable(v_arrData_Export, v_arrCol_Grid);
+            List<object[]> v_arrData = new List<object[]>();
+
+            //tạo 1 list header
+            object[] v_objHeader = new object[v_arrCol_Grid.Count];
+            for (int i = 0; i < v_arrCol_Grid.Count; i++)
+            {
+                CCol_Grid_Property v_obj = v_arrCol_Grid[i];
+
+                //nếu hok có language thì giữ lại title của grd
+                v_objHeader[i] = Get_Language_Data_Field(v_obj.Field_Name);
+                if (v_objHeader[i].ToString() == v_obj.Field_Name)
+                    v_objHeader[i] = v_obj.Title;
+            }
+
+
+            //tạo 1 dòng tieu đề col band nếu có
+            object[] v_objHeader_Band = new object[v_arrCol_Grid.Count];
+            int v_iLine_Band_End = 0;
+            foreach(CCol_Grid_Property v_obj in v_arrCol_Grid_Band)
+            {
+                v_objHeader_Band[v_obj.Pos_Index] = v_obj.Title;
+                v_iLine_Band_End = v_obj.Pos_Index + v_obj.SL_Col_Band;
+            }
+
+            if (v_arrCol_Grid_Band.Count == 0)
+                v_objHeader_Band = null;
+
+            byte[] v_objbyteRes = v_objCtrlExcel.Export_Excel_Grid(v_strPath_File, 0, 1, v_arrCol_Grid, v_objHeader_Band, v_objHeader, v_iLine_Band_End, v_dt);
+            //var v_objFileStream = new MemoryStream(v_objbyteRes);
+            var v_objFileStream_Excel = new MemoryStream(v_objbyteRes);
+
+            var v_strFileName = v_dt.TableName + "_Export_" + DateTime.Now.ToString("ddMMyyHHmmss") + ".xlsx";
+            // using var v_objStream_Ref = new DotNetStreamReference(stream: v_objFileStream);
+            // await g_jsRuntime.InvokeVoidAsync("downloadFileFromStream", v_strFileName, v_objStream_Ref);
+
+            //save log file export
+            string v_strFolder = this.g_objEnvironment.WebRootPath + CConfig.Export_Excel_URL + "\\" + DateTime.Now.ToString("ddMMyyyy");
+            if (Directory.Exists(v_strFolder) == false)
+                Directory.CreateDirectory(v_strFolder);
+
+            string v_strPath_File_Export = v_strFolder + "\\" + v_strFileName;
+
+            using (var fs = new FileStream(v_strPath_File_Export, FileMode.CreateNew, FileAccess.ReadWrite))
+            {
+                v_objFileStream_Excel.CopyTo(fs);
+                fs.Flush();
+
+                CLog_Report_File_Excel_Controller v_objCtrlReport_Excel = new();
+                CLog_Report_File_Excel v_objReport_Excel = new()
+                    {
+                        Chu_Hang_ID = r_iChu_Hang_ID,
+                        Report_File_Type_ID = (int)EReport_File_Type_ID.Export_Excel,
+                        Ten_File = v_strFileName,
+                        File_URL = CConfig.Export_Excel_URL +  DateTime.Now.ToString("ddMMyyyy")  + "\\" + v_strFileName,
+                        Last_Updated_By = r_strActive_User_Name,
+                        Last_Updated_By_Function = r_strActive_Function_Code
+                    };
+                v_objCtrlReport_Excel.FQ_427_RFE_sp_ins_Insert(v_objReport_Excel);
+
+            }
+
+            //dowmload file
+            FileInfo v_fileInfo_Result = new FileInfo(v_strPath_File_Export);
+            byte[] bytes = v_objCtrlExcel.ConvertFileInfoToByteArray(v_fileInfo_Result);
+            var v_objFileStream = new MemoryStream(bytes);
+            using var v_objStream_Ref = new DotNetStreamReference(stream: v_objFileStream);
+            await g_jsRuntime.InvokeVoidAsync("downloadFileFromStream", v_strFileName, v_objStream_Ref);
+
+            //log nhật ký thao tác tính năng
+            CLog_Nhat_Ky_Truy_Cap_Chuc_Nang v_objFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang()
+                {
+                    Ma_Chuc_Nang = r_strActive_Function_Code,
+                    Ma_Dang_Nhap = r_strActive_User_Name,
+                    Ten_Chuc_Nang = r_objChuc_Nang.Ten_Chuc_Nang
+                };
+
+            string v_strLang_Name = Get_Language_Data_Field(v_objFH.Ma_Chuc_Nang);
+            if (v_strLang_Name == v_objFH.Ma_Chuc_Nang)
+                v_strLang_Name = v_objFH.Ten_Chuc_Nang;
+
+            v_objFH.Ten_Chuc_Nang = v_strLang_Name + " - " + Get_Language_Data_Field("Export Excel");
+
+            v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
+
+
+
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            if (v_objCtrlExcel != null)
+                v_objCtrlExcel.Close();
+
+            End_Queue(v_iQueue_ID);
+        }
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+    public async Task Export_Excel_Telerik_Default<T>(TelerikGrid<T> p_grdGrid)
+    {
+        CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller v_objCtrFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller();
+        
+        DateTime v_dtmStart = DateTime.Now;
+
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+        long v_iQueue_ID = 0;
+
+        try
+        {
+            v_iQueue_ID = Process_Queue("Export Excel Telerik");
+
+            await p_grdGrid.SaveAsExcelFileAsync();
+
+            CLog_Nhat_Ky_Truy_Cap_Chuc_Nang v_objFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang()
+                {
+                    Ma_Chuc_Nang = r_strActive_Function_Code,
+                    Ma_Dang_Nhap = r_strActive_User_Name,
+                    Ten_Chuc_Nang = r_objChuc_Nang.Ten_Chuc_Nang
+                };
+
+            string v_strLang_Name = Get_Language_Data_Field(v_objFH.Ma_Chuc_Nang);
+            if (v_strLang_Name == v_objFH.Ma_Chuc_Nang)
+                v_strLang_Name = v_objFH.Ten_Chuc_Nang;
+
+            v_objFH.Ten_Chuc_Nang = v_strLang_Name + " - " + Get_Language_Data_Field("Export Excel");
+
+            v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+    public async Task Export_Excel<T>(TelerikGrid<T> p_grdGrid)
+    {
+        await Export_Excel_Custom(p_grdGrid);
+    }
+
+    public async Task Export_CSV<T>(TelerikGrid<T> p_grdGrid)
+    {
+        CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller v_objCtrFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang_Controller();
+
+        DateTime v_dtmStart = DateTime.Now;
+
+        await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+
+        r_objLayout.Start_Loading();
+        r_strError = "";
+        long v_iQueue_ID = 0;
+
+        try
+        {
+            v_iQueue_ID = Process_Queue("Export CSV");
+
+            await p_grdGrid.SaveAsCsvFileAsync();
+
+            CLog_Nhat_Ky_Truy_Cap_Chuc_Nang v_objFH = new CLog_Nhat_Ky_Truy_Cap_Chuc_Nang()
+                {
+                    Ma_Chuc_Nang = r_strActive_Function_Code,
+                    Ma_Dang_Nhap = r_strActive_User_Name,
+                    Ten_Chuc_Nang = r_objChuc_Nang.Ten_Chuc_Nang + " - Export CSV"
+                };
+
+            string v_strLang_Name = Get_Language_Data_Field(v_objFH.Ma_Chuc_Nang);
+            if (v_strLang_Name == v_objFH.Ma_Chuc_Nang)
+                v_strLang_Name = v_objFH.Ten_Chuc_Nang;
+
+            v_objFH.Ten_Chuc_Nang = v_strLang_Name + " - " + Get_Language_Data_Field("Export CSV");
+
+            v_objCtrFH.FQ_424_NKTCCN_sp_ins_Insert(v_objFH);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+
+        finally
+        {
+            End_Queue(v_iQueue_ID);
+        }
+
+        r_objLayout.Stop_Loading();
+
+        DateTime v_dtmEnd = DateTime.Now;
+        TimeSpan v_ts = v_dtmEnd - v_dtmStart;
+
+        await g_jsRuntime.InvokeVoidAsync("Set_Speed_Label", v_ts.TotalSeconds.ToString("###,###0.##") + "s");
+    }
+
+    protected string Get_Language_Data_Field(string p_strField)
+    {
+        return CCache_Language.Get_String_Label_By_Field(p_strField, r_strLanguage);
+    }   
+
+    protected void Set_Grid_Single_Select<T>(TelerikGrid<T> p_grid)
+    {
+        // var v_objState = p_grid.GetState(); // giữ state để sau khi thay đổi thì set lại
+        var v_arrGrid_Props = p_grid.GetType().GetProperties(); //lấy các thuộc tính của grid
+        v_arrGrid_Props.FirstOrDefault(x => x.Name == "SelectionMode").SetValue(p_grid, GridSelectionMode.Single);
+        //p_grid.SelectionMode = GridSelectionMode.Single;
+    }
+
+    protected void Hide_Filter_Row<T>(TelerikGrid<T> p_grid)
+    {
+        var v_objState = p_grid.GetState();
+        p_grid.FilterMode = GridFilterMode.None;
+        // p_grid.GetType().GetProperties().FirstOrDefault(x => x.Name == "FilterMode").SetValue(p_grid, GridFilterMode.None);
+        p_grid.GridToolBarTemplate = null;
+
+        foreach (var v_objCol in v_objState.ColumnStates)
+        {
+            var v_arrProps = v_objCol.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic).ToList();//get các object ẩn
+            if (v_arrProps.Count > 0)
+            {
+                var obj = v_arrProps.FirstOrDefault(x => x.Name == "Column"); //lấy object Column
+                if (obj != null)
+                {
+                    var data = obj.GetValue(v_objCol) as Telerik.Blazor.Common.Columns.IColumn;
+                    if (data == null)
+                        continue;
+
+                    if (CUtility.Convert_To_String(v_objCol.Field) != "")
+                    {
+                        GridColumn v_objGridColumn = (GridColumn)data;
+                        //ẩn các filter icon
+                        v_objGridColumn.ShowFilterCellButtons = false;
+                        v_objGridColumn.Filterable = false;
+                    }
+
+                }
+            }
+        }
+
+
+        p_grid.SetStateAsync(v_objState);
+
+    }
+
+    protected void Hide_Pageable<T>(TelerikGrid<T> p_grid)
+    {
+    //var v_objState = p_grid.GetState(); // giữ state để sau khi thay đổi thì set lại
+        //var v_arrGrid_Props = p_grid.GetType().GetProperties(); //lấy các thuộc tính của grid
+        // v_arrGrid_Props.FirstOrDefault(x => x.Name == "Pageable").SetValue(p_grid, false);
+        p_grid.Pageable = false;
+    }
+
+    protected long Process_Queue(string p_strFunction_Name)
+    {
+        return CUtility_Queue_DB.Add_Queue(r_strActive_Function_Code, r_strActive_Function_Name, p_strFunction_Name);
+    }
+
+    protected void End_Queue(long p_iQueue)
+    {
+        CUtility_Queue_DB.Remove_Queue(p_iQueue);
+    }
+
+    #region Event class
+
+    private void OnCellRenderHandler_Yellow(GridCellRenderEventArgs args)
+    {
+        args.Class = "Yellow_Column_Class";
+    }
+
+    private void OnCellRenderHandler_Orange(GridCellRenderEventArgs args)
+    {
+        args.Class = "Orange_Column_Class";
+    }
+
+    private void OnCellRenderHandler_Gray(GridCellRenderEventArgs args)
+    {
+        args.Class = "Gray_Column_Class";
+    }
+
+    private void OnCellRenderHandler_Red(GridCellRenderEventArgs args)
+    {
+        args.Class = "Red_Column_Class";
+    }
+
+    private void OnCellRenderHandler_YellowGreen(GridCellRenderEventArgs args)
+    {
+        args.Class = "YellowGreen_Column_Class";
+    }
+
+    private void OnCellRenderHandler_Lightgoldenrodyellow(GridCellRenderEventArgs args)
+    {
+        args.Class = "Lightgoldenrodyellow_Column_Class";
+    }
+
+    private static void OnCellRenderHandler(GridCellRenderEventArgs args)
+    {
+        args.Class = "Freeze_Edit_Column_Class";
+    }
+
+    #endregion Event class
+
+    public RenderFragment<FooterTemplateContext> GetColumnTemplate_Footer(string propName)
+    {
+        RenderFragment<FooterTemplateContext> ColumnTemplate = context => __builder =>
+        {
+            <span class="Grid_Footer_Cell">@context.Sum?.ToString(CConfig.Footer_Number_Format_String)</span>
+        };
+
+        return ColumnTemplate;
+    }
+
+    public RenderFragment<object> GetColumnTemplate(CSys_Drill_Down p_objDrill)
+    {
+        RenderFragment<object> ColumnTemplate = context => __builder =>
+        {
+            PropertyInfo propertyParameter_Field = context.GetType().GetProperty(p_objDrill.Parameter_Field);
+            PropertyInfo propertyField_Name = context.GetType().GetProperty(p_objDrill.Field_Name);
+            if (propertyField_Name != null)
+            {
+                string v_strField_NameValue = CUtility.Convert_To_String(propertyField_Name.GetValue(context));
+
+                if (propertyParameter_Field != null)
+                {
+                    var Parameter_FieldValue = propertyParameter_Field.GetValue(context);
+                    if (CUtility.Convert_To_Int64(Parameter_FieldValue) > 0)
+                    {
+                        <a style="color:blue;cursor:pointer;" @onclick="@(()=> Open_Info_Drill_Down(CUtility.Convert_To_Int64(Parameter_FieldValue), p_objDrill.Field_Name))">
+                            @v_strField_NameValue
+                        </a>
+                    }
+                    else
+                    {
+                        @v_strField_NameValue
+                    }
+                }
+                else
+                {
+                    @v_strField_NameValue
+                }
+            }
+            else
+            {
+                string v_strField_NameValue = CUtility.Convert_To_String(propertyField_Name?.GetValue(context));
+                @v_strField_NameValue
+            }
+
+        };
+
+        return ColumnTemplate;
+    }
+
+    public RenderFragment SetGridAggregateTemplate(List<string> p_arrData)
+    {
+
+        RenderFragment ColumnTemplate = __builder =>
+         {
+             @foreach (string pro in p_arrData)
+             {
+                 <GridAggregate Field="@pro" Aggregate="GridAggregateType.Sum" />
+             }
+
+         };
+
+        return ColumnTemplate;
+    }
+
+    public RenderFragment SetGridToolBarTemplate()
+    {
+
+        RenderFragment ColumnTemplate = __builder =>
+         {
+             <span class="k-toolbar-spacer"></span> @* add this spacer to keep the searchbox on the right *@
+             <GridSearchBox />
+
+         };
+
+        return ColumnTemplate;
+    }
+
+    public async Task SaveState_Grid<T>(TelerikGrid<T> p_grid)
+    {
+        if (r_strActive_Function_Code != "")
+        {
+            try
+            {
+                var v_objGridState = p_grid.GetState();
+                await CLocalStorage.Set_State_Grid(m_objLocalStorage, r_strActive_Function_Code, v_objGridState);
+                Load_Data_Init();
+            }
+            catch { }
+        }
+    }
+
+    public async void ResetState_Grid<T>(TelerikGrid<T> p_grid)
+    {
+        if (r_strActive_Function_Code != "")
+        {
+            try
+            {
+                var v_objLocal = await CLocalStorage.Get_State_Grid(m_objLocalStorage, r_strActive_Function_Code);
+                if (!string.IsNullOrEmpty(v_objLocal))
+                {
+                    GridState<T> v_objStoredState = JsonConvert.DeserializeObject<GridState<T>>(v_objLocal);
+                    if (v_objStoredState != null)
+                    {
+                        await p_grid.SetStateAsync(null);
+                        await CLocalStorage.Set_State_Grid(m_objLocalStorage, r_strActive_Function_Code, null);
+                        Load_Data_Init();
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+
+    protected async void Format_Grid<T>(TelerikGrid<T> p_grid)
+    {
+        var v_objState = p_grid.GetState();
+
+        if (r_strActive_Function_Code != "")
+        {
+            try
+            {
+                var v_objLocal = await CLocalStorage.Get_State_Grid(m_objLocalStorage, r_strActive_Function_Code);
+                if (!string.IsNullOrEmpty(v_objLocal))
+                {
+                    GridState<T> v_objStoredState = JsonConvert.DeserializeObject<GridState<T>>(v_objLocal);
+
+                    if (v_objStoredState != null)
+                    {
+                        await p_grid.SetStateAsync(v_objStoredState);
+                        v_objState = p_grid.GetState();
+                    }
+                }
+            }
+            catch { }
+        }
+
+        //v_objState = p_grid.GetState(); // giữ state để sau khi thay đổi thì set lại
+        var v_arrColState = v_objState.ColumnStates;// lấy tất các column hiện có của Grid
+                                                    // var v_arrGrid_Props = p_grid.GetType().GetProperties(); //lấy các thuộc tính của grid
+
+        //set FilterMode cho grid
+        p_grid.FilterMode = GridFilterMode.FilterRow;
+        p_grid.PageSize = CConfig.Page_Size;
+        p_grid.Pageable = true;
+        p_grid.Reorderable = true;
+        p_grid.Resizable = true;
+        p_grid.SelectionMode = GridSelectionMode.Multiple;
+        p_grid.Sortable = true;
+        // v_arrGrid_Props.FirstOrDefault(x => x.Name == "FilterMode").SetValue(p_grid, GridFilterMode.FilterRow);
+        //v_arrGrid_Props.FirstOrDefault(x => x.Name == "PageSize").SetValue(p_grid, CConfig.Page_Size);
+        // v_arrGrid_Props.FirstOrDefault(x => x.Name == "Pageable").SetValue(p_grid, true);
+        // v_arrGrid_Props.FirstOrDefault(x => x.Name == "Reorderable").SetValue(p_grid, true);
+        // v_arrGrid_Props.FirstOrDefault(x => x.Name == "Resizable").SetValue(p_grid, true);
+        //v_arrGrid_Props.FirstOrDefault(x => x.Name == "SelectionMode").SetValue(p_grid, GridSelectionMode.Multiple);
+        //v_arrGrid_Props.FirstOrDefault(x => x.Name == "Sortable").SetValue(p_grid, true);
+
+        List<string> v_arrField_Number = new();
+        int v_iSTT_Col = 0;
+
+        int v_iCol_Count = 0;
+
+        foreach (var v_objCol in v_arrColState)
+        {
+            //Set Title cho Grid
+            var v_arrProps = v_objCol.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic).ToList();//get các object ẩn
+            if (v_arrProps.Count > 0)
+            {
+                var obj = v_arrProps.FirstOrDefault(x => x.Name == "Column"); //lấy object Column
+                if (obj != null)
+                {
+                    v_iCol_Count++;
+                    var data = obj.GetValue(v_objCol) as Telerik.Blazor.Common.Columns.IColumn;
+                    if (data == null)
+                        continue;
+
+                    if (CUtility.Convert_To_String(v_objCol.Field) != "")
+                    {
+                        GridColumn v_objGridColumn = (GridColumn)data;
+                        v_objGridColumn.ShowFilterCellButtons = false;
+
+                        //ẩn các filter icon
+                        v_iSTT_Col++;
+
+                        //drill dow
+                        CSys_Drill_Down v_objDrill = CCache_Drill_Down.Get_Data_By_Code(v_objCol.Field);
+                        if (v_objDrill != null)
+                        {
+                            // GridColumn v_objColDrill_Down = (GridColumn)data;
+                            var v_objTemplate = GetColumnTemplate(v_objDrill);
+                            if (v_objTemplate != null)
+                                v_objGridColumn.Template = v_objTemplate;
+                        }
+
+                        var dataType = data.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).FirstOrDefault(x => x.Name == "PropertyType").GetValue(data); //lấy kiểu dữ liệu của column
+                        string v_strType_Name = dataType.ToString(); // lấy tên của kiểu dữ liệu ("System.String", "System.Int32", ...)
+
+                        // Xử lý format
+                        if (v_strType_Name.ToLower() == "system.datetime")
+                        {
+                            //filter fotmat = dd/mm/yyyy
+                            v_objGridColumn.FilterEditorFormat = CConfig.Date_Format_String;
+
+                            if (v_objCol.Field.ToLower().StartsWith("ngay_gio") || v_objCol.Field.ToLower() == "created" || v_objCol.Field.ToLower() == "last_updated")
+                            {
+                                v_objGridColumn.DisplayFormat = "{0: " + CConfig.FullTime_Format_String + "}";
+
+                                if (v_objCol.Field.ToLower() == "ngay_gio_xu_ly")
+                                    v_objGridColumn.DisplayFormat = "{0: " + CConfig.Full_DateTime_Format_String + "}";
+                                // data.GetType().GetProperties().FirstOrDefault(x => x.Name == "DisplayFormat").SetValue(data, "{0: " + CConfig.FullTime_Format_String + "}");
+                            }
+                            else
+                            {
+                                v_objGridColumn.DisplayFormat = "{0: " + CConfig.Date_Format_String + "}";
+                                // data.GetType().GetProperties().FirstOrDefault(x => x.Name == "DisplayFormat").SetValue(data, "{0: " + CConfig.Date_Format_String + "}");
+                            }
+                        }
+
+                        if (v_strType_Name.ToLower() == "system.int32" || v_strType_Name.ToLower() == "system.int64" || v_strType_Name.ToLower() == "system.double")
+                        {
+                            if (v_objCol.Field.ToLower() != "auto_id")
+                            {
+                                // data.GetType().GetProperties().FirstOrDefault(x => x.Name == "DisplayFormat").SetValue(data, "{0: " + CConfig.Number_Format_String + "}");
+                                v_objGridColumn.DisplayFormat = "{0: " + CConfig.Number_Format_String + "}";
+                                //data.GetType().GetProperties().FirstOrDefault(x => x.Name == "TextAlign").SetValue(data, ColumnTextAlign.Right);
+                                v_objGridColumn.TextAlign = ColumnTextAlign.Right;
+
+                                //GridColumn v_objColTemp = (GridColumn)data;
+
+                                if (v_objCol.Field.ToLower().Contains("gw") == true || v_objCol.Field.ToLower().Contains("nw") == true
+                                    || v_objCol.Field.ToLower().Contains("cbm") == true || v_objCol.Field.ToLower().Contains("sqft") == true)
+                                {
+                                    // v_objColTemp.OnCellRender = OnCellRenderHandler_Orange;
+                                    v_objGridColumn.OnCellRender = OnCellRenderHandler_Orange;
+                                }
+                                else
+                                {
+                                    // v_objColTemp.OnCellRender = OnCellRenderHandler_Yellow;
+                                    v_objGridColumn.OnCellRender = OnCellRenderHandler_Yellow;
+                                }
+
+                                //không tính total cho các field name này
+                                if (v_objCol.Field.ToLower() != "don_gia" && v_objCol.Field.ToLower() != "don_gia_nhap" && v_objCol.Field.ToLower() != "don_gia_xuat"
+                                    && v_objCol.Field.ToLower() != "sl_cai_1_thung" && v_objCol.Field.ToLower() != "sl_thung_1_pallet"
+                                    && v_objCol.Field.ToLower() != "gia_mua" && v_objCol.Field.ToLower() != "gia_ban" && v_objCol.Field.ToLower() != "so_ngay_su_dung"
+                                    && v_objCol.Field.ToLower() != "ty_le_vi_tri_co_hang" && v_objCol.Field.ToLower() != "ty_le_sl_vt_co_hang_chu_hang"
+                                    && v_objCol.Field.ToLower() != "ty_le_vi_tri_trong" && v_objCol.Field.ToLower() != "sort_priority"
+                                    && v_objCol.Field.ToLower() != "life" && v_objCol.Field.ToLower() != "stt" && v_objCol.Field.ToLower() != "ref_id"
+                                    && v_objCol.Field.ToLower() != "volume0" && v_objCol.Field.ToLower() != "density" && v_objCol.Field.ToLower() != "weight0"
+                                    && v_objCol.Field.ToLower() != "length0" && v_objCol.Field.ToLower() != "width0" && v_objCol.Field.ToLower() != "height0"
+                                    && v_objCol.Field.ToLower() != "nw" && v_objCol.Field.ToLower() != "qui" && v_objCol.Field.ToLower() != "thang" 
+                                    && v_objCol.Field.ToLower() != "nam" && v_objCol.Field.ToLower() != "sl_pallet_dau_ky" && v_objCol.Field.ToLower() != "sl_pallet_cuoi_ky"
+                                    )
+                                {
+                                    v_objGridColumn.FooterTemplate = GetColumnTemplate_Footer(v_objCol.Field);
+                                    v_arrField_Number.Add(v_objCol.Field);
+                                }
+                            }
+                        }
+
+                        // Tô màu
+                        CSys_Mau_Column v_objMau_Col = CCache_Mau_Column.Get_Data_By_Code(v_objCol.Field);
+                        if (v_objMau_Col != null)
+                        {
+                            //GridColumn v_objColTemp = (GridColumn)data;
+                            //v_objColTemp.OnCellRender = OnCellRenderHandler_Gray;
+                            switch (v_objMau_Col.Ma_So_Mau)
+                            {
+                                case "Gray": v_objGridColumn.OnCellRender = OnCellRenderHandler_Gray; break;
+                                case "Yellow": v_objGridColumn.OnCellRender = OnCellRenderHandler_Yellow; break;
+                                case "Orange": v_objGridColumn.OnCellRender = OnCellRenderHandler_Orange; break;
+                                case "Red": v_objGridColumn.OnCellRender = OnCellRenderHandler_Red; break;
+                                case "YellowGreen": v_objGridColumn.OnCellRender = OnCellRenderHandler_YellowGreen; break;
+                                case "Lightgoldenrodyellow": v_objGridColumn.OnCellRender = OnCellRenderHandler_Lightgoldenrodyellow; break;
+                            }
+
+                        }
+
+                        // Setup multilanguage
+                        string v_strTitle = CCache_Language.Get_String_Label_By_Field(v_objCol.Field, r_strLanguage);
+                        if (v_strTitle != v_objCol.Field)
+                        {
+                            data.Title = v_strTitle;
+                        }
+                        else
+                        {
+                            v_strTitle = CCache_Language.Get_String_Label_By_Field(data.Title, r_strLanguage);
+                            if (v_strTitle != data.Title)
+                                data.Title = v_strTitle;
+                        }
+
+                        // Setup hiện / ẩn column
+                        // Lấy tất cả chủ hàng, tat cả function
+                        CSys_Hien_An_Column v_objH1 = CCache_Hien_An_Column.Get_Data_By_Code(-5, v_objCol.Field, "");
+                        if (v_objH1 != null)
+                        {
+                            if (v_objH1.Option_ID == (int)EHien_An_Option_ID.Hide)
+                                data.Visible = false;
+                            else
+                                data.Visible = true;
+                        }
+                        else
+                        {
+                            // Lấy tất cả chủ hàng, theo 1 function function
+                            v_objH1 = CCache_Hien_An_Column.Get_Data_By_Code(-5, v_objCol.Field, r_strActive_Function_Code);
+                            if (v_objH1 != null)
+                            {
+                                if (v_objH1.Option_ID == (int)EHien_An_Option_ID.Hide)
+                                    data.Visible = false;
+                                else
+                                    data.Visible = true;
+                            }
+                            else
+                            {
+                                // Lấy theo chức năng
+                                v_objH1 = CCache_Hien_An_Column.Get_Data_By_Code(r_iChu_Hang_ID, v_objCol.Field, r_strActive_Function_Code);
+                                if (v_objH1 != null)
+                                {
+                                    if (v_objH1.Option_ID == (int)EHien_An_Option_ID.Hide)
+                                        data.Visible = false;
+                                    else
+                                        data.Visible = true;
+                                }
+                            }
+                        }
+
+
+
+                        // Setup độ rộng cột
+                        CSys_Column_Width v_objCol_Width = CCache_Column_Width.Get_Data_By_Code(v_objCol.Field);
+                        if (v_objCol_Width != null)
+                        {
+                            v_objCol.Width = v_objCol_Width.Do_Rong + "px";
+
+                            //Setup Format Number của cột (Khaitq thêm 10/07/2023)
+                            if (v_objCol_Width.Format_Number != "")
+                                data.GetType().GetProperties().FirstOrDefault(x => x.Name == "DisplayFormat").SetValue(data, "{0: " + v_objCol_Width.Format_Number + "}");
+                        }
+
+                        //// Frozen column
+                        CSys_Frozen_Column v_objFrozen = CCache_Frozen_Column.Get_Data_By_Code(r_strActive_Function_Code);
+                        if (v_objFrozen != null)
+                        {
+                            //if (v_objFrozen.SL_Cot_Frozen == v_iSTT_Col)
+                            if (v_objFrozen.SL_Cot_Frozen >= v_iSTT_Col)
+                            {
+                                v_objCol.Locked = true;
+                            }
+                        }
+                    }
+                    // Xử lý menu bị ẩn (VinhTPD)
+                    else
+                    {
+                        var v_objShowColumnMenu = data.GetType().GetProperty("ShowColumnMenu");
+                        if (v_objShowColumnMenu != null)
+                            v_objShowColumnMenu.SetValue(data, false);
+
+                        if (v_iCol_Count < 3)
+                        {
+                            v_objCol.Locked = true;
+                            var v_objCellRender = data.GetType().GetProperties().FirstOrDefault(x => x.Name == "OnCellRender");
+                            v_objCellRender.SetValue(data, (GridCellRenderEventArgs args) => { OnCellRenderHandler(args); });
+                        }
+                    }
+                }
+            }
+        }
+
+        int v_iTemp_Count = 0;
+        if (v_iCol_Count >= 15)
+        {
+            foreach (var v_objCol in v_arrColState)
+            {
+                var v_arrProps = v_objCol.GetType().GetProperties(BindingFlags.Instance | BindingFlags.NonPublic).ToList();//get các object ẩn
+                if (v_arrProps.Count > 0)
+                {
+                    var obj = v_arrProps.FirstOrDefault(x => x.Name == "Column"); //lấy object Column
+                    if (obj != null)
+                    {
+                        var data = obj.GetValue(v_objCol) as Telerik.Blazor.Common.Columns.IColumn;
+
+                        v_iTemp_Count++;
+
+                        //code test chờ review
+                        v_objCol.Locked = true;
+
+                        if (v_iTemp_Count >= 4)
+                            break;
+                    }
+                }
+            }
+        }
+
+        //set các function hàm như sum, count,...
+        p_grid.GridAggregates = SetGridAggregateTemplate(v_arrField_Number);
+
+        //Task.Run(() => p_grid.SetStateAsync(v_objState)).Wait(); //sau khi thay đổi trong for thì phải SetState để thay đổi Grid
+        await p_grid.SetStateAsync(v_objState); //sau khi thay đổi trong for thì phải SetState để thay đổi Grid
+                                                // Unselect item
+        p_grid.SelectedItems = Enumerable.Empty<T>();
+
+    }
+
+    #endregion
+
+    #region các hàm Open, close các panel: Info, Edit, Filter, Delete, Import excel
+
+    //[JSInvokable("Close_ESC")]
+    //public void Close_ESC()
+    //{
+    //    r_bIs_Show_Info = false;
+    //    StateHasChanged();
+    //}
+
+    protected void Open_Info(long p_iAuto_ID)
+    {
+        r_iAuto_ID = p_iAuto_ID;
+        r_bIs_Show_Info = true;
+        StateHasChanged();
+    }
+
+    protected void Close_Info()
+    {
+        r_bIs_Show_Info = false;
+        StateHasChanged();
+    }
+
+    protected void Open_Info_Drill_Down(long p_iAuto_ID, string p_strField_Name)
+    {
+        r_iAuto_ID = p_iAuto_ID;
+        r_bIs_Show_Info_Drill_Down = true;
+        r_strDrill_Down_Field = p_strField_Name;
+        StateHasChanged();
+    }
+
+    protected void Close_Info_Drill_Down()
+    {
+        r_bIs_Show_Info_Drill_Down = false;
+        StateHasChanged();
+    }
+
+
+    protected void Open_Message_Info(string p_strMessage_Header, string p_strMessage_Info)
+    {
+        r_strMessage_Header = p_strMessage_Header;
+        r_strMessage_Info = p_strMessage_Info;
+
+        r_bIs_Show_Message_Info = true;
+        StateHasChanged();
+    }
+
+    protected void Close_Message_Info()
+    {
+        r_bIs_Show_Message_Info = false;
+        StateHasChanged();
+    }
+
+    protected void Open_Helpguide(string p_strAction_Function)
+    {
+        r_bIs_Show_Help_Guide = true;
+        StateHasChanged();
+    }
+
+    protected void Close_Helpguide()
+    {
+        r_bIs_Show_Help_Guide = false;
+        StateHasChanged();
+    }
+
+    protected void Open_Edit(long p_iAuto_ID)
+    {
+        r_strError = "";
+        r_iAuto_ID = p_iAuto_ID;
+        r_bIs_Show_Edit = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Edit(CEvent_Call_Back p_objEvent)
+    {
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data || p_objEvent.Message_ID == (int)EModal_Result.Close_Cancel)
+            r_bIs_Show_Edit = false;
+
+        if (p_objEvent.Message_ID == (int)EModal_Result.Close_And_Reload_Data)
+        {
+            await Task.Delay(1);
+
+            r_objLayout.Start_Loading();
+
+            Load_Data_Init();
+            On_Close_Edit_Process(p_objEvent);
+
+            r_objLayout.Stop_Loading();
+        }
+    }
+
+    protected void Open_Filter()
+    {
+        r_strError = "";
+        r_bIs_Show_Filter = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Filter(CFilter p_objFilter)
+    {
+        r_bIs_Show_Filter = false;
+
+        if (p_objFilter != null)
+        {
+            r_objFilter = p_objFilter;
+            await Tim_Kiem_Click();
+        }
+    }
+
+    protected void Open_Import_Excel(string p_strFile_Name)
+    {
+        r_bIs_Show_Import_Excel = true;
+        r_objImport_Excel.URL_File_Template = Path.Combine(CConfig.Template_URL) + p_strFile_Name;
+        StateHasChanged();
+    }
+
+    protected void Open_Import_Excel_Update(string p_strFile_Name)
+    {
+        r_bIs_Show_Import_Excel = true;
+        r_objImport_Excel.URL_File_Template = Path.Combine(CConfig.Template_URL) + p_strFile_Name;
+        r_bIs_Import_Excel_Edit = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Import_Excel(CImport_Excel p_objImport_Excel)
+    {
+        r_bIs_Show_Import_Excel = false;
+        if (p_objImport_Excel != null)
+        {
+            if (p_objImport_Excel.Path_File != "")
+            {
+                await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+
+                r_objImport_Excel = p_objImport_Excel;
+                Import_Excel();
+            }
+        }
+    }
+
+    protected void Open_Import_File()
+    {
+        r_bIs_Show_Import_File = true;
+        StateHasChanged();
+    }
+
+    protected async Task Close_Import_File(CImport_Excel p_objImport_Excel)
+    {
+        r_bIs_Show_Import_File = false;
+        if (p_objImport_Excel != null)
+        {
+            if (p_objImport_Excel.Path_File != "")
+            {
+                await Task.Delay(1); // Gắn await 1ms là để có hàm await, task async mới chạy
+
+                r_objImport_Excel = p_objImport_Excel;
+                Import_File();
+            }
+        }
+    }
+
+    #endregion
+
+    #region các hàm private nội bộ
+    private void Search()
+    {
+        r_strError = "";
+        Load_Data_Init();
+    }
+    #endregion
+
+    #region Parameter Function
+    [Parameter]
+    public EventCallback<CEvent_Call_Back> OnClose { get; set; }
+
+    #endregion
+
+    [JSInvokable("HandleEscKey")]
+    public void HandleEscKey()
+    {
+        //await Task.Delay(1);
+        Modal_Cancel();
+    }
+
+    public RenderFragment Layout_Default_Filter<T>(TelerikGrid<T> p_objGrid, string p_strExcel_Template, string p_strExcel_Template_Update= "")
+    {
+
+        RenderFragment ColumnTemplate = __builder =>
+         {
+             <EditForm Model="@r_objFilter">
+                 <div class="row">
+                     <div class="col-lg-7">
+                         <div class="row g-3">
+                             <div style="width: 80px; padding-top: 8px;">
+                                 <label class="form-label">@Get_Language_Data_Field("Ngày tạo"):</label>
+                             </div>
+                             <div style="width: 140px;">
+                                 <TelerikDatePicker @bind-Value="@r_objFilter.Date_From" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                             </div>
+                             <div style="width: 40px; text-align: center; padding-top: 8px;">
+                                 <label class="form-label">--></label>
+                             </div>
+                             <div style="width: 140px;">
+                                 <TelerikDatePicker @bind-Value="@r_objFilter.Date_To" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                             </div>
+
+                             <div class="col-lg-4">
+                                 <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+                                     <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+
+                     <div class="col-lg-5">
+                         <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+                             @if (r_objChuc_Nang.Is_Have_Add_Permission == true)
+                             {
+                                 <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Edit(0))">
+                                     <i class="ri-add-circle-fill align-bottom me-1"></i>
+                                     @Get_Language_Data_Field("Thêm")
+                                 </button>
+                             }
+
+                             @if (r_objChuc_Nang.Is_Have_Add_Permission == true && p_strExcel_Template != "")
+                             {
+                                 <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Open_Import_Excel(p_strExcel_Template))">
+                                     <i class="ri-upload-fill align-bottom me-1"></i>
+                                     @Get_Language_Data_Field("Import")
+                                 </button>
+                             }
+
+                             @Layout_Tool_Button(p_objGrid)
+                         </div>
+                     </div>
+                 </div>
+             </EditForm>
+
+         };
+
+        return ColumnTemplate;
+    }
+
+    public RenderFragment Layout_Tool_Button<T>(TelerikGrid<T> p_objGrid)
+    {
+        RenderFragment ColumnTemplate = __builder =>
+         {
+            <div class="btn-group" role="group">
+                <button type="button" class="btn rounded-pill btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    @Get_Language_Data_Field("Công cụ")
+                </button>
+                <ul class="dropdown-menu">
+                    @if (r_objChuc_Nang.Is_Have_Export_Permission == true)
+                    {
+                        <button class="dropdown-item" type="button" @onclick="@(()=> Export_Excel(p_objGrid))"><i class="ri-file-excel-2-fill align-bottom me-1"></i>&nbsp; @Get_Language_Data_Field("Export Excel")</button>
+                        <button class="dropdown-item" type="button" @onclick="@(()=> Export_CSV(p_objGrid))"><i class="ri-booklet-fill align-bottom me-1"></i>&nbsp; @Get_Language_Data_Field("Export CSV")</button>
+                        <div class="dropdown-divider"></div>
+                    }
+                    <button class="dropdown-item" type="button" @onclick="@(()=> Open_Helpguide(r_strActive_Function_Code))"><i class="mdi mdi-lifebuoy align-bottom me-1"></i>&nbsp; @Get_Language_Data_Field("Hướng dẫn")</button>
+                </ul>
+            </div>
+         };
+
+        return ColumnTemplate;
+    }
+
+    public RenderFragment Layout_Tool_Button()
+    {
+        RenderFragment ColumnTemplate = __builder =>
+         {
+             <div class="btn-group" role="group">
+                 <button type="button" class="btn rounded-pill btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                     @Get_Language_Data_Field("Công cụ")
+                 </button>
+                 <ul class="dropdown-menu">
+                     <button class="dropdown-item" type="button" @onclick="@(()=> Open_Helpguide(r_strActive_Function_Code))"><i class="mdi mdi-lifebuoy align-bottom me-1"></i>&nbsp; @Get_Language_Data_Field("Hướng dẫn")</button>
+                 </ul>
+             </div>
+         };
+
+        return ColumnTemplate;
+    }
+
+    private List<CSys_Grid_Field> AssingGrid_UI(List<CSys_Grid_UI_Global> p_arrGlobal)
+    {
+        List<CSys_Grid_Field> v_arrRes = new List<CSys_Grid_Field>();
+
+        if (p_arrGlobal != null)
+        {
+            if (p_arrGlobal.Count > 0)
+            {
+                foreach (CSys_Grid_UI_Global v_obj in p_arrGlobal)
+                {
+                    CSys_Grid_Field v_objField = CCache_Grid_Field.Get_Data_By_ID(v_obj.Grid_Field_ID);
+                    if (v_objField != null)
+                    {
+                        CSys_Grid_Field v_objRes = new();
+
+                        v_objRes.Field_Name = v_obj.Field_Name;
+                        v_objRes.Tieu_De_Column = v_obj.Tieu_De_Column;
+                        v_objRes.Column_Width = v_obj.Column_Width;
+                        v_objRes.Field_Type_ID = v_obj.Field_Type_ID;
+                        v_objRes.Field_Name_Parent = v_objField.Field_Name_Parent;
+                        v_objRes.Sort_Priority = v_obj.Sort_Priority;
+
+                        v_arrRes.Add(v_objRes);
+                    }
+                }
+
+                return v_arrRes;
+            }
+        }
+
+        return v_arrRes;
+    }
+
+    public RenderFragment<object> GetColumnTemplate(string propName)
+    {
+        // Define the RenderFragment in your code
+        // Its type matches the type of the Grid context - an object
+        // The same as if you were defining it in the markup
+
+        // The syntax for writing a RenderFragment is rather specific, note the lambda expressions
+
+        RenderFragment<object> ColumnTemplate = context => __builder =>
+        {
+            // in this example we pass the property name from the grid declaration
+            // and we use reflection to extract the needed data. You don't have to
+            // If you know the field or the type, you can cast and simplify this code as needed
+
+            PropertyInfo propertyInfo = context.GetType().GetProperty(propName);
+
+            var propType = propertyInfo.PropertyType;
+
+            var propValue = propertyInfo.GetValue(context);
+            string v_strType_Name = propType.Name.ToString();
+            if (v_strType_Name == "Boolean")
+            {
+                bool v_blRes = CUtility.Convert_To_Bool(propValue);
+                <div class="form-check form-switch form-switch-success">
+                    <input type="checkbox" @bind="@v_blRes" class="form-check-input" disabled="true">
+                </div>
+            }
+            else
+            {
+                string v_strRes = propValue.ToString();
+                @((MarkupString)v_strRes)
+            }
+        };
+
+        return ColumnTemplate;
+    }
+
+    public RenderFragment General_Col_Grid(string p_strUser, string p_strMa_Chuc_Nang, string p_strTen_Grid)
+    {
+        //mức ưu tiên level 2 cấu hình col grd (của gobal dành cho triển khai support)
+        List<CSys_Grid_UI_Global> v_arrCol_Global = CCache_Grid_UI_Global.List_Data_By_Code(p_strMa_Chuc_Nang, p_strTen_Grid);
+
+        List<CSys_Grid_Field> v_arrCol_Res = AssingGrid_UI(v_arrCol_Global);
+
+        RenderFragment v_objTemp = __builder =>
+             {
+                 @foreach (CSys_Grid_Field v_objCol in v_arrCol_Res.Where(it => it.Field_Name_Parent == "").ToList())
+                 {
+                     string v_strWidth = "100px";
+
+                     if (v_objCol.Column_Width > 0)
+                         v_strWidth = v_objCol.Column_Width.ToString() + "px";
+
+                     switch (v_objCol.Field_Type_ID)
+                     {
+                         case (int)EGrid_Field_Type_ID.Data_Column:
+                             <GridColumn Field="@v_objCol.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objCol.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth"></GridColumn>
+                             break;
+                              case (int)EGrid_Field_Type_ID.Check_Box:
+                             <GridColumn Template="@(GetColumnTemplate(v_objCol.Field_Name))" Field="@v_objCol.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objCol.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth">
+                             </GridColumn>
+                             break;
+                         case (int)EGrid_Field_Type_ID.HTML:
+                             <GridColumn Template="@(GetColumnTemplate(v_objCol.Field_Name))" Field="@v_objCol.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objCol.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth">
+                             </GridColumn>
+                             break;
+
+                         case (int)EGrid_Field_Type_ID.Band_Column:
+
+                             //check band xem có col con đi theo khong, nếu có thì tạo col
+                             List<CSys_Grid_Field> v_arrCol_Parent = v_arrCol_Res.Where(it => it.Field_Name_Parent == v_objCol.Field_Name).OrderBy(it => it.Sort_Priority).ToList();
+
+                             if(v_arrCol_Parent.Count > 0)
+                             {
+                                 <GridColumn Title="@CCache_Language.Get_String_Label_By_Field(v_objCol.Tieu_De_Column, r_strLanguage)">
+                                     <Columns>
+                                         @foreach (CSys_Grid_Field v_objParent in v_arrCol_Parent)
+                                         {
+                                             v_strWidth = "100px";
+
+                                             if (v_objParent.Column_Width > 0)
+                                                 v_strWidth = v_objParent.Column_Width.ToString() + "px";
+
+                                             switch (v_objParent.Field_Type_ID)
+                                             {
+                                                 case (int)EGrid_Field_Type_ID.Data_Column:
+                                                     <GridColumn Field="@v_objParent.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objParent.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth"></GridColumn>
+                                                     break;
+
+                                                 case (int)EGrid_Field_Type_ID.Check_Box:
+                                                     <GridColumn Template="@(GetColumnTemplate(v_objParent.Field_Name))" Field="@v_objParent.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objParent.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth">
+                                                     </GridColumn>
+                                                     break;
+
+                                                 case (int)EGrid_Field_Type_ID.HTML:
+                                                     <GridColumn Template="@(GetColumnTemplate(v_objParent.Field_Name))" Field="@v_objParent.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objParent.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth">
+                                                     </GridColumn>
+                                                     break;
+                                             }
+                                         }
+
+                                     </Columns>
+                                 </GridColumn>
+                             }
+                             
+                             break;
+
+                         default:
+                             <GridColumn Field="@v_objCol.Field_Name" Title="@CCache_Language.Get_String_Label_By_Field(v_objCol.Tieu_De_Column, r_strLanguage)" Width="@v_strWidth"></GridColumn>
+                             break;
+                     }
+
+                 }
+                 //mặc định luôn luôn có
+                 <GridColumn Field="" Title=""></GridColumn>
+             };
+
+        return v_objTemp;
+    }
+
+    [JSInvokable("HandleEnterKey")]
+    public void HandleEnterKey()
+    {
+        r_objLayout.Start_Loading();
+
+        Load_Data_Init();
+
+        r_objLayout.Stop_Loading();
+
+    }
+
+    public void Check_Permission_Model(string p_strFunction_Code)
+    {
+        bool v_blProcess = false;
+        string v_strErorr = Get_Language_Data_Field("Bạn không có quyền thực hiện tính năng này.");
+        try
+
+        {
+            CSys_Chuc_Nang v_objChuc_Nang = CCommonFunction.Get_Chuc_Nang_By_User(r_strActive_User_Name, p_strFunction_Code);
+            if (v_objChuc_Nang != null)
+            {
+                if (v_objChuc_Nang.Is_Have_Add_Permission == true || v_objChuc_Nang.Is_Have_Edit_Permission == true
+                || v_objChuc_Nang.Is_Have_Delete_Permission == true || v_objChuc_Nang.Is_Have_Export_Permission == true)
+                {
+                    v_blProcess = true;
+                }
+            }
+
+            if (v_blProcess == false)
+                throw new Exception(v_strErorr);
+
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+
+    }
+    public async Task SavePDFReport(byte[] data)
+    {
+        await g_jsRuntime.InvokeVoidAsync("saveFileFromBytes", data, "Report.pdf");
+    }
+
+}

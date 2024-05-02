@@ -1,0 +1,64 @@
+﻿@layout MPBlank_Layout
+@inherits FBase_Blank;
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Http.Connections
+
+@inject NavigationManager navigationManager
+@inject IJSRuntime jsRuntime
+@inject ProtectedLocalStorage sessionStorage
+
+@page "/Sys/Token_Expired_Error"
+
+<!-- Background Start -->
+<div class="fixed-background"></div>
+<!-- Background End -->
+
+<div class="auth-page-wrapper d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-xl-7">
+        &nbsp;
+    </div>
+    <div class="col-xl-5">
+        <!-- auth-page content -->
+        <div class="auth-page-content overflow-hidden min-vh-100" style="background-color: white;">
+            <div class="container" style="margin-top: 40vh;">
+                <div class="row justify-content-center">
+                    <div style="padding-left: 50px;">
+                        <h2 class="cta-1 mb-3 text-primary">@Get_Language_Data_Field("Token đã hết hạn hoặc có máy khác đăng nhập vào!")</h2>
+                        <a class="btn btn-primary" href="javascript:window.location.href='/sys/dang_nhap'">@Get_Language_Data_Field("Quay về trang đăng nhập")</a>
+                    </div>
+                </div>
+                <!-- end row -->
+            </div>
+            <!-- end container -->
+        </div>
+        <!-- end auth page content -->
+    </div>
+</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            await CSession.Set_Active_User_Name(sessionStorage, "");
+            await CSession.Set_Active_Full_Name(sessionStorage, "");
+
+            CCookie v_objCookie = new CCookie(jsRuntime);
+            await v_objCookie.SetValue(CConfig.Token_Cookie_Name, "", 5000);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void Dang_Nhap_Voi_Tai_Khoan_Khac()
+    {
+        navigationManager.NavigateTo("/sys/dang_nhap", true);
+    }
+}

@@ -1,0 +1,32 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingIntValue"
+							ScrollMode="@DropDownScrollMode.Virtual"
+							Data="@m_arrData"
+							ValueField="@(nameof(CSys_Chuc_Nang_App.FApp_ID))"
+							TextField="@(nameof(CSys_Chuc_Nang_App.FApp_Label))"
+							Width="100%"
+							PageSize="10"
+							ItemHeight="35"
+							Filterable="true"
+							FilterOperator="@StringFilterOperator.Contains"
+							ListHeight="260px">
+	<MultiColumnComboBoxColumns>
+		<MultiColumnComboBoxColumn Field="@nameof(CSys_Chuc_Nang_App.FApp_ID)" Title="@Get_Language_Data_Field("App ID")" Width="90px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+		<MultiColumnComboBoxColumn Field="@nameof(CSys_Chuc_Nang_App.FApp_Label)" Title="@Get_Language_Data_Field("App Label")" Width="350px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+	</MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+	[Parameter]
+	public List<CSys_Chuc_Nang_App> m_arrData { get; set; } = new();
+
+	protected override void Load_Data()
+	{
+		if (m_arrData.Count == 0)
+		{
+			CSys_Chuc_Nang_App_Controller v_objCtrl = new();
+			m_arrData = v_objCtrl.F1023_sp_sel_List_FApp_Func();
+		}
+	}
+}

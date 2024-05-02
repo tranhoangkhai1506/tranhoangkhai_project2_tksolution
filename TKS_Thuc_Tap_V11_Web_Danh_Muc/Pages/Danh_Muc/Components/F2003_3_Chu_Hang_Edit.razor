@@ -1,0 +1,258 @@
+@inherits FBase;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (r_iAuto_ID != 0)
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+                }
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            @((MarkupString)r_strError)
+
+            <EditForm Model="@m_objData">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Mã chủ hàng"):</label>
+                                    <input @ref="txtFocus" @bind="@m_objData.Ma_Chu_Hang" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Tên viết tắt"):</label>
+                                    <input @bind="@m_objData.Ten_Viet_Tat" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Tên chủ hàng"):</label>
+                                    <input @bind="@m_objData.Ten_Chu_Hang" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Địa chỉ"):</label>
+                                    <input @bind="@m_objData.Dia_Chi" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Điện thoại"):</label>
+                                    <input @bind="@m_objData.Dien_Thoai" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Email"):</label>
+                                    <input @bind="@m_objData.Email" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Mã số thuế"):</label>
+                                    <input @bind="@m_objData.MST" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Header Title"):</label>
+                                    <input @bind="@m_objData.Header_Title" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+                                    <input @bind="@m_objData.Ghi_Chu" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-11">
+                                    <label class="form-label">@Get_Language_Data_Field("URL Image"):</label>
+                                </div>
+                                <div class="col-lg-11">
+                                    <InputFile OnChange="@OnSelectHandler" class="form-control " style="border-radius:10px" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </EditForm>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="@Save_Data" style="margin-right: 37px;">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CDM_Chu_Hang m_objData = new();
+    private List<IBrowserFile> loadedFiles = new();
+    private bool m_bIs_Update_File = false;
+
+
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        CDM_Chu_Hang_Controller v_objCtrData = new();
+        m_objData = v_objCtrData.FQ_104_CH_sp_sel_Get_By_ID(r_iAuto_ID);
+
+        if (m_objData == null)
+            m_objData = new CDM_Chu_Hang();
+        else
+        {
+            r_bUpdate = true;
+
+            // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+            CDM_Chu_Hang v_objClone = new();
+            CUtility.Clone_Entity(m_objData, v_objClone);
+            r_objSource = v_objClone;
+            // End tracking
+        }
+    }
+
+    protected override void Add_Data()
+    {
+        CDM_Chu_Hang_Controller v_objCtrData = new();
+
+        #region Save File
+        Check_Data();
+        if (m_bIs_Update_File)
+        {
+            m_objData.Image_URL = CCommonFunction.Save_Upload_File(loadedFiles, r_objImport_Excel.Path_File);
+            string v_strTextExl = Path.GetExtension(m_objData.Image_URL).ToLower();
+            string v_strFile_Name_Thumb = m_objData.Image_URL.Substring(0, m_objData.Image_URL.Length - v_strTextExl.Length) + "_Thumb" + v_strTextExl;
+            m_objData.Image_URL_Thumb = m_objData.Image_URL;
+        }
+
+        #endregion
+
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+        m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_104_CH_sp_ins_Insert(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        r_strAdd_Key = m_objData.Ma_Chu_Hang;
+        // End tracking
+
+        CCache_Chu_Hang.Add_Data(m_objData);
+
+    }
+
+    protected override void Update_Data()
+    {
+        CDM_Chu_Hang_Controller v_objCtrData = new();
+        Check_Data();
+
+        if (m_bIs_Update_File)
+        {
+            m_objData.Image_URL = CCommonFunction.Save_Upload_File(loadedFiles, r_objImport_Excel.Path_File);
+            string v_strTextExl = Path.GetExtension(m_objData.Image_URL).ToLower();
+            string v_strFile_Name_Thumb = m_objData.Image_URL.Substring(0, m_objData.Image_URL.Length - v_strTextExl.Length) + "_Thumb" + v_strTextExl;
+
+            //byte[] v_arrBytes = Task.Run<byte[]>(() => Get_Byte_Array(loadedFiles)).Result;
+
+            //byte[] v_arrBytes_Thumb = File.ReadAllBytes(webHostEnviroment.WebRootPath + "\\" + m_objData.Image_URL);
+
+            //File.WriteAllBytes(v_strFile_Name_Thumb, v_arrBytes_Thumb);
+
+            //m_objData.Image_URL_Thumb = v_strFile_Name_Thumb;
+            m_objData.Image_URL_Thumb = m_objData.Image_URL;
+        }
+
+        // CDM_Chu_Hang_Controller v_objCtrData = new();
+        m_objData.Last_Updated_By = r_strActive_User_Name;
+        m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+         v_objCtrData.FQ_104_CH_sp_upd_Update(m_objData);
+
+        // Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+        CDM_Chu_Hang v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objDes = v_objClone;
+        // End tracking
+
+        CCache_Chu_Hang.Update_Data(m_objData);
+    }
+
+    private void OnSelectHandler(InputFileChangeEventArgs e)
+    {
+        r_strError = "";
+        loadedFiles.Clear();
+        try
+        {
+            foreach (var file in e.GetMultipleFiles())
+            {
+                if (file.Size > 1024000)
+                    throw new Exception("File phải nhỏ hơn 1MB.");
+
+                loadedFiles.Add(file);
+            }
+        }
+        catch (Exception ex)
+        {
+            loadedFiles.Clear();
+            throw new Exception(ex.Message);
+        }
+    }
+
+    private void Check_Data()
+    {
+        r_strError = "";
+        try
+        {
+            if (loadedFiles.Count > 0)
+            {
+                IBrowserFile v_objFile = loadedFiles[0];
+
+                string v_strTextExl = Path.GetExtension(v_objFile.Name).ToLower();
+
+                if (!CUtility.Check_File_Type_Accept_Upload(v_strTextExl))
+                    throw new Exception("File không đúng định dạng");
+
+                string v_strFile_Name_Full = Path.GetFileName(v_objFile.Name);
+                r_objImport_Excel.Path_File = CUtility.Fix_Handler_File_Name(v_strFile_Name_Full);
+
+                m_bIs_Update_File = true;
+            }
+            //else
+            //{
+            //	r_objImport_Excel.Path_File = "";
+            //	if (r_bUpdate == false)
+            //		throw new Exception("File không được trống");
+            //}
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+}

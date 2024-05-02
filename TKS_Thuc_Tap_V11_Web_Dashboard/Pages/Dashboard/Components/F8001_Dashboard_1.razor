@@ -1,0 +1,25 @@
+﻿@inherits FBase;
+
+@((MarkupString)r_strError)
+
+<div class="row" style="margin-top:10px;">
+    <div class="col-xl-12">
+        <div class="card card-animate">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <p class="text-muted text-truncate mb-0">
+                        @Get_Language_Data_Field("Chào mừng đến TKS Core V10")
+                    </p>
+                </div>
+            </div><!-- end card body -->
+        </div>
+    </div><!-- end col -->
+</div><!-- end row -->
+
+@code
+{
+    protected override void Load_Data()
+    {
+        
+    }
+}

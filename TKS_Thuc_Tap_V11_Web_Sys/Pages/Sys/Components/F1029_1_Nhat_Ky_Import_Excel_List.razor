@@ -1,0 +1,111 @@
+@inherits FBase;
+
+<EditForm Model="@r_objFilter">
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="row g-3">
+                <div style="width: 80px; padding-top: 8px;">
+                    <label class="form-label">@Get_Language_Data_Field("Ngày tạo"):</label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_From" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+                <div style="width: 40px; text-align: center; padding-top: 8px;">
+                    <label class="form-label">--></label>
+                </div>
+                <div style="width: 140px;">
+                    <TelerikDatePicker @bind-Value="@r_objFilter.Date_To" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+                        <button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="hstack flex-wrap gap-2 mb-3 mb-lg-0" style="float: right;">
+
+                @Layout_Tool_Button(grdData)
+            </div>
+        </div>
+    </div>
+</EditForm>
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+    <div class="col-lg-12">
+        @((MarkupString)r_strError)
+
+        <TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+            <GridExport>
+                <GridExcelExport FileName="Nhat_Ky_Import_Excel_Export" AllPages="true" />
+                <GridCsvExport FileName="Nhat_Ky_Import_Excel_Export" AllPages="true" />
+            </GridExport>
+            <GridColumns>
+                <GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+                @if (CCache_Grid_UI_Global.List_Data_By_Code("1029", "grdData").Count > 0)
+                {
+                    <FCommon_General_Col_Grid m_strFCode="1029" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+                }
+                else
+                {
+                    <GridColumn Width="30px">
+                        <Template>
+                            @{
+                                var data = context as CLog_Import_Excel;
+                                <a class="btn btn-link" href="@data.Link_URL">
+                                    <i class="ri-file-download-fill" style="color: purple;"></i>
+                                </a>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="Created" Title="Ngày giờ tạo" Width="120px"></GridColumn>
+                    <GridColumn Field="Created_By" Title="Người tạo" Width="120px"></GridColumn>
+                    <GridColumn Field="Ma_Chuc_Nang" Title="Mã chức năng" Width="100px"></GridColumn>
+                    <GridColumn Field="Ten_Chuc_Nang" Title="Tên chức năng" Width="200px"></GridColumn>
+                    <GridColumn Field="Trang_Thai_HTML" Title="Trạng thái" Width="150px">
+                        <HeaderTemplate>
+                            @Get_Language_Data_Field("Trạng thái")
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var data = context as CLog_Import_Excel;
+                                @((MarkupString)data.Trang_Thai_HTML)
+                            }
+                        </Template>
+                    </GridColumn>
+
+                    <GridColumn Field="Ghi_Chu" Title="Ghi chú" Width="200px"></GridColumn>
+                    <GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+                }
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+    <FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@code {
+    public List<CLog_Import_Excel> v_arrData = new();
+    TelerikGrid<CLog_Import_Excel> grdData = new();
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        Format_Grid(grdData);
+        CLog_Import_Excel_Controller v_objCtrData = new();
+        v_arrData = v_objCtrData.F1029_sp_sel_List_Nhat_Ky_Import_Excel(r_objFilter.Date_From, r_objFilter.Date_To);
+
+
+    }
+}

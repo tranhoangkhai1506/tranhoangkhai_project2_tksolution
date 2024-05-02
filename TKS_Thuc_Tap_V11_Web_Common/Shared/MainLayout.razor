@@ -1,0 +1,60 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Http.Connections
+
+@inject ProtectedLocalStorage sessionStorage
+@inject NavigationManager navManager
+@inject IJSRuntime jsRuntime
+
+<TelerikRootComponent>
+    <CascadingValue Value="@this">
+        @Body
+
+        @if (Is_Loading == true)
+        {
+            <div class="modal fade modal-close-out show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; background-color: rgba(10, 10, 10, .8);">
+                <TelerikLoaderContainer Visible="true" Text="" OverlayThemeColor="dark" LoaderType="LoaderType.ConvergingSpinner">
+                </TelerikLoaderContainer>
+            </div>
+        }
+
+    </CascadingValue>
+</TelerikRootComponent>
+
+@code {
+    private string Active_User_Name = "";
+    public bool Is_Loading { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            Active_User_Name = await CSession.Get_Active_User_Name(sessionStorage);
+
+            if (Active_User_Name == "")
+            {
+                navManager.NavigateTo("/sys/dang_nhap", true);
+                return;
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Start_Loading()
+    {
+        Is_Loading = true;
+        StateHasChanged();
+    }
+
+    public void Stop_Loading()
+    {
+        Is_Loading = false;
+        StateHasChanged();
+    }
+}

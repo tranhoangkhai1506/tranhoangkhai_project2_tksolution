@@ -1,0 +1,155 @@
+﻿@using Telerik.DataSource;
+@code {
+    [Inject]
+    public IJSRuntime g_jsRuntime { get; set; }
+
+    // Error, message
+    public string r_strError = "";
+
+    public string r_strLanguage = "";
+    public long r_iChu_Hang_ID = 0;
+    public long r_iKho_ID = 0;
+
+    protected long _value;
+    protected string _strValue;
+    protected int _intvalue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Init_Data();
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            try
+            {
+                CCookie v_objCookie = new CCookie(g_jsRuntime);
+                r_strLanguage = await v_objCookie.GetValue("language");
+
+                if (r_strLanguage != "vi-VN" && r_strLanguage != "en-US" && r_strLanguage != "jp-JA" && r_strLanguage != "zh-CN" && r_strLanguage != "ko-KR")
+                    r_strLanguage = "vi-VN";
+
+                r_iChu_Hang_ID = CUtility.Convert_To_Int64(await v_objCookie.GetValue("Chu_Hang_ID"));
+                r_iKho_ID = CUtility.Convert_To_Int64(await v_objCookie.GetValue("Kho_ID"));
+
+                Load_Data_Init();
+                await Load_Data_Init_Async();
+
+                StateHasChanged();
+            }
+
+            catch (Exception ex)
+            {
+                r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    #region Hàm inherit
+    protected virtual void Init_Data()
+    {
+
+    }
+
+    protected virtual void Load_Data()
+    {
+
+    }
+
+    protected virtual async Task Load_Data_Async()
+    {
+        await Task.Delay(1);
+    }
+
+    #endregion
+
+    #region Hàm protected xử lý try, catch, chính xác cho các hàm inherit
+
+    protected void Load_Data_Init()
+    {
+        try
+        {
+            Load_Data();
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+    }
+
+    protected async Task Load_Data_Init_Async()
+    {
+        try
+        {
+            await Load_Data_Async();
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox(ex.Message);
+        }
+    }
+
+    #endregion
+
+    #region Hàm protected xử lý luôn
+
+    protected string Get_Language_Data_Field(string p_strField)
+    {
+        return CCache_Language.Get_String_Label_By_Field(p_strField, r_strLanguage);
+    }
+    #endregion
+
+    #region Bind Value
+    [Parameter]
+    public long BindingValue
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            BindingValueChanged.InvokeAsync(value);
+        }
+    }
+    
+    [Parameter]
+    public string BindingStringValue
+    {
+        get => CUtility.Convert_To_String(_strValue);
+        set
+        {
+            if (_strValue == value) return;
+            _strValue = CUtility.Convert_To_String(value);
+            BindingStringValueChanged.InvokeAsync(CUtility.Convert_To_String(value));
+        }
+    }
+
+    [Parameter]
+    public int BindingIntValue
+    {
+        get => _intvalue;
+        set
+        {
+            if (_intvalue == value) return;
+            _intvalue = value;
+            BindingIntValueChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<long> BindingValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> BindingStringValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<int> BindingIntValueChanged { get; set; }
+    #endregion
+}

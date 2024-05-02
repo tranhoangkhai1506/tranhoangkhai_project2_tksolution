@@ -1,0 +1,210 @@
+﻿@layout MPBlank_Layout
+@inherits FBase_Blank
+
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Http.Connections
+
+@inject NavigationManager navigationManager
+@inject IJSRuntime jsRuntime
+@inject ProtectedLocalStorage sessionStorage
+@inject IHttpContextAccessor g_objContext
+
+@page "/Sys/Dang_Nhap"
+
+<div class="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+    <div class="bg-overlay"></div>
+    <!-- auth-page content -->
+    <div class="auth-page-content overflow-hidden pt-lg-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card overflow-hidden">
+                        <div class="row g-0">
+                            <div class="col-lg-6">
+                                <div class="p-lg-5 p-4 auth-one-bg h-100">
+                                    <div class="bg-overlay"></div>
+                                    <div class="position-relative h-100 d-flex flex-column">
+                                        <div class="mt-auto">
+                                            <div class="mb-3">
+                                                <i class="ri-double-quotes-l display-4 text-success"></i>
+                                            </div>
+
+                                            <div id="qoutescarouselIndicators" class="carousel slide" data-bs-ride="carousel">
+                                                <div class="carousel-indicators">
+                                                    <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="0" class="active"
+                                                        aria-current="true" aria-label="Slide 1"></button>
+                                                    <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="1"
+                                                        aria-label="Slide 2"></button>
+                                                    <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="2"
+                                                        aria-label="Slide 3"></button>
+                                                </div>
+                                                <div class="carousel-inner text-center text-white pb-5">
+                                                    <div class="carousel-item active">
+                                                        <p class="fs-15 fst-italic">@Get_Language_Data_Field("\" TKELog WMS có thể xử lý được hơn 50.000 đơn / ngày \"")</p>
+                                                    </div>
+                                                    <div class="carousel-item">
+                                                        <p class="fs-15 fst-italic">@Get_Language_Data_Field("\" Hệ thống đã được phát triển và cải tiến liên tục trong 10 năm qua. \"")</p>
+                                                    </div>
+                                                    <div class="carousel-item">
+                                                        <p class="fs-15 fst-italic">@Get_Language_Data_Field("\" Hiện version mới nhất là 5.0. Cảm ơn quý khách đã ủng hộ và đồng hành cùng TKSolution \"")</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- end carousel -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end col -->
+
+                            <div class="col-lg-6">
+                                <div class="p-lg-5 p-4">
+                                    <div>
+                                        <h5 class="text-primary">@Get_Language_Data_Field("Chào mừng bạn đến TKELog WMS version 5.0") !</h5>
+                                        <p class="text-muted">@Get_Language_Data_Field("Đăng nhập để vào hệ thống").</p>
+                                    </div>
+
+                                    @((MarkupString)r_strError)
+            
+                                    <div class="mt-4">
+                                        <EditForm Model="@r_objUser">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">@Get_Language_Data_Field("Mã đăng nhập")</label>
+                                                <input class="form-control" @ref="txtMa_Dang_Nhap" @bind="@r_objUser.Ma_Dang_Nhap">
+                                            </div>
+                            
+                                            <div class="mb-3">
+                                                <label class="form-label" for="password-input">@Get_Language_Data_Field("Mật khẩu")</label>
+                                                <div class="position-relative auth-pass-inputgroup mb-3">
+                                                    <input type="password" class="form-control pe-5 password-input" @bind="@r_objUser.Mat_Khau">
+                                                </div>
+                                            </div>
+                            
+                                            <div class="mt-4">
+                                                <button class="btn btn-success w-100" @onclick="@Dang_Nhap_System">@Get_Language_Data_Field("Đăng nhập")</button>
+                                            </div>
+                        
+                                            <div class="mt-4 text-center">
+                                                <div class="signin-other-title">
+                                                    <h5 class="fs-14 mb-4 title">@Get_Language_Data_Field("Đăng nhập với nền tảng khác")</h5>
+                                                </div>
+        
+                                                <div>
+                                                    @Get_Language_Data_Field("Hiện doanh nghiệp của bạn không tích hợp các nền tảng đăng nhập như Office 365, Google,... vào TKELog WMS")
+                                                </div>
+                                            </div>
+                
+                                        </EditForm>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end col -->
+                        </div>
+                        <!-- end row -->
+                    </div>
+                    <!-- end card -->
+                </div>
+                <!-- end col -->
+    
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+    <!-- end auth page content -->
+</div>
+
+@code {
+    CSys_Thanh_Vien r_objUser = new CSys_Thanh_Vien();
+
+    private ElementReference txtMa_Dang_Nhap;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender == true)
+        {
+            await txtMa_Dang_Nhap.FocusAsync();
+
+            string v_strActive_User_Name = await CSession.Get_Active_User_Name(sessionStorage);
+            if (v_strActive_User_Name != "")
+                navigationManager.NavigateTo("/", true);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task Dang_Nhap_System()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrThanh_Vien = new CSys_Thanh_Vien_Controller();
+        CLog_Nhat_Ky_Dang_Nhap_Controller v_objCtrNKDN = new CLog_Nhat_Ky_Dang_Nhap_Controller();
+
+        string v_strStep = "";
+
+        await Task.Delay(1);
+        r_objLayout.Start_Loading();
+
+        try
+        {
+            v_strStep = "S1";
+            if (r_objUser.Ma_Dang_Nhap.Trim() == "" || r_objUser.Mat_Khau.Trim() == "")
+                throw new Exception(Get_Language_Data_Field("Vui lòng nhập mã đăng nhập và mật khẩu") + ".");
+
+            v_strStep = "S2";
+            CSys_Thanh_Vien v_objUser = v_objCtrThanh_Vien.FQ_531_TV_sp_sel_Get_By_Ma_Dang_Nhap(r_objUser.Ma_Dang_Nhap);
+            if (v_objUser == null)
+                throw new Exception(Get_Language_Data_Field("Mã đăng nhập không tồn tại") + ".");
+
+            v_strStep = "S3";
+            if (CUtility.MD5_Encrypt(r_objUser.Mat_Khau) != v_objUser.Mat_Khau)
+                throw new Exception(Get_Language_Data_Field("Mật khẩu không đúng") + ".");
+
+            v_strStep = "S4";
+            //Check xem tài khoản đã bị khoá hay chưa
+            if (v_objUser.Trang_Thai_ID == (int)ETrang_Thai_Thanh_Vien_ID.Khoa)
+                throw new Exception(Get_Language_Data_Field("Tài khoản đã bị khoá vui lòng liên hệ quản trị") + ".");
+
+            v_strStep = "S5";
+            // Generate token, Lưu vào cache và lưu xuống database
+            string v_strToken = CUtility.Create_Random_String(45);
+            CCache_Token.Set_Token(v_objUser.Ma_Dang_Nhap, v_strToken);
+
+            v_strStep = "S6";
+            // Tạo nhật ký đăng nhập
+            CLog_Nhat_Ky_Dang_Nhap v_objNKDN = new CLog_Nhat_Ky_Dang_Nhap()
+                {
+                    Ma_Dang_Nhap = r_objUser.Ma_Dang_Nhap,
+                    //IP = g_objContext.HttpContext.Connection.RemoteIpAddress.ToString(),
+                    //User_Agent = g_objContext.HttpContext.Request.Headers["User-Agent"].ToString(),
+                    Last_Updated_By = r_objUser.Ma_Dang_Nhap,
+                    Last_Updated_By_Function = "Sign In"
+                };
+
+            v_strStep = "S7";
+            v_objCtrNKDN.FQ_423_NKDN_sp_ins_Insert(v_objNKDN);
+
+            v_strStep = "S8";
+            await CSession.Set_Active_User_Name(sessionStorage, v_objUser.Ma_Dang_Nhap);
+            await CSession.Set_Active_Full_Name(sessionStorage, v_objUser.Ho_Ten);
+
+            v_strStep = "S9";
+            // Lưu vào cookie 5000 ngày
+            CCookie v_objCookie = new CCookie(jsRuntime);
+            await v_objCookie.SetValue(CConfig.Token_Cookie_Name, v_strToken, 5000);
+
+            v_strStep = "S10";
+            navigationManager.NavigateTo("/", true);
+        }
+
+        catch (Exception ex)
+        {
+            r_strError = CCommonFunction.Set_Error_MessageBox("Step " + v_strStep + ": " + ex.Message);
+        }
+
+        r_objLayout.Stop_Loading();
+    }
+}

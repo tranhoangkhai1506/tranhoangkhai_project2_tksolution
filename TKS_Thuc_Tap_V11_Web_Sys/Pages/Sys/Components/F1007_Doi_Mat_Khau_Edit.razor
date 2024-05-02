@@ -1,0 +1,115 @@
+﻿@inherits FBase;
+
+<EditForm Model="@m_objData">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    @((MarkupString)r_strError)
+                    <div class="row mb-3">
+                        <div class="col-lg-4 col-form-label">
+                            <label class="form-label">@Get_Language_Data_Field("Mật khẩu cũ"):</label>
+                        </div>
+                        <div class="col-lg-8">
+                            <input type="password" @ref="txtFocus" @bind="@m_objData.Mat_Khau" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-lg-4 col-form-label">
+                            <label class="form-label">@Get_Language_Data_Field("Mật khẩu mới"):</label>
+                        </div>
+                        <div class="col-lg-8">
+                            <input type="password" @bind="@m_objData.Mat_Khau_Moi" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-lg-4 col-form-label">
+                            <label class="form-label">@Get_Language_Data_Field("Nhập lại mật khẩu"):</label>
+                        </div>
+                        <div class="col-lg-8">
+                            <input type="password" @bind="@m_objData.Mat_Khau_Moi_Nhap_Lai" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-lg-12" style="text-align: right;">
+                            <button class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Đổi Mật Khẩu")</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    private CSys_Thanh_Vien m_objData = new();
+
+    protected override void Init_Data()
+    {
+
+    }
+
+    protected override void Load_Data()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrData = new();
+        m_objData = CCache_Thanh_Vien.Get_Data_By_Ma_Dang_Nhap(r_strActive_User_Name);
+
+        m_objData.Mat_Khau = "";
+
+        r_bUpdate = true;
+
+        CSys_Thanh_Vien v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objSource = v_objClone;
+    }
+
+    private string Check_Data()
+    {
+        StringBuilder v_sb = new StringBuilder();
+
+        //Kiểm tra không cho password rỗng
+        if (m_objData.Mat_Khau_Moi == "")
+            v_sb.AppendLine(Get_Language_Data_Field("Vui lòng nhập mật khẩu mới."));
+
+        //Kiểm tra không cho password có khoản trắng
+        string v_strValid = CUtility.Is_Valid_Password_Format(m_objData.Mat_Khau_Moi);
+        if (v_strValid != "")
+            v_sb.AppendLine(Get_Language_Data_Field(v_strValid));
+
+        // Kiểm tra hai mật khẩu khớp nhau hay không
+        if (m_objData.Mat_Khau_Moi != m_objData.Mat_Khau_Moi_Nhap_Lai)
+            v_sb.AppendLine(Get_Language_Data_Field("Mật khẩu mới và mật khẩu nhập lại không giống nhau."));
+
+        return v_sb.ToString();
+    }
+
+    protected override void Update_Data()
+    {
+        CSys_Thanh_Vien_Controller v_objCtrData = new();
+
+        string v_strError = Check_Data();
+        if (v_strError != "")
+            throw new Exception(v_strError);
+
+        CSys_Thanh_Vien v_objOld = v_objCtrData.FQ_531_TV_sp_sel_Get_By_Ma_Dang_Nhap(r_strActive_User_Name);
+
+        if (v_objOld.Mat_Khau != CUtility.MD5_Encrypt(m_objData.Mat_Khau))
+            throw new Exception(Get_Language_Data_Field("Mật khẩu cũ không đúng."));
+
+        v_objCtrData.F1007_sp_upd_Doi_Mat_Khau(v_objOld.Auto_ID, CUtility.MD5_Encrypt(m_objData.Mat_Khau_Moi), r_strActive_User_Name, r_strActive_Function_Code);
+
+        r_strError = CCommonFunction.Set_Success_MessageBox(Get_Language_Data_Field("Cập nhật mật khẩu thành công."));
+
+
+        CSys_Thanh_Vien v_objClone = new();
+        CUtility.Clone_Entity(m_objData, v_objClone);
+        r_objDes = v_objClone;
+
+        v_objClone.Mat_Khau = CUtility.MD5_Encrypt(m_objData.Mat_Khau_Moi);
+        CCache_Thanh_Vien.Update_Data(v_objClone);
+    }
+}

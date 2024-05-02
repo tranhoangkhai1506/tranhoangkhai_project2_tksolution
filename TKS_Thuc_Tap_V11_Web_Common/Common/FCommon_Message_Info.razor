@@ -1,0 +1,37 @@
+﻿@inherits FBase;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                @if (r_strMessage_Header == "")
+                {
+                    <h5 class="modal-title" id="myLargeModalLabel">Thông báo</h5>
+                }
+                else
+                {
+                    <h5 class="modal-title" id="myLargeModalLabel">@r_strMessage_Header</h5>
+                }
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                @if (r_strMessage_Info != "")
+                {
+                    @((MarkupString)r_strMessage_Info)
+                }
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        r_bIs_Show_Message_Info = true;
+        await base.OnInitializedAsync();
+    }
+}

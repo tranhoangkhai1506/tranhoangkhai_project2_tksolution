@@ -1,0 +1,324 @@
+﻿@using TKS_Thuc_Tap_V11_Data_Access.Controller.Cache
+@using TKS_Thuc_Tap_V11_Data_Access.Entity.Sys
+@using TKS_Thuc_Tap_V11_Data_Access.Controller.Sys
+@using TKS_Thuc_Tap_V11_Data_Access.Utility
+@using TKS_Thuc_Tap_V11_Web
+@using TKS_Thuc_Tap_V11_Web_Common.Common;
+
+@using System.Text
+
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedLocalStorage sessionStorage
+@inject NavigationManager navigationManager
+
+@{
+    string v_strToken_Login = CUtility.Convert_To_String(ViewContext.HttpContext.Request.Cookies[CConfig.Token_Cookie_Name]);
+    CSys_Token v_objToken = CCache_Token.Get_Data_By_Token(v_strToken_Login);
+
+    if (v_strToken_Login != "" && v_objToken == null)
+    {
+        <script>
+            window.location.href = '/sys/token_expired_error'
+        </script>
+    }
+
+    string v_strLanguage = CUtility.Convert_To_String(ViewContext.HttpContext.Request.Cookies["language"]);
+
+    if (v_strLanguage != "vi-VN" && v_strLanguage != "en-US" && v_strLanguage != "jp-JA" && v_strLanguage != "zh-CN" && v_strLanguage != "ko-KR")
+    {
+        v_strLanguage = "vi-VN";
+
+        <script>
+            Set_Data_Language('vi-VN');
+        </script>
+    }
+}
+
+<div class="app-menu navbar-menu" id="tks_navbar">
+    <!-- LOGO -->
+    
+
+    <div id="scrollbar">
+        <div class="container-fluid">
+            <div id="two-column-menu"></div>
+            <ul class="navbar-nav" id="navbar-nav">
+                <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+
+    @{
+        // Dùng trong trường hợp đăng nhập lần đầu, chưa có token
+        if (v_objToken == null)
+            v_objToken = new CSys_Token();
+
+        List<CSys_Chuc_Nang> v_arrChuc_Nang = CCommonFunction.List_Chuc_Nang_By_User(v_objToken.Ma_Dang_Nhap);
+        
+        // Xử lý menu tùy chỉnh, chuyển các menu con lên thêm 1 cấp nếu đúng khách hàng ID. TienPV 18-09-2023
+        foreach (CSys_Chuc_Nang v_objFunc in v_arrChuc_Nang)
+        {
+            if (v_objFunc.Ma_Chuc_Nang == "I000")
+            {
+                foreach (CSys_Chuc_Nang v_objCN_Con in v_arrChuc_Nang)
+                {
+                    if (v_objCN_Con.Chuc_Nang_Parent_ID == v_objFunc.Auto_ID)
+                    {
+                        if (v_objCN_Con.Khach_Hang_ID != "")
+                            v_objCN_Con.deleted = 1;
+
+                        if (v_objCN_Con.Khach_Hang_ID == CConfig.Khach_Hang_ID.ToString())
+                        {
+                            foreach (CSys_Chuc_Nang v_objCN_Con_1 in v_arrChuc_Nang)
+                                if (v_objCN_Con_1.Chuc_Nang_Parent_ID == v_objCN_Con.Auto_ID)
+                                    v_objCN_Con_1.Chuc_Nang_Parent_ID = v_objFunc.Auto_ID;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int v_i = v_arrChuc_Nang.Count - 1; v_i >= 0; v_i--)
+            if (v_arrChuc_Nang[v_i].deleted == 1)
+                v_arrChuc_Nang.RemoveAt(v_i);
+
+        // Tạo dictionary cha con
+        Dictionary<long, List<CSys_Chuc_Nang>> m_dicDic_Sub = new Dictionary<long, List<CSys_Chuc_Nang>>();
+        foreach (CSys_Chuc_Nang v_objFunc in v_arrChuc_Nang)
+        {
+            foreach (CSys_Chuc_Nang v_objFunc_Con in v_arrChuc_Nang)
+            {
+                if (v_objFunc_Con.Chuc_Nang_Parent_ID == v_objFunc.Auto_ID && v_objFunc_Con.Is_View == true && v_objFunc_Con.Is_Have_View_Permission == true)
+                {
+                    if (m_dicDic_Sub.ContainsKey(v_objFunc.Auto_ID) == false)
+                        m_dicDic_Sub.Add(v_objFunc.Auto_ID, new List<CSys_Chuc_Nang>());
+
+                    m_dicDic_Sub[v_objFunc.Auto_ID].Add(v_objFunc_Con);
+                }
+            }
+        }
+
+        // Xử lý multi language cho danh sách chức năng
+        foreach (CSys_Chuc_Nang v_objChuc_Nang in v_arrChuc_Nang)
+        {
+            string v_strCN_Lang = CCache_Language.Get_String_Label_By_Field(v_objChuc_Nang.Ma_Chuc_Nang, v_strLanguage);
+
+            if (v_strCN_Lang != v_objChuc_Nang.Ma_Chuc_Nang)
+                v_objChuc_Nang.Ten_Chuc_Nang = v_strCN_Lang;
+            else
+            {
+                v_strCN_Lang = CCache_Language.Get_String_Label_By_Field(v_objChuc_Nang.Ten_Chuc_Nang, v_strLanguage);
+                if (v_strCN_Lang != v_objChuc_Nang.Ten_Chuc_Nang)
+                    v_objChuc_Nang.Ten_Chuc_Nang = v_strCN_Lang;
+            }
+        }
+
+        void Generate_Menu(CSys_Chuc_Nang p_objChuc_Nang, int p_iLevel, bool p_bMega)
+        {
+            StringBuilder v_sb = new StringBuilder();
+
+            long v_iParent_ID = 0;
+            if (p_objChuc_Nang != null)
+                v_iParent_ID = p_objChuc_Nang.Auto_ID;
+
+            // List function con
+            List<CSys_Chuc_Nang> v_arrFunc_Con = new List<CSys_Chuc_Nang>();
+
+            if (p_iLevel > 0)
+            {
+                if (m_dicDic_Sub.ContainsKey(v_iParent_ID) == true)
+                    v_arrFunc_Con = m_dicDic_Sub[v_iParent_ID];
+            }
+            else
+            {
+                foreach (CSys_Chuc_Nang v_objFunc_Con in v_arrChuc_Nang)
+                {
+                    if (v_objFunc_Con.Chuc_Nang_Parent_ID == 0 && v_objFunc_Con.Is_View == true && v_objFunc_Con.Is_Have_View_Permission == true)
+                        v_arrFunc_Con.Add(v_objFunc_Con);
+                }
+            }
+
+            if (p_iLevel == 0)
+            {
+                foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                {
+                    bool v_bMega = false;
+
+                    if (v_objCN_Con.Func_URL.ToLower() == "#mega")
+                        v_bMega = true;
+
+                    Generate_Menu(v_objCN_Con, p_iLevel + 1, v_bMega);
+                }
+            }
+
+            if (p_iLevel == 1 && p_bMega == false)
+            {
+                @:<li class="nav-item">
+                    @:<a class="nav-link menu-link main-menu" href="#F-@p_objChuc_Nang.Auto_ID.ToString()" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="F-@p_objChuc_Nang.Auto_ID.ToString()" title="@p_objChuc_Nang.Ten_Chuc_Nang">
+                        @:<i class="@p_objChuc_Nang.Image_URL"></i> <span data-key="t-@p_objChuc_Nang.Auto_ID.ToString()">@p_objChuc_Nang.Ten_Chuc_Nang</span>
+                    @:</a>
+
+                if (v_arrFunc_Con.Count > 0)
+                {
+                    @:<div class="collapse menu-dropdown" id="F-@p_objChuc_Nang.Auto_ID.ToString()">
+                    @:<ul class="nav nav-sm flex-column">
+                    foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                        Generate_Menu(v_objCN_Con, p_iLevel + 1, p_bMega);
+
+                    @:</ul>
+                    @:</div>
+                }
+
+                @:</li>
+            }
+
+            if (p_iLevel == 1 && p_bMega == true)
+            {
+                @:<li class="nav-item">
+                    @:<a class="nav-link menu-link main-menu" href="#F-@p_objChuc_Nang.Auto_ID.ToString()" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="F-@p_objChuc_Nang.Auto_ID.ToString()" title="@p_objChuc_Nang.Ten_Chuc_Nang">
+                        @:<i class="@p_objChuc_Nang.Image_URL"></i> <span data-key="t-@p_objChuc_Nang.Auto_ID.ToString()">@p_objChuc_Nang.Ten_Chuc_Nang</span>
+                    @:</a>
+
+                if (v_arrFunc_Con.Count > 0)
+                {
+                    @:<div class="collapse menu-dropdown mega-dropdown-menu" id="F-@p_objChuc_Nang.Auto_ID.ToString()">
+                    @:<div class="row">
+
+                    // Xác định các menu con không có sub
+                    List<CSys_Chuc_Nang> v_arrCN_Con_No_Sub = new List<CSys_Chuc_Nang>();
+
+                    foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                    {
+                        if (m_dicDic_Sub.ContainsKey(v_objCN_Con.Auto_ID) == false)
+                            v_arrCN_Con_No_Sub.Add(v_objCN_Con);
+                    }
+
+                    int v_iCol = 0;
+                    if (v_arrCN_Con_No_Sub.Count > 0)
+                    {
+                        v_iCol++;
+                        @:<div class="col-lg-2">
+                            @:<ul class="nav nav-sm flex-column">
+                                @:<li class="nav-item" style="padding-bottom: 5px; padding-top: 5px;">
+                                    <span class="nav-item-sub-title">@p_objChuc_Nang.Ten_Chuc_Nang.ToUpper()</span>
+                                @:</li>
+                                foreach (CSys_Chuc_Nang v_objCN_Con in v_arrCN_Con_No_Sub)
+                                {
+                                    @:<li class="nav-item">
+                                        @:<a href="@v_objCN_Con.Func_URL" class="nav-link" data-key="t-@v_objCN_Con.Auto_ID.ToString()"> @v_objCN_Con.Ten_Chuc_Nang </a>
+                                    @:</li>
+                                }
+                            @:</ul>
+                        @:</div>
+                    }
+
+                    foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                    {
+                         if (m_dicDic_Sub.ContainsKey(v_objCN_Con.Auto_ID) == true)
+                         {
+                             v_iCol++;
+
+                             Generate_Menu(v_objCN_Con, p_iLevel + 1, p_bMega);
+                         }
+                    }
+
+                    @:</div>
+                    @:</div>
+                }
+
+                @:</li>
+            }
+
+            if (p_iLevel == 2 && p_bMega == false)
+            {
+                if (v_arrFunc_Con.Count == 0)
+                {
+                    @:<li class="nav-item">
+                    @:<a href="@p_objChuc_Nang.Func_URL" class="nav-link" data-key="t-@p_objChuc_Nang.Auto_ID.ToString()"> @p_objChuc_Nang.Ten_Chuc_Nang </a>
+                }
+                else
+                {
+                    @:<li class="nav-item sub-menu">
+                    @:<a href="#F-@p_objChuc_Nang.Auto_ID.ToString()" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="F-@p_objChuc_Nang.Auto_ID.ToString()" data-key="F-@p_objChuc_Nang.Auto_ID.ToString()">
+                    @:@p_objChuc_Nang.Ten_Chuc_Nang
+                    @:</a>
+                }
+                    
+                if (v_arrFunc_Con.Count > 0)
+                {
+                    @:<div class="collapse menu-dropdown" id="F-@p_objChuc_Nang.Auto_ID.ToString()">
+                    @:<ul class="nav nav-sm flex-column">
+
+                    foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                        Generate_Menu(v_objCN_Con, p_iLevel + 1, p_bMega);
+
+                    @:</ul>
+                    @:</div>
+                }
+
+                @:</li>
+            }
+
+            if (p_iLevel == 2 && p_bMega == true)
+            {
+                @:<div class="col-lg-2">
+                    @:<ul class="nav nav-sm flex-column">
+                        @:<li class="nav-item" style="padding-bottom: 5px; padding-top: 5px;">
+                            <span class="nav-item-sub-title">@p_objChuc_Nang.Ten_Chuc_Nang.ToUpper()</span>
+                        @:</li>
+                        foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                        {
+                            Generate_Menu(v_objCN_Con, p_iLevel + 1, p_bMega);
+                        }
+                    @:</ul>
+                @:</div>
+            }
+
+            if (p_iLevel == 3)
+            {
+                @:<li class="nav-item sub-menu">
+                if (v_arrFunc_Con.Count == 0)
+                {
+                    @:<a href="@p_objChuc_Nang.Func_URL" class="nav-link" data-key="t-@p_objChuc_Nang.Auto_ID.ToString()"> @p_objChuc_Nang.Ten_Chuc_Nang </a>
+                }
+                else
+                {
+                    @:<a href="#F-@p_objChuc_Nang.Auto_ID.ToString()" class="nav-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="F-@p_objChuc_Nang.Auto_ID.ToString()" data-key="F-@p_objChuc_Nang.Auto_ID.ToString()">
+                    @:@p_objChuc_Nang.Ten_Chuc_Nang
+                    @:</a>
+                }
+                    
+                if (v_arrFunc_Con.Count > 0)
+                {
+                    @:<div class="collapse menu-dropdown" id="F-@p_objChuc_Nang.Auto_ID.ToString()">
+                    @:<ul class="nav nav-sm flex-column">
+
+                    foreach (CSys_Chuc_Nang v_objCN_Con in v_arrFunc_Con)
+                        Generate_Menu(v_objCN_Con, p_iLevel + 1, p_bMega);
+
+                    @:</ul>
+                    @:</div>
+                }
+
+                @:</li>
+            }
+
+            if (p_iLevel == 4)
+            {
+                @:<li class="nav-item">
+                @:<a href="@p_objChuc_Nang.Func_URL" class="nav-link" data-key="t-@p_objChuc_Nang.Auto_ID.ToString()"> @p_objChuc_Nang.Ten_Chuc_Nang </a>
+                @:</li>
+            }
+        }
+
+        Generate_Menu(null, 0, false);
+    }
+
+                
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->
+<!-- Vertical Overlay-->
+<div class="vertical-overlay"></div>
+

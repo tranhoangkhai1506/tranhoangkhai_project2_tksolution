@@ -1,0 +1,27 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingStringValue"
+							ScrollMode="@DropDownScrollMode.Virtual"
+							Data="@m_arrData"
+							ValueField="@(nameof(CCombo_Enum.Text))"
+							TextField="@(nameof(CCombo_Enum.Text_Value))"
+							Width="100%"
+							PageSize="10"
+							ItemHeight="35"
+							Filterable="true"
+							FilterOperator="@StringFilterOperator.Contains"
+							ListHeight="260px">
+	<MultiColumnComboBoxColumns>
+		<MultiColumnComboBoxColumn Field="@nameof(CCombo_Enum.Text)" Title="@Get_Language_Data_Field("Title")" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+	</MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+	[Parameter]
+	public List<CCombo_Enum> m_arrData { get; set; } = new();
+
+	protected override void Load_Data()
+	{
+
+	}
+}
