@@ -84,7 +84,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.Cache
 		}
         public static List<CDM_Don_Vi_Tinh> List_Data()
         {
-            return Arr_Data.OrderBy(it => it.Ten_Don_Vi_Tinh).ToList();
+            return Arr_Data.OrderBy(item => item.Ten_Don_Vi_Tinh).ToList();
         }
     }
 }

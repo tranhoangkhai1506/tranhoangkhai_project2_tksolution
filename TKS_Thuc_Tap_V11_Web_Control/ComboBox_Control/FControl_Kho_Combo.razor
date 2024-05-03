@@ -1,0 +1,34 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingValue"
+                            ScrollMode="@DropDownScrollMode.Virtual"
+                            Data="@m_arrData"
+                            ValueField="@(nameof(CDM_Kho.Auto_ID))"
+                            TextField="@(nameof(CDM_Kho.Ten_Kho))"
+                            Width="100%"
+                            PageSize="10"
+                            ItemHeight="35"
+                            Filterable="true"
+                            FilterOperator="@StringFilterOperator.Contains"
+                            ListHeight="260px"
+                            OnChange="Load_Data_Kho_User">
+    <MultiColumnComboBoxColumns>
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_Kho.Auto_ID)" Title="@Get_Language_Data_Field("Kho ID")" Width="150px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_Kho.Ten_Kho)" Title="@Get_Language_Data_Field("Tên Kho")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+    </MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+    List<CDM_Kho> m_arrData = new();
+
+    protected override void Load_Data()
+    {
+        m_arrData = CCache_Kho.List_Data();
+    }
+    [Parameter] public EventCallback Load_Data_Kho_User { get; set; }
+
+    async Task OnValueChanged(string selectedValue)
+    {
+        await Load_Data_Kho_User.InvokeAsync(selectedValue);
+    }
+}

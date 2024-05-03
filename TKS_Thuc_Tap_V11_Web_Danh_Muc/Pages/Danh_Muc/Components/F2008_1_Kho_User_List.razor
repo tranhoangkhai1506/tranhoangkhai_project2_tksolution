@@ -1,0 +1,115 @@
+﻿@inherits FBase;
+
+@Layout_Default_Filter(grdData, "")
+<div style="padding-top: 10px;"></div>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="row mb-1">
+			<div class="col-md-1 col-form-label">
+				<label class="form-label">@Get_Language_Data_Field("Chọn Kho"):</label>
+			</div>
+			<div class="col-md-3">
+				<FControl_Kho_Combo @bind-BindingValue="@m_objData.Kho_ID" Load_Data_Kho_User="Load_Data"></FControl_Kho_Combo>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-12">
+		@((MarkupString)r_strError)
+
+		<TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+			<GridExport>
+				<GridExcelExport FileName="Kho_User_Export" AllPages="true" />
+				<GridCsvExport FileName="Kho_User_Export" AllPages="true" />
+			</GridExport>
+			<GridColumns>
+				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+				<GridColumn Width="60px">
+					<Template>
+						<button class="btn btn-link" @onclick="@(()=> Open_Info((context as CDM_Kho_User).Auto_ID))">
+							<i class="mdi mdi-eye" style="color: purple;"></i>
+						</button>
+						&nbsp;
+						<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="mdi mdi-cog-outline" style="color: purple;"></i>
+						</button>
+						<ul class="dropdown-menu">
+							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+							{
+								<li>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CDM_Kho_User).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+								</li>
+							}
+							@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+							{
+								<li>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CDM_Kho_User).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+								</li>
+							}
+						</ul>
+					</Template>
+				</GridColumn>
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2029", "grdData").Count > 0)
+				{
+					<FCommon_General_Col_Grid m_strFCode="2029" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+				}
+				else
+				{
+					<GridColumn Field="Ma_Dang_Nhap" Title="Mã Đăng Nhập" Width="100px"></GridColumn>
+					<GridColumn Field="Ten_Kho" Title="Tên Kho" Width="100px"></GridColumn>
+					<GridColumn Field="" Title=""></GridColumn>
+				}
+			</GridColumns>
+		</TelerikGrid>
+	</div>
+</div>
+
+@if (r_bIs_Show_Info == true)
+{
+	<F2008_2_Kho_User_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2008_2_Kho_User_Info>
+}
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+	<FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@if (r_bIs_Show_Edit == true)
+{
+	<F2008_3_Kho_User_Edit r_iAuto_ID="@r_iAuto_ID" m_lngKho_ID=m_objData.Kho_ID OnClose="@Close_Edit"></F2008_3_Kho_User_Edit>
+}
+
+@code {
+	public List<CDM_Kho_User> v_arrData = new();
+	TelerikGrid<CDM_Kho_User> grdData = new();
+	private CDM_Kho_User m_objData = new();
+
+	protected override void Init_Data()
+	{
+	}
+	protected override void Load_Data()
+	{
+		CDM_Kho_User_Controller v_objCtrData = new();
+
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+
+		v_arrData = v_objCtrData.FQ_117_KU_sp_sel_List_By_Created(m_objData.Kho_ID, r_objFilter.Date_From, r_objFilter.Date_To );
+	}
+
+	protected override void Delete_Data_Entry(long p_iAuto_ID)
+	{
+		CDM_Kho_User_Controller v_objCtrData = new();
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CDM_Kho_User v_objData = v_objCtrData.FQ_117_KU_sp_sel_Get_By_ID(p_iAuto_ID);
+		if (v_objData != null)
+			r_strDelete_Key = v_objData.Ma_Dang_Nhap;
+		// End tracking
+
+		v_objCtrData.FQ_117_KU_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+
+		CCache_Kho_User.Delete_Data(p_iAuto_ID);
+	}
+}

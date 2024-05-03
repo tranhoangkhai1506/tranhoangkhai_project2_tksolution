@@ -1,6 +1,6 @@
 ﻿@inherits FBase;
 
-@Layout_Default_Filter(grdData, "San_Pham_Template.xlsx")
+@Layout_Default_Filter(grdData, "NCC_Template.xlsx")
 <div style="padding-top: 10px;"></div>
 
 <div class="row">
@@ -9,14 +9,14 @@
 
 		<TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
 			<GridExport>
-				<GridExcelExport FileName="San_Pham_Export" AllPages="true" />
-				<GridCsvExport FileName="San_Pham_Export" AllPages="true" />
+				<GridExcelExport FileName="NCC_Export" AllPages="true" />
+				<GridCsvExport FileName="NCC_Export" AllPages="true" />
 			</GridExport>
 			<GridColumns>
 				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
 				<GridColumn Width="60px">
 					<Template>
-						<button class="btn btn-link" @onclick="@(()=> Open_Info((context as CDM_San_Pham).Auto_ID))">
+						<button class="btn btn-link" @onclick="@(()=> Open_Info((context as CDM_NCC).Auto_ID))">
 							<i class="mdi mdi-eye" style="color: purple;"></i>
 						</button>
 						&nbsp;
@@ -27,28 +27,26 @@
 							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
 							{
 								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CDM_San_Pham).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CDM_NCC).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
 								</li>
 							}
 							@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
 							{
 								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CDM_San_Pham).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CDM_NCC).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
 								</li>
 							}
 						</ul>
 					</Template>
 				</GridColumn>
-				@if (CCache_Grid_UI_Global.List_Data_By_Code("2003", "grdData").Count > 0)
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2006", "grdData").Count > 0)
 				{
-					<FCommon_General_Col_Grid m_strFCode="2003" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+					<FCommon_General_Col_Grid m_strFCode="2006" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
 				}
 				else
 				{
-					<GridColumn Field="Ma_San_Pham" Title="Mã Sản Phẩm" Width="100px"></GridColumn>
-					<GridColumn Field="Ten_San_Pham" Title="Tên Sản Phẩm" Width="200px"></GridColumn>
-					<GridColumn Field="Ten_Loai_San_Pham" Title="Loại Sản Phẩm" Width="100px"></GridColumn>
-					<GridColumn Field="Ten_Don_Vi_Tinh" Title="Đơn Vị Tính" Width="100px"></GridColumn>
+					<GridColumn Field="Ma_NCC" Title="Mã Nhà Cung Cấp" Width="100px"></GridColumn>
+					<GridColumn Field="Ten_NCC" Title="Tên NCC" Width="200px"></GridColumn>
 					<GridColumn Field="Ghi_Chu" Title="Ghi Chú" Width="200px"></GridColumn>
 					<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
 				}
@@ -59,7 +57,7 @@
 
 @if (r_bIs_Show_Info == true)
 {
-	<F2003_2_San_Pham_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2003_2_San_Pham_Info>
+	<F2006_2_NCC_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2006_2_NCC_Info>
 }
 
 @if (r_bIs_Show_Help_Guide == true)
@@ -69,7 +67,7 @@
 
 @if (r_bIs_Show_Edit == true)
 {
-	<F2003_3_San_Pham_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2003_3_San_Pham_Edit>
+	<F2006_3_NCC_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2006_3_NCC_Edit>
 }
 
 @if (r_bIs_Show_Import_Excel == true)
@@ -83,8 +81,8 @@
 }
 
 @code {
-	public List<CDM_San_Pham> v_arrData = new();
-	TelerikGrid<CDM_San_Pham> grdData = new();
+	public List<CDM_NCC> v_arrData = new();
+	TelerikGrid<CDM_NCC> grdData = new();
 
 	protected override void Init_Data()
 	{
@@ -93,32 +91,32 @@
 
 	protected override void Load_Data()
 	{
-		CDM_San_Pham_Controller v_objCtrData = new();
+		CDM_NCC_Controller v_objCtrData = new();
 
 		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
 		Format_Grid(grdData);
 
-		v_arrData = v_objCtrData.FQ_165_SP_sp_sel_List_By_Created(r_objFilter.Date_From, r_objFilter.Date_To);
+		v_arrData = v_objCtrData.FQ_123_N_sp_sel_List_By_Created(r_objFilter.Date_From, r_objFilter.Date_To);
 	}
 
 	protected override void Delete_Data_Entry(long p_iAuto_ID)
 	{
-		CDM_San_Pham_Controller v_objCtrData = new();
+		CDM_NCC_Controller v_objCtrData = new();
 
 		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
-		CDM_San_Pham v_objData = v_objCtrData.FQ_165_SP_sp_sel_Get_By_ID(p_iAuto_ID);
+		CDM_NCC v_objData = v_objCtrData.FQ_123_N_sp_sel_Get_By_ID(p_iAuto_ID);
 		if (v_objData != null)
-			r_strDelete_Key = v_objData.Ma_San_Pham;
+			r_strDelete_Key = v_objData.Ma_NCC;
 		// End tracking
 
-		v_objCtrData.FQ_165_SP_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+		v_objCtrData.FQ_123_N_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
 
-		CCache_San_Pham.Delete_Data(p_iAuto_ID);
+		CCache_NCC.Delete_Data(p_iAuto_ID);
 	}
 
 	protected override void Import_Excel_Entry(CExcel_Controller v_objCtrlExcel, ref int p_iCount_Success, ref int p_iCount_Error)
 	{
-		CDM_San_Pham_Controller v_objCtrData = new();
+		CDM_NCC_Controller v_objCtrData = new();
 
 		StringBuilder v_sbError = new StringBuilder();
 		SqlConnection v_conn = null;
@@ -126,7 +124,7 @@
 
 		try
 		{
-			DataTable v_dt = v_objCtrlExcel.List_Range_Value_To_End(0, "A2", "E");
+			DataTable v_dt = v_objCtrlExcel.List_Range_Value_To_End(0, "A2", "C");
 
 			// Loại mấy dòng trống
 			for (int v_i = v_dt.Rows.Count - 1; v_i >= 0; v_i--)
@@ -146,22 +144,20 @@
 
 				try
 				{
-					CDM_San_Pham v_objData = new CDM_San_Pham();
-					v_objData.Ma_San_Pham = CUtility.Convert_To_String(v_row[0]);
-					v_objData.Ten_San_Pham = CUtility.Convert_To_String(v_row[1]);
-					v_objData.Loai_San_Pham_ID = CUtility.Convert_To_Int64(v_row[2]);
-					v_objData.Don_Vi_Tinh_ID = CUtility.Convert_To_Int64(v_row[3]);
-					v_objData.Ghi_Chu = CUtility.Convert_To_String(v_row[4]);
+					CDM_NCC v_objData = new CDM_NCC();
+					v_objData.Ma_NCC = CUtility.Convert_To_String(v_row[0]);
+					v_objData.Ten_NCC = CUtility.Convert_To_String(v_row[1]);
+					v_objData.Ghi_Chu = CUtility.Convert_To_String(v_row[2]);
 					v_objData.Last_Updated_By = r_strActive_User_Name;
 					v_objData.Last_Updated_By_Function = r_strActive_Function_Code;
 
-					v_objData.Auto_ID = v_objCtrData.FQ_165_SP_sp_ins_Insert(v_conn, v_trans, v_objData);
+					v_objData.Auto_ID = v_objCtrData.FQ_123_N_sp_ins_Insert(v_conn, v_trans, v_objData);
 					p_iCount_Success++;
 					v_trans.Commit();
 
-					CCache_San_Pham.Add_Data(v_objData);
+					CCache_NCC.Add_Data(v_objData);
 
-					CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.Ma_San_Pham);
+					CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.Ma_NCC);
 				}
 
 				catch (Exception ex)
