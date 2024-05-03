@@ -1,0 +1,27 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingValue"
+                            ScrollMode="@DropDownScrollMode.Virtual"
+                            Data="@m_arrData"
+                            ValueField="@(nameof(CDM_Don_Vi_Tinh.Auto_ID))"
+                            TextField="@(nameof(CDM_Don_Vi_Tinh.Ten_Don_Vi_Tinh))"
+                            Width="100%"
+                            PageSize="10"
+                            ItemHeight="35"
+                            Filterable="true"
+                            FilterOperator="@StringFilterOperator.Contains"
+                            ListHeight="260px">
+    <MultiColumnComboBoxColumns>
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_Don_Vi_Tinh.Ten_Don_Vi_Tinh)" Title="@Get_Language_Data_Field("Tên Đơn Vị Tính")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+    </MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+    List<CDM_Don_Vi_Tinh> m_arrData = new();
+
+    protected override void Load_Data()
+    {
+        m_arrData = CCache_Don_Vi_Tinh.List_Data();
+    }
+
+}

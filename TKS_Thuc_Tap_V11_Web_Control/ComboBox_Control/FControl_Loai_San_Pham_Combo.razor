@@ -1,0 +1,28 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingValue"
+                            ScrollMode="@DropDownScrollMode.Virtual"
+                            Data="@m_arrData"
+                            ValueField="@(nameof(CDM_Loai_San_Pham.Auto_ID))"
+                            TextField="@(nameof(CDM_Loai_San_Pham.Ten_LSP))"
+                            Width="100%"
+                            PageSize="10"
+                            ItemHeight="35"
+                            Filterable="true"
+                            FilterOperator="@StringFilterOperator.Contains"
+                            ListHeight="260px">
+    <MultiColumnComboBoxColumns>
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_Loai_San_Pham.Ma_LSP)" Title="@Get_Language_Data_Field("Mã Loại Sản Phẩm")" Width="150px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_Loai_San_Pham.Ten_LSP)" Title="@Get_Language_Data_Field("Tên Loại Sản Phẩm")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+    </MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+    List<CDM_Loai_San_Pham> m_arrData = new();
+
+    protected override void Load_Data()
+    {
+        m_arrData = CCache_Loai_San_Pham.List_Data();
+    }
+
+}
