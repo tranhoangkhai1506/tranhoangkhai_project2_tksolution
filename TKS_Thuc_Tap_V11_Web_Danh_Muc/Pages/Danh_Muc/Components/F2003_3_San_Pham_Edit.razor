@@ -111,6 +111,17 @@
 
 	protected override void Add_Data()
 	{
+
+		@if (m_objData.Loai_San_Pham_ID == 0)
+		{
+			throw new Exception("Vui lòng chọn loại sản phẩm.");
+		}
+		
+		@if (m_objData.Don_Vi_Tinh_ID == 0)
+		{
+			throw new Exception("Vui lòng chọn đơn vị tính.");
+		}
+
 		CDM_San_Pham_Controller v_objCtrData = new();
 		m_objData.Last_Updated_By = r_strActive_User_Name;
 		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
@@ -126,6 +137,16 @@
 
 	protected override void Update_Data()
 	{
+		@if (m_objData.Loai_San_Pham_ID == 0)
+		{
+			throw new Exception("Vui lòng chọn loại sản phẩm.");
+		}
+
+		@if (m_objData.Don_Vi_Tinh_ID == 0)
+		{
+			throw new Exception("Vui lòng chọn đơn vị tính.");
+		}
+
 		CDM_San_Pham_Controller v_objCtrData = new();
 		m_objData.Last_Updated_By = r_strActive_User_Name;
 		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;

@@ -17,38 +17,17 @@
             </div>
 
             @((MarkupString)r_strError)
-
+            
             <EditForm Model="@m_objData">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            @if (m_lngKho_ID != 0)
-                            {
-                                <div class="row mb-1">
-                                    <div class="col-lg-12 col-form-label">
-                                        <label class="form-label">@Get_Language_Data_Field("Thêm user vào Kho " + m_objKho.Ten_Kho) </label>
-                                        <span hidden class="form-label">@CUtility.Get_Label_Text(@m_lngKho_ID, false)</span>
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="row mb-1">
-                                    <div class="col-lg-4 col-form-label">
-                                        <label class="form-label">@Get_Language_Data_Field("Chọn Kho"):</label>
-                                    </div>
-                                    <div class="col-lg-8">
-                                        <FControl_Kho_Combo @bind-BindingValue="@m_objData.Kho_ID"></FControl_Kho_Combo>
-
-                                    </div>
-                                </div>
-                            }
+                        <div class="col-lg-12">                           
                             <div class="row mb-1">
                                 <div class="col-lg-4 col-form-label">
                                     <label class="form-label">@Get_Language_Data_Field("Mã đăng nhập"):</label>
                                 </div>
                                 <div class="col-lg-8">
-                                    <FControl_Ma_Dang_Nhap_Combo @bind-BindingValue="@m_objData.Thanh_Vien_ID"></FControl_Ma_Dang_Nhap_Combo>
+                                    <FControl_Ma_Dang_Nhap_Combo m_arrData="@m_arrThanh_Vien" @bind-BindingValue="@m_objData.Thanh_Vien_ID"></FControl_Ma_Dang_Nhap_Combo>
                                 </div>
                             </div>
                         </div>
@@ -60,6 +39,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
             </div>
+
         </div>
     </div>
 </div>
@@ -72,6 +52,7 @@
 
     private CDM_Kho_User m_objData = new();
 
+    private List<CSys_Thanh_Vien> m_arrThanh_Vien = new();
     protected override void Init_Data()
     {
     }
@@ -85,7 +66,17 @@
         CDM_Kho_User_Controller v_objCtrData = new();
         m_objData = v_objCtrData.FQ_117_KU_sp_sel_Get_By_ID(r_iAuto_ID);
 
-        if (m_objData == null)
+        @if (m_lngKho_ID != 0)
+        {
+            CSys_Thanh_Vien_Controller v_objCtrThanh_Vien = new CSys_Thanh_Vien_Controller();
+            m_arrThanh_Vien = v_objCtrThanh_Vien.F117_sp_sel_List_Thanh_Vien_Khong_Thuoc_Kho(m_lngKho_ID);
+        }
+        else
+        {
+            m_arrThanh_Vien = null;
+        }
+
+    if (m_objData == null)
             m_objData = new CDM_Kho_User();
         else
         {
@@ -101,6 +92,14 @@
 
     protected override void Add_Data()
     {
+        @if (m_lngKho_ID == 0)
+        {
+            throw new Exception("Vui lòng chọn Kho.");
+        }
+        @if (m_objData.Thanh_Vien_ID == 0)
+        {
+            throw new Exception("Vui lòng chọn thành viên.");
+        }
         CDM_Kho_User_Controller v_objCtrData = new();
         m_objData.Last_Updated_By = r_strActive_User_Name;
         m_objData.Last_Updated_By_Function = r_strActive_Function_Code;

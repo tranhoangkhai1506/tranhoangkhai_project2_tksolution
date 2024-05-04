@@ -43,7 +43,7 @@ namespace TKS_Thuc_Tap_V11_Web.Background_Service
                 CCache_Don_Vi_Tinh.Load_Cache_DM_Don_Vi_Tinh();
                 CCache_Loai_San_Pham.Load_Cache_DM_Loai_San_Pham();
                 CCache_Kho.Load_Cache_DM_Kho();
-                //CCache_Thanh_Vien.Load_Cache_Thanh_Vien();
+                CCache_Thanh_Vien.Load_Cache_Thanh_Vien();
 				CCache_Common_Controller.Is_Completed_Load_Cache = true;
             }
 

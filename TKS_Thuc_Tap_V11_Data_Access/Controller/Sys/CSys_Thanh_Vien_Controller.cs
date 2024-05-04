@@ -257,6 +257,34 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.Sys
 
             return v_arrRes;
         }
+        public List<CSys_Thanh_Vien> F117_sp_sel_List_Thanh_Vien_Khong_Thuoc_Kho(long p_iKho_ID)
+        {
+            List<CSys_Thanh_Vien> v_arrRes = new List<CSys_Thanh_Vien>();
+            DataTable v_dt = new DataTable();
+
+            try
+            {
+                CSqlHelper.FillDataTable(CConfig.TKS_Thuc_Tap_V11_Conn_String, v_dt, "F117_sp_sel_List_Thanh_Vien_Khong_Thuoc_Kho", p_iKho_ID);
+
+                foreach (DataRow v_row in v_dt.Rows)
+                {
+                    CSys_Thanh_Vien v_objRes = CUtility.Map_Row_To_Entity<CSys_Thanh_Vien>(v_row);
+                    v_arrRes.Add(v_objRes);
+                }
+            }
+
+            catch (Exception)
+            {
+                throw;
+            }
+
+            finally
+            {
+                v_dt.Dispose();
+            }
+
+            return v_arrRes;
+        }
 
         public void F1007_sp_upd_Doi_Mat_Khau(long p_iAuto_ID, string p_strMat_Khau_Moi, string p_strLast_Updated_By, string p_strLast_Updated_By_Function)
         {
