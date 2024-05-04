@@ -39,14 +39,14 @@
 						</ul>
 					</Template>
 				</GridColumn>
-				@if (CCache_Grid_UI_Global.List_Data_By_Code("2003", "grdData").Count > 0)
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2005", "grdData").Count > 0)
 				{
-					<FCommon_General_Col_Grid m_strFCode="2003" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+					<FCommon_General_Col_Grid m_strFCode="2005" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
 				}
 				else
 				{
-					<GridColumn Field="Ma_LSP" Title="Mã Loại Sản Phẩm" Width="100px"></GridColumn>
-					<GridColumn Field="Ten_LSP" Title="Tên Loại Sản Phẩm" Width="200px"></GridColumn>
+					<GridColumn Field="Ma_LSP" Title="Mã loại sản phẩm" Width="100px"></GridColumn>
+					<GridColumn Field="Ten_LSP" Title="Tên loại sản phẩm" Width="200px"></GridColumn>
 					<GridColumn Field="Ghi_Chu" Title="Ghi Chú" Width="200px"></GridColumn>
 					<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
 				}
@@ -57,7 +57,7 @@
 
 @if (r_bIs_Show_Info == true)
 {
-	<F2003_2_Loai_San_Pham_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2003_2_Loai_San_Pham_Info>
+	<F2005_2_Loai_San_Pham_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2005_2_Loai_San_Pham_Info>
 }
 
 @if (r_bIs_Show_Help_Guide == true)
@@ -67,7 +67,7 @@
 
 @if (r_bIs_Show_Edit == true)
 {
-	<F2003_3_Loai_San_Pham_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2003_3_Loai_San_Pham_Edit>
+	<F2005_3_Loai_San_Pham_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2005_3_Loai_San_Pham_Edit>
 }
 
 @if (r_bIs_Show_Import_Excel == true)

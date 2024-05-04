@@ -39,9 +39,9 @@
 						</ul>
 					</Template>
 				</GridColumn>
-				@if (CCache_Grid_UI_Global.List_Data_By_Code("2003", "grdData").Count > 0)
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2009", "grdData").Count > 0)
 				{
-					<FCommon_General_Col_Grid m_strFCode="2003" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+					<FCommon_General_Col_Grid m_strFCode="2009" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
 				}
 				else
 				{
@@ -59,7 +59,7 @@
 
 @if (r_bIs_Show_Info == true)
 {
-	<F2003_2_San_Pham_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2003_2_San_Pham_Info>
+	<F2009_2_San_Pham_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2009_2_San_Pham_Info>
 }
 
 @if (r_bIs_Show_Help_Guide == true)
@@ -69,7 +69,7 @@
 
 @if (r_bIs_Show_Edit == true)
 {
-	<F2003_3_San_Pham_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2003_3_San_Pham_Edit>
+	<F2009_3_San_Pham_Edit r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2009_3_San_Pham_Edit>
 }
 
 @if (r_bIs_Show_Import_Excel == true)
