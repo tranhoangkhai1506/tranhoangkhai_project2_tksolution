@@ -1,0 +1,33 @@
+﻿@inherits FBase_Combo;
+
+<TelerikMultiColumnComboBox @bind-Value="@BindingValue"
+                            ScrollMode="@DropDownScrollMode.Virtual"
+                            Data="@m_arrData"
+                            ValueField="@(nameof(CDM_San_Pham.Auto_ID))"
+                            TextField="@(nameof(CDM_San_Pham.Ten_San_Pham))"
+                            Width="100%"
+                            PageSize="10"
+                            ItemHeight="35"
+                            Filterable="true"
+                            FilterOperator="@StringFilterOperator.Contains"
+                            ListHeight="260px">
+    <MultiColumnComboBoxColumns>
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_San_Pham.Auto_ID)" Title="@Get_Language_Data_Field("ID")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+        <MultiColumnComboBoxColumn Field="@nameof(CDM_San_Pham.Ten_San_Pham)" Title="@Get_Language_Data_Field("Tên Sản Phẩm")" Width="250px" Class="k-tks-combobox-item" HeaderClass="k-tks-combobox-header" />
+    </MultiColumnComboBoxColumns>
+</TelerikMultiColumnComboBox>
+
+@code {
+    List<CDM_San_Pham> m_arrData = new();
+
+    protected override void Load_Data()
+    {
+        m_arrData = CCache_San_Pham.List_Data();
+    }
+    [Parameter] public EventCallback Load_Data_Chi_Tiet { get; set; }
+
+    async Task OnValueChanged(string selectedValue)
+    {
+        await Load_Data_Chi_Tiet.InvokeAsync(selectedValue);
+    }
+}

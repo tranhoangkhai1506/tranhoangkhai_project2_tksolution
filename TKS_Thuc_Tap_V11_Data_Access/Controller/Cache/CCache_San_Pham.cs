@@ -82,5 +82,9 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.Cache
 
 			return null;
 		}
-	}
+        public static List<CDM_San_Pham> List_Data()
+        {
+            return Arr_Data.OrderBy(item => item.Auto_ID).ToList();
+        }
+    }
 }
