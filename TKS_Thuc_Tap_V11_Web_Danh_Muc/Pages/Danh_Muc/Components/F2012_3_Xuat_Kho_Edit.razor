@@ -1,0 +1,171 @@
+﻿@inherits FBase_Edit;
+
+<div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
+	<div class="modal-dialog modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header bg-light">
+				@if (r_iAuto_ID != 0)
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Hiệu chỉnh")</h5>
+				}
+				else
+				{
+					<h5 class="modal-title">@Get_Language_Data_Field("Thêm mới")</h5>
+				}
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
+				</button>
+			</div>
+
+			@((MarkupString)r_strError)
+
+			<EditForm Model="@m_objData">
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Số phiếu xuất kho"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @ref="txtFocus" @bind="@m_objData.So_Phieu_Xuat_Kho" class="form-control">
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Ngày xuất kho"):</label>
+								</div>
+								<div class="col-lg-8">
+									<TelerikDatePicker @bind-Value="@m_objData.Ngay_Xuat_Kho" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+
+								</div>
+							</div>
+
+							<div class="row mb-1">
+								<div class="col-lg-4 col-form-label">
+									<label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
+								</div>
+								<div class="col-lg-8">
+									<input @bind="@m_objData.Ghi_Chu" class="form-control">
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</EditForm>
+
+			<div style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px">
+				<F2013_1_Xuat_Kho_Chi_Tiet_Xuat_Kho_List m_lngSo_Phieu_Xuat_Kho="@r_iAuto_ID"></F2013_1_Xuat_Kho_Chi_Tiet_Xuat_Kho_List>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public long m_lngKho_ID { get; set; }
+	private CXNK_Xuat_Kho m_objData = new();
+
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+		m_objData = v_objCtrData.FQ_728_XK_sp_sel_Get_By_ID(r_iAuto_ID);
+
+		if (m_objData == null)
+			m_objData = new CXNK_Xuat_Kho();
+		else
+		{
+			r_bUpdate = true;
+
+			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+			CXNK_Xuat_Kho v_objClone = new();
+			CUtility.Clone_Entity(m_objData, v_objClone);
+			r_objSource = v_objClone;
+			// End tracking
+		}
+	}
+
+	protected override void Add_Data()
+	{
+		@if (m_lngKho_ID == 0)
+		{
+			throw new Exception("Vui lòng chọn Kho.");
+		}
+		@if (m_objData.Ngay_Xuat_Kho is null)
+		{
+			throw new Exception("Vui lòng chọn ngày xuất kho.");
+		}
+
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+
+
+		List<CXNK_Xuat_Kho> m_objExistData = v_objCtrData.F2012_sp_sel_List_By_So_Phieu_Xuat_Kho(m_objData.So_Phieu_Xuat_Kho);
+
+		if (m_objExistData.Count() != 0)
+		{
+			if (m_objData.Auto_ID != m_objExistData[0].Auto_ID)
+			{
+				throw new Exception("Số phiếu xuất kho đã tồn tại.");
+			}
+		}
+
+		m_objData.Kho_ID = m_lngKho_ID;
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_728_XK_sp_ins_Insert(m_objData);
+
+		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
+
+		List<CXNK_Xuat_Kho_Raw_Data> v_arrRawData = v_objCtrRawData.F2013_sp_sel_List_Chi_Tiet_Xuat_Kho_Local();
+
+		try
+		{
+			if (v_arrRawData.Count() != 0)
+			{
+				foreach (var v_objDetail in v_arrRawData)
+				{
+					v_objDetail.Xuat_Kho_ID = m_objData.Auto_ID;
+					v_objCtrRawData.FQ_734_XKRD_sp_ins_Insert(v_objDetail);
+				}
+				v_objCtrRawData.F2013_sp_del_List_Chi_Tiet_Xuat_Kho_Local();
+			}
+		}
+		catch (Exception ex)
+		{
+			throw new Exception(ex.Message);
+		}
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		r_strAdd_Key = m_objData.So_Phieu_Xuat_Kho;
+		// End tracking
+	}
+
+	protected override void Update_Data()
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+		m_objData.Last_Updated_By = r_strActive_User_Name;
+		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+		v_objCtrData.FQ_728_XK_sp_upd_Update(m_objData);
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CXNK_Xuat_Kho v_objClone = new();
+		CUtility.Clone_Entity(m_objData, v_objClone);
+		r_objDes = v_objClone;
+		// End tracking
+	}
+}

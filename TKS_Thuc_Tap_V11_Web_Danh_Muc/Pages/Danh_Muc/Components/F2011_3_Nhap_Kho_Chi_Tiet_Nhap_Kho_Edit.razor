@@ -92,7 +92,6 @@
 			</EditForm>
 			}
 			
-
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>
 			</div>
@@ -139,6 +138,18 @@
 
 	protected override void Add_Data()
 	{
+		@if (m_objData.San_Pham_ID == 0 )
+		{
+			throw new Exception("Vui lòng chon Sản Phẩm.");
+		}
+		@if (m_objData.SL_Nhap <= 0 )
+		{
+			throw new Exception("Vui lòng nhập Số Lượng Nhập > 0.");
+		}
+		@if (m_objData.Don_Gia_Nhap <= 0)
+		{
+			throw new Exception("Vui lòng nhập Đơn Giá Nhập > 0.");
+		}
 		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrData = new();
 		if (m_lngSo_Phieu_Nhap_Kho != 0)
 		{
@@ -190,8 +201,6 @@
 			CUtility.Clone_Entity(m_objData, v_objClone);
 			r_objDes = v_objClone;
 			r_strAdd_Key = m_objData.Auto_ID.ToString();
-		}
-
-		
+		}		
 	}
 }

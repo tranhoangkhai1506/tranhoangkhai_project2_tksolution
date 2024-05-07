@@ -21,56 +21,45 @@
 			<EditForm Model="@m_objData">
 				<div class="modal-body">
 					<div class="row">
-						<!-- First Row -->
 						<div class="col-lg-6">
-							<div class="row mb-1">
-								<div class="col-lg-4 col-form-label">
+							<div class="row mb-3">
+								<div class="col-lg-11">
 									<label class="form-label">@Get_Language_Data_Field("Số phiếu nhập"):</label>
-								</div>
-								<div class="col-lg-8">
 									<input @ref="txtFocus" @bind="@m_objData.So_Phieu_Nhap_Kho" class="form-control">
 								</div>
 							</div>
-						</div>
-						<div class="col-lg-6">
-							<div class="row mb-1">
-								<div class="col-lg-4 col-form-label">
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
 									<label class="form-label">@Get_Language_Data_Field("Nhà cung cấp"):</label>
-								</div>
-								<div class="col-lg-8">
 									<FControl_NCC_Combo @bind-BindingValue="@m_objData.NCC_ID"></FControl_NCC_Combo>
 								</div>
 							</div>
+
 						</div>
-					</div>
-					<div class="row">
-						<!-- Second Row -->
+
 						<div class="col-lg-6">
-							<div class="row mb-1">
-								<div class="col-lg-4 col-form-label">
+							<div class="row mb-3">
+								<div class="col-lg-11">
 									<label class="form-label">@Get_Language_Data_Field("Ngày nhập kho"):</label>
-								</div>
-								<div class="col-lg-8">
 									<TelerikDatePicker @bind-Value="@m_objData.Ngay_Nhap_Kho" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
 								</div>
 							</div>
-						</div>
-						<div class="col-lg-6">
-							<div class="row mb-1">
-								<div class="col-lg-4 col-form-label">
+
+							<div class="row mb-3">
+								<div class="col-lg-11">
 									<label class="form-label">@Get_Language_Data_Field("Ghi chú"):</label>
-								</div>
-								<div class="col-lg-8">
 									<input @bind="@m_objData.Ghi_Chu" class="form-control">
 								</div>
 							</div>
 						</div>
 					</div>
+
 				</div>
 			</EditForm>
-
-
-			<F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List m_lngSo_Phieu_Nhap_Kho="@r_iAuto_ID"></F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List>
+			<div style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px">
+				<F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List m_lngSo_Phieu_Nhap_Kho="@r_iAuto_ID"></F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List>
+			</div>
 
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary" @onclick="@Save_Data">@Get_Language_Data_Field("Lưu Thay Đổi")</button>

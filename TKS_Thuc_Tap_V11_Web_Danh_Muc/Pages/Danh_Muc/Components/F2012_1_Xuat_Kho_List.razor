@@ -1,0 +1,210 @@
+﻿@inherits FBase;
+
+@Layout_Default_Filter(grdData, "Xuat_Kho_Template.xlsx")
+<div style="padding-top: 10px;"></div>
+
+<div class="row">
+	<div class="col-lg-12">
+		<div class="row mb-1">
+			<div class="col-md-1 col-form-label">
+				<label class="form-label">@Get_Language_Data_Field("Chọn Kho"):</label>
+			</div>
+			<div class="col-md-3">
+				<FControl_Kho_Combo @bind-BindingValue="@m_objXuat_Kho.Kho_ID" Load_Data_Kho_User="Load_Data"></FControl_Kho_Combo>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-lg-12">
+		@((MarkupString)r_strError)
+
+		<TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+			<GridExport>
+				<GridExcelExport FileName="Xuat_Kho_Export" AllPages="true" />
+				<GridCsvExport FileName="Xuat_Kho_Export" AllPages="true" />
+			</GridExport>
+			<GridColumns>
+				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+				<GridColumn Width="60px">
+					<Template>
+						<button class="btn btn-link" @onclick="@(()=> Open_Info((context as CXNK_Xuat_Kho).Auto_ID))">
+							<i class="mdi mdi-eye" style="color: purple;"></i>
+						</button>
+						&nbsp;
+						<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="mdi mdi-cog-outline" style="color: purple;"></i>
+						</button>
+						<ul class="dropdown-menu">
+							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+							{
+								<li>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
+								</li>
+							}
+							@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+							{
+								<li>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+								</li>
+							}
+						</ul>
+					</Template>
+				</GridColumn>
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2012", "grdData").Count > 0)
+				{
+					<FCommon_General_Col_Grid m_strFCode="2012" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+				}
+				else
+				{
+					<GridColumn Field="So_Phieu_Xuat_Kho" Title="Số Phiếu Xuất" Width="100px"></GridColumn>
+					<GridColumn Field="Ngay_Xuat_Kho" Title="Ngày Xuất Kho" Width="120px"></GridColumn>
+					<GridColumn Field="Ghi_Chu" Title="Ghi Chú" Width="200px"></GridColumn>
+					<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
+				}
+			</GridColumns>
+		</TelerikGrid>
+	</div>
+</div>
+
+@if (r_bIs_Show_Info == true)
+{
+	<F2012_2_Xuat_Kho_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2012_2_Xuat_Kho_Info>
+}
+
+@if (r_bIs_Show_Help_Guide == true)
+{
+	<FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
+}
+
+@if (r_bIs_Show_Edit == true)
+{
+	<F2012_3_Xuat_Kho_Edit m_lngKho_ID=@m_objXuat_Kho.Kho_ID r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2012_3_Xuat_Kho_Edit>
+}
+
+@if (r_bIs_Show_Import_Excel == true)
+{
+	<FCommon_Import_Excel r_objImport_Excel="@r_objImport_Excel" OnClose="@Close_Import_Excel"></FCommon_Import_Excel>
+}
+
+@if (r_bIs_Show_Message_Info == true)
+{
+	<FCommon_Message_Info r_strMessage_Header="@r_strMessage_Header" r_strMessage_Info="@r_strMessage_Info" OnClose="@Close_Message_Info"></FCommon_Message_Info>
+}
+
+@code {
+	public List<CXNK_Xuat_Kho> v_arrData = new();
+	TelerikGrid<CXNK_Xuat_Kho> grdData = new();
+
+	CXNK_Xuat_Kho m_objXuat_Kho = new();
+
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+
+		v_arrData = v_objCtrData.FQ_728_XK_sp_sel_List_By_Created(m_objXuat_Kho.Kho_ID, r_objFilter.Date_From, r_objFilter.Date_To);
+	}
+
+	protected override void Delete_Data_Entry(long p_iAuto_ID)
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+
+		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
+		CXNK_Xuat_Kho v_objData = v_objCtrData.FQ_728_XK_sp_sel_Get_By_ID(p_iAuto_ID);
+		if (v_objData != null)
+			r_strDelete_Key = v_objData.So_Phieu_Xuat_Kho;
+		// End tracking
+
+		v_objCtrData.FQ_728_XK_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
+	}
+
+	protected override void Import_Excel_Entry(CExcel_Controller v_objCtrlExcel, ref int p_iCount_Success, ref int p_iCount_Error)
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+
+		StringBuilder v_sbError = new StringBuilder();
+		SqlConnection v_conn = null;
+		SqlTransaction v_trans = null;
+
+		try
+		{
+			DataTable v_dt = v_objCtrlExcel.List_Range_Value_To_End(0, "A2", "D");
+
+			// Loại mấy dòng trống
+			for (int v_i = v_dt.Rows.Count - 1; v_i >= 0; v_i--)
+				if (v_dt.Rows[v_i][0].ToString().Trim() == "")
+					v_dt.Rows.RemoveAt(v_i);
+
+			int v_iCount = 1;
+
+			foreach (DataRow v_row in v_dt.Rows)
+			{
+				v_iCount++;
+
+				//tao ket noi transaction
+				v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
+				v_conn.Open();
+				v_trans = v_conn.BeginTransaction();
+
+				try
+				{
+					CXNK_Xuat_Kho v_objData = new CXNK_Xuat_Kho();
+					v_objData.So_Phieu_Xuat_Kho = CUtility.Convert_To_String(v_row[0]);
+					v_objData.Kho_ID = m_objXuat_Kho.Auto_ID;
+
+					string v_strNgay_Xuat_Kho = CUtility.Convert_To_String(v_row[1]);
+					if (v_strNgay_Xuat_Kho != "")
+						v_objData.Ngay_Xuat_Kho = DateTime.FromOADate(CUtility.Convert_To_Double(v_strNgay_Xuat_Kho));
+
+					v_objData.Ghi_Chu = CUtility.Convert_To_String(v_row[2]);
+					v_objData.Last_Updated_By = r_strActive_User_Name;
+					v_objData.Last_Updated_By_Function = r_strActive_Function_Code;
+
+					v_objData.Auto_ID = v_objCtrData.FQ_728_XK_sp_ins_Insert(v_conn, v_trans, v_objData);
+					p_iCount_Success++;
+					v_trans.Commit();
+
+					CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.So_Phieu_Xuat_Kho);
+				}
+
+				catch (Exception ex)
+				{
+					v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iCount.ToString() + " " + Get_Language_Data_Field("có lỗi") + ": " + ex.Message + "<br/>");
+
+					if (v_trans != null)
+						v_trans.Rollback();
+				}
+
+				finally
+				{
+					if (v_trans != null)
+						v_trans.Dispose();
+
+					if (v_conn != null)
+						v_conn.Close();
+				}
+			}
+
+			p_iCount_Error = v_dt.Rows.Count - p_iCount_Success;
+			string v_strMessage = CCommonFunction.Set_Success_MessageBox(Get_Language_Data_Field("Thêm mới") + " " + p_iCount_Success.ToString() + " " + Get_Language_Data_Field("dòng thành công."));
+			if (v_sbError.ToString() != "")
+				v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
+
+			Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);
+		}
+
+		catch (Exception ex)
+		{
+			Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), ex.Message);
+		}
+	}
+}

@@ -157,15 +157,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		static List<CXNK_Nhap_Kho_Raw_Data> v_arrTemp = new List<CXNK_Nhap_Kho_Raw_Data>();
 		public void F2011_sp_ins_List_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data temp)
 		{
-			try
-			{
-				v_arrTemp.Add(temp);
-			}
-
-			catch (Exception)
-			{
-				throw;
-			}
+			v_arrTemp.Add(temp);
 		}
 
 		public void F2011_sp_upd_Update_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data temp)
@@ -179,7 +171,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 					existDetail.Don_Gia_Nhap = temp.Don_Gia_Nhap;
 				}
 			}
-
 			catch (Exception)
 			{
 				throw;
@@ -188,24 +179,23 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 
 		public List<CXNK_Nhap_Kho_Raw_Data> F2011_sp_sel_List_Chi_Tiet_Nhap_Kho_Local()
 		{
-			try
-			{
-				return v_arrTemp;
-			}
-
-			catch (Exception)
-			{
-				throw;
-			}
+			return v_arrTemp;
 		}
 
 		public void F2011_sp_del_List_Chi_Tiet_Nhap_Kho_Local()
 		{
+			v_arrTemp.Clear();
+		}
+		public void F2011_sp_del_By_ID_Chi_Tiet_Nhap_Kho_Local(long p_iID)
+		{
 			try
 			{
-				v_arrTemp.Clear();
+				CXNK_Nhap_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+				if (existDetail is not null)
+				{
+					v_arrTemp.Remove(existDetail);
+				}
 			}
-
 			catch (Exception)
 			{
 				throw;
