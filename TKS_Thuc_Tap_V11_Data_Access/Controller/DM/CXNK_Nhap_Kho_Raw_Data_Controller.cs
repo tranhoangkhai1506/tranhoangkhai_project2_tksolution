@@ -214,5 +214,34 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			}
 		}
 
+		public List<CXNK_Nhap_Kho_Raw_Data> F2011_NKRD_sp_sel_List_By_PhieuNhapID(long p_lngPhieuNhapID)
+		{
+			List<CXNK_Nhap_Kho_Raw_Data> v_arrRes = new List<CXNK_Nhap_Kho_Raw_Data>();
+			DataTable v_dt = new DataTable();
+
+			try
+			{
+				CSqlHelper.FillDataTable(CConfig.TKS_Thuc_Tap_V11_Conn_String, v_dt, "F2011_NKRD_sp_sel_List_By_PhieuNhapID", p_lngPhieuNhapID);
+
+				foreach (DataRow v_row in v_dt.Rows)
+				{
+					CXNK_Nhap_Kho_Raw_Data v_objRes = CUtility.Map_Row_To_Entity<CXNK_Nhap_Kho_Raw_Data>(v_row);
+					v_arrRes.Add(v_objRes);
+				}
+			}
+
+			catch (Exception)
+			{
+				throw;
+			}
+
+			finally
+			{
+				v_dt.Dispose();
+			}
+
+			return v_arrRes;
+		}
+
 	}
 }

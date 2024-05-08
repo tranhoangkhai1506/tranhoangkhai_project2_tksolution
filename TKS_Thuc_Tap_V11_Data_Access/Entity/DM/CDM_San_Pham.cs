@@ -116,8 +116,14 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = Don_Vi_Tinh_ID != 0 ? CCache_Don_Vi_Tinh.Get_Data_By_ID(Don_Vi_Tinh_ID).Ten_Don_Vi_Tinh : "UNKNONW";
-				return result;
+				if (Don_Vi_Tinh_ID != 0)
+				{
+					return CCache_Don_Vi_Tinh.Get_Data_By_ID(Don_Vi_Tinh_ID).Ten_Don_Vi_Tinh;
+				}
+				else
+				{
+					return  "UNKNONW";
+				}
 			}
 		}
 

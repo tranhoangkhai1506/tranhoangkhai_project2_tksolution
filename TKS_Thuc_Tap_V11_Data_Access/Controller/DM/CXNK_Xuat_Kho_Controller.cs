@@ -182,5 +182,37 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 
 			return v_arrRes;
 		}
+
+		public List<CXNK_Xuat_Kho> F2012_XK_sp_sel_List_By_Date_From_To(DateTime? p_dtmFrom, DateTime? p_dtmTo)
+		{
+			List<CXNK_Xuat_Kho> v_arrRes = new List<CXNK_Xuat_Kho>();
+			DataTable v_dt = new DataTable();
+
+			try
+			{
+				p_dtmFrom = CUtility_Date.Convert_To_Dau_Ngay(p_dtmFrom);
+				p_dtmTo = CUtility_Date.Convert_To_Cuoi_Ngay(p_dtmTo);
+
+				CSqlHelper.FillDataTable(CConfig.TKS_Thuc_Tap_V11_Conn_String, v_dt, "F2012_XK_sp_sel_List_By_Date_From_To", p_dtmFrom, p_dtmTo);
+
+				foreach (DataRow v_row in v_dt.Rows)
+				{
+					CXNK_Xuat_Kho v_objRes = CUtility.Map_Row_To_Entity<CXNK_Xuat_Kho>(v_row);
+					v_arrRes.Add(v_objRes);
+				}
+			}
+
+			catch (Exception)
+			{
+				throw;
+			}
+
+			finally
+			{
+				v_dt.Dispose();
+			}
+
+			return v_arrRes;
+		}
 	}
 }

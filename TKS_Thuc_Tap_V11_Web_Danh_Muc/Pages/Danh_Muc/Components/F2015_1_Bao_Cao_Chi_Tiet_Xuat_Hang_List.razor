@@ -1,0 +1,96 @@
+﻿@inherits FBase;
+
+@Layout_Default_Filter(grdData, "Xuat_Kho_Template.xlsx")
+<div style="padding-top: 10px;"></div>
+<div class="row">
+	<div class="col-lg-12">
+		@((MarkupString)r_strError)
+
+		<TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+			<GridColumns>
+				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2010", "grdData").Count > 0)
+				{
+					<FCommon_General_Col_Grid m_strFCode="2010" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+				}
+				else
+				{
+					<GridColumn Field="Ngay_Xuat_Kho" Title="Ngày Xuất Kho" Width="100px"></GridColumn>
+					<GridColumn Field="So_Phieu_Xuat_Kho" Title="Số Phiếu Xuất" Width="100px"></GridColumn>
+					<GridColumn Field="Ma_San_Pham" Title="Mã Sản Phẩm" Width="100px"></GridColumn>
+					<GridColumn Field="Ten_San_Pham" Title="Tên Sản Phẩm" Width="200px"></GridColumn>
+					<GridColumn Field="SL_Xuat" Title="Số Lượng Xuất" Width="100px"></GridColumn>
+					<GridColumn Field="Don_Gia_Xuat" Title="Đơn Giá Xuất" Width="100px"></GridColumn>
+					<GridColumn Field="Tri_Gia" Title="Trị Giá" Width="100px"></GridColumn>
+					<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
+				}
+			</GridColumns>
+		</TelerikGrid>
+	</div>
+</div>
+
+
+@code {
+	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrData = new();
+	public List<CXNK_Xuat_Kho> v_arrPhieuXuat = new();
+	TelerikGrid<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> grdData = new();
+
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+		v_arrData = new();
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+		List<CXNK_Xuat_Kho_Raw_Data> v_arrChiTiet = new();
+		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
+		CDM_San_Pham v_objSanPham = new();
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+		v_arrPhieuXuat = v_objCtrData.F2012_XK_sp_sel_List_By_Date_From_To(r_objFilter.Date_From, r_objFilter.Date_To);
+
+		if (v_arrPhieuXuat.Count() != 0)
+		{
+			CDM_Bao_Cao_Chi_Tiet_Xuat_Hang v_objBaoCao = new();
+
+			foreach (var item in v_arrPhieuXuat)
+			{
+				
+				v_arrChiTiet = new();
+				v_arrChiTiet = v_objCtrRawData.F2013_XKRD_sp_sel_List_By_PhieuXuatID(item.Auto_ID);
+
+				if (v_arrChiTiet.Count() > 0)
+				{
+					foreach (var v_objChiTiet in v_arrChiTiet)
+					{
+						v_objSanPham = new();
+						v_objBaoCao = new();
+						v_objBaoCao.Ngay_Xuat_Kho = item.Ngay_Xuat_Kho;
+						v_objBaoCao.So_Phieu_Xuat_Kho = item.So_Phieu_Xuat_Kho;
+						v_objSanPham = CCache_San_Pham.Get_Data_By_ID(v_objChiTiet.San_Pham_ID);
+
+						if (v_objSanPham != null)
+						{
+							v_objBaoCao.Ma_San_Pham = v_objSanPham.Ma_San_Pham;
+							v_objBaoCao.Ten_San_Pham = v_objSanPham.Ten_San_Pham;
+						}
+						else
+						{
+							v_objBaoCao.Ma_San_Pham = "Unknown";
+							v_objBaoCao.Ten_San_Pham = "Unknown";
+						}
+						v_objBaoCao.SL_Xuat = v_objChiTiet.SL_Xuat;
+						v_objBaoCao.Don_Gia_Xuat = v_objChiTiet.Don_Gia_Xuat;
+						v_arrData.Add(v_objBaoCao);
+					}
+					
+				}
+
+			}
+		}
+
+	}
+
+}
