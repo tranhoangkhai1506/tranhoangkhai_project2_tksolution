@@ -1,0 +1,447 @@
+﻿@inherits FBase;
+
+@Layout_Default_Filter(grdData, "Nhap_Kho_Template.xlsx")
+<div style="padding-top: 10px;"></div>
+<div class="row">
+	<div class="col-lg-12">
+		@((MarkupString)r_strError)
+
+		<TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
+			<GridColumns>
+				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2010", "grdData").Count > 0)
+				{
+					<FCommon_General_Col_Grid m_strFCode="2010" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+				}
+				else
+				{
+					<GridColumn Field="Ma_San_Pham" Title="Mã Sản Phẩm" Width="100px"></GridColumn>
+					<GridColumn Field="Ten_San_Pham" Title="Tên Sản Phẩm" Width="200px"></GridColumn>
+					<GridColumn Field="SL_Dau_Ky" Title="Số Lượng Đầu Kỳ" Width="150px"></GridColumn>
+					<GridColumn Field="SL_Nhap" Title="Số Lượng Nhập" Width="100px"></GridColumn>
+					<GridColumn Field="SL_Xuat" Title="Số Lượng Xuất" Width="100px"></GridColumn>
+					<GridColumn Field="SL_Cuoi_Ky" Title="Số Lượng Cuối Kỳ" Width="150px"></GridColumn>
+					<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
+				}
+			</GridColumns>
+		</TelerikGrid>
+	</div>
+</div>
+
+
+@code {
+	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrData = new();
+	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrBaoCaoTonDauKy = new();
+	TelerikGrid<CDM_Bao_Cao_Xuat_Nhap_Ton> grdData = new();
+	public List<CDM_Bao_Cao_Chi_Tiet_Nhap_Hang> v_arrBaoCaoHangNhap = new();
+	public List<CDM_Bao_Cao_Chi_Tiet_Nhap_Hang> v_arrBaoCaoHangNhapDauKy = new();
+	public List<CXNK_Nhap_Kho> v_arrPhieuNhap = new();
+	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrBaoCaoHangXuat = new();
+	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrBaoCaoHangXuatDauKy= new ();
+	public List<CXNK_Xuat_Kho> v_arrPhieuXuat = new();
+	protected override void Init_Data()
+	{
+
+	}
+
+	protected override void Load_Data()
+	{
+		v_arrData = new();
+		v_arrBaoCaoHangNhap = new();
+		v_arrBaoCaoHangXuat = new();
+		v_arrBaoCaoTonDauKy  = new();
+		v_arrBaoCaoHangNhapDauKy = new();
+		v_arrBaoCaoHangXuatDauKy= new();
+		Load_Phieu_Nhap_Dau_Ky();
+		Load_Phieu_Xuat_Dau_Ky();
+		Load_SL_Dau_Ky();
+		Load_Arr_Nhap();
+		Load_Arr_Xuat();
+		Load_SL_Nhap();
+		Load_SL_Xuat();
+
+	}
+
+	protected void Load_SL_Dau_Ky()
+	{
+		if (v_arrBaoCaoHangNhapDauKy.Count()  != 0)
+		{
+			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangNhapDauKy)
+			{
+				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				if (v_arrData.Count != 0)
+				{
+					var V_objXuatNhapTonItem = v_arrBaoCaoTonDauKy.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangNhap.Ma_San_Pham));
+					if (V_objXuatNhapTonItem is not null)
+					{
+						V_objXuatNhapTonItem.SL_Nhap += v_objBaoCaoHangNhap.SL_Nhap;
+					}
+					else
+					{
+						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+						V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+						v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+					}
+				}
+				else
+				{
+					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+					V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+					v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+				}
+			}
+		}
+
+		//
+		if (v_arrBaoCaoHangXuatDauKy.Count() != 0)
+		{
+			foreach (var v_objBaoCaoHangXuat in v_arrBaoCaoHangXuatDauKy)
+			{
+				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				if (v_arrData.Count != 0)
+				{
+					var V_objXuatNhapTonItem = v_arrBaoCaoTonDauKy.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangXuat.Ma_San_Pham));
+					if (V_objXuatNhapTonItem is not null)
+					{
+						V_objXuatNhapTonItem.SL_Xuat += v_objBaoCaoHangXuat.SL_Xuat;
+					}
+					else
+					{
+						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangXuat.Ma_San_Pham;
+						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangXuat.Ten_San_Pham;
+						V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangXuat.SL_Xuat;
+						v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+					}
+				}
+				else
+				{
+					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangXuat.Ma_San_Pham;
+					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangXuat.Ten_San_Pham;
+					V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangXuat.SL_Xuat;
+					v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+				}
+			}
+		}
+
+		//
+		if (v_arrBaoCaoTonDauKy.Count() != 0)
+		{
+			if (v_arrData.Count() != 0)
+			{
+				foreach (var v_objBaoCaoTonItem in v_arrBaoCaoTonDauKy)
+				{
+					var v_objSanPham = v_arrData.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoTonItem.Ma_San_Pham));
+					if (v_objSanPham is not null)
+					{
+						v_objSanPham.SL_Dau_Ky += v_objBaoCaoTonItem.SL_Cuoi_Ky;
+					}
+					else
+					{
+						CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
+						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
+						V_objXuatNhapTonNewItem.SL_Dau_Ky = v_objBaoCaoTonItem.SL_Cuoi_Ky;
+						v_arrData.Add(V_objXuatNhapTonNewItem);
+					}
+				}
+			}
+			else
+			{
+				foreach (var v_objBaoCaoTonItem in v_arrBaoCaoTonDauKy)
+				{
+					var v_objSanPham = v_arrData.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoTonItem.Ma_San_Pham));
+					if (v_objSanPham is not null)
+					{
+						v_objSanPham.SL_Dau_Ky += v_objBaoCaoTonItem.SL_Cuoi_Ky;
+					}
+					else
+					{
+						CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
+						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
+						V_objXuatNhapTonNewItem.SL_Dau_Ky = v_objBaoCaoTonItem.SL_Cuoi_Ky;
+						v_arrData.Add(V_objXuatNhapTonNewItem);
+					}
+				}
+			}
+		}
+	}
+
+	protected void Load_SL_Nhap()
+	{
+		if (v_arrBaoCaoHangNhap.Count()  != 0)
+		{
+			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangNhap)
+			{
+				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				if (v_arrData.Count != 0)
+				{
+					var V_objXuatNhapTonItem = v_arrData.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangNhap.Ma_San_Pham));
+					if (V_objXuatNhapTonItem is not null)
+					{
+						V_objXuatNhapTonItem.SL_Nhap += v_objBaoCaoHangNhap.SL_Nhap;
+					}
+					else
+					{
+						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+						V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+						v_arrData.Add(V_objXuatNhapTonNewItem);
+					} 
+				}
+				else
+				{
+					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+					V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+					v_arrData.Add(V_objXuatNhapTonNewItem);
+				}
+			}
+		}
+	}
+
+	protected void Load_SL_Xuat()
+	{
+		if (v_arrBaoCaoHangXuat.Count() != 0)
+		{
+			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangXuat)
+			{
+				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				if (v_arrData.Count != 0)
+				{
+					var V_objXuatNhapTonItem = v_arrData.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangNhap.Ma_San_Pham));
+					if (V_objXuatNhapTonItem is not null)
+					{
+						V_objXuatNhapTonItem.SL_Xuat += v_objBaoCaoHangNhap.SL_Xuat;
+					}
+					else
+					{
+						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+						V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangNhap.SL_Xuat;
+						v_arrData.Add(V_objXuatNhapTonNewItem);
+					}
+				}
+				else
+				{
+					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+					V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangNhap.SL_Xuat;
+					v_arrData.Add(V_objXuatNhapTonNewItem);
+				}
+			}
+		}
+	}
+
+	protected void Load_Phieu_Nhap_Dau_Ky()
+	{
+		CXNK_Nhap_Kho_Controller v_objCtrData = new();
+		List<CXNK_Nhap_Kho_Raw_Data> v_arrChiTiet = new();
+		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrRawData = new();
+		CDM_San_Pham v_objSanPham = new();
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+		v_arrPhieuNhap = new();
+		v_arrPhieuNhap = v_objCtrData.F2010_NK_sp_sel_List_By_Date(r_objFilter.Date_From);
+
+		if (v_arrPhieuNhap.Count() != 0)
+		{
+			CDM_Bao_Cao_Chi_Tiet_Nhap_Hang v_objBaoCao = new();
+
+			foreach (var item in v_arrPhieuNhap)
+			{
+
+				v_arrChiTiet = new();
+				v_arrChiTiet = v_objCtrRawData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(item.Auto_ID);
+
+				if (v_arrChiTiet.Count() > 0)
+				{
+					foreach (var v_objChiTiet in v_arrChiTiet)
+					{
+						v_objSanPham = new();
+						v_objBaoCao = new();
+						v_objBaoCao.Ngay_Nhap_Kho = item.Ngay_Nhap_Kho;
+						v_objBaoCao.So_Phieu_Nhap_Kho = item.So_Phieu_Nhap_Kho;
+						v_objBaoCao.NCC_ID = item.NCC_ID;
+						v_objSanPham = CCache_San_Pham.Get_Data_By_ID(v_objChiTiet.San_Pham_ID);
+
+						if (v_objSanPham != null)
+						{
+							v_objBaoCao.Ma_San_Pham = v_objSanPham.Ma_San_Pham;
+							v_objBaoCao.Ten_San_Pham = v_objSanPham.Ten_San_Pham;
+						}
+						else
+						{
+							v_objBaoCao.Ma_San_Pham = "Unknown";
+							v_objBaoCao.Ten_San_Pham = "Unknown";
+						}
+
+						v_objBaoCao.SL_Nhap = v_objChiTiet.SL_Nhap;
+						v_objBaoCao.Don_Gia_Nhap = v_objChiTiet.Don_Gia_Nhap;
+						v_arrBaoCaoHangNhapDauKy.Add(v_objBaoCao);
+					}
+
+				}
+
+			}
+		}
+	}
+
+	protected void Load_Phieu_Xuat_Dau_Ky()
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+		List<CXNK_Xuat_Kho_Raw_Data> v_arrChiTiet = new();
+		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
+		CDM_San_Pham v_objSanPham = new();
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+		v_arrPhieuXuat = new();
+		v_arrPhieuXuat = v_objCtrData.F2012_XK_sp_sel_List_By_Date(r_objFilter.Date_From);
+
+		if (v_arrPhieuXuat.Count() != 0)
+		{
+			CDM_Bao_Cao_Chi_Tiet_Xuat_Hang v_objBaoCao = new();
+
+			foreach (var item in v_arrPhieuXuat)
+			{
+
+				v_arrChiTiet = new();
+				v_arrChiTiet = v_objCtrRawData.F2013_XKRD_sp_sel_List_By_PhieuXuatID(item.Auto_ID);
+
+				if (v_arrChiTiet.Count() > 0)
+				{
+					foreach (var v_objChiTiet in v_arrChiTiet)
+					{
+						v_objSanPham = new();
+						v_objBaoCao = new();
+						v_objBaoCao.Ngay_Xuat_Kho = item.Ngay_Xuat_Kho;
+						v_objBaoCao.So_Phieu_Xuat_Kho = item.So_Phieu_Xuat_Kho;
+						v_objSanPham = CCache_San_Pham.Get_Data_By_ID(v_objChiTiet.San_Pham_ID);
+
+						if (v_objSanPham != null)
+						{
+							v_objBaoCao.Ma_San_Pham = v_objSanPham.Ma_San_Pham;
+							v_objBaoCao.Ten_San_Pham = v_objSanPham.Ten_San_Pham;
+						}
+						else
+						{
+							v_objBaoCao.Ma_San_Pham = "Unknown";
+							v_objBaoCao.Ten_San_Pham = "Unknown";
+						}
+						v_objBaoCao.SL_Xuat = v_objChiTiet.SL_Xuat;
+						v_objBaoCao.Don_Gia_Xuat = v_objChiTiet.Don_Gia_Xuat;
+						v_arrBaoCaoHangXuatDauKy.Add(v_objBaoCao);
+					}
+
+				}
+
+			}
+		}
+	}
+	protected void Load_Arr_Nhap()
+	{
+		CXNK_Nhap_Kho_Controller v_objCtrData = new();
+		List<CXNK_Nhap_Kho_Raw_Data> v_arrChiTiet = new();
+		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrRawData = new();
+		CDM_San_Pham v_objSanPham = new();
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+		v_arrPhieuNhap = v_objCtrData.F2010_NK_sp_sel_List_By_Date_From_To(r_objFilter.Date_From, r_objFilter.Date_To);
+
+		if (v_arrPhieuNhap.Count() != 0)
+		{
+			CDM_Bao_Cao_Chi_Tiet_Nhap_Hang v_objBaoCao = new();
+
+			foreach (var item in v_arrPhieuNhap)
+			{
+
+				v_arrChiTiet = new();
+				v_arrChiTiet = v_objCtrRawData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(item.Auto_ID);
+
+				if (v_arrChiTiet.Count() > 0)
+				{
+					foreach (var v_objChiTiet in v_arrChiTiet)
+					{
+						v_objSanPham = new();
+						v_objBaoCao = new();
+						v_objBaoCao.Ngay_Nhap_Kho = item.Ngay_Nhap_Kho;
+						v_objBaoCao.So_Phieu_Nhap_Kho = item.So_Phieu_Nhap_Kho;
+						v_objBaoCao.NCC_ID = item.NCC_ID;
+						v_objSanPham = CCache_San_Pham.Get_Data_By_ID(v_objChiTiet.San_Pham_ID);
+
+						if (v_objSanPham != null)
+						{
+							v_objBaoCao.Ma_San_Pham = v_objSanPham.Ma_San_Pham;
+							v_objBaoCao.Ten_San_Pham = v_objSanPham.Ten_San_Pham;
+						}
+						else
+						{
+							v_objBaoCao.Ma_San_Pham = "Unknown";
+							v_objBaoCao.Ten_San_Pham = "Unknown";
+						}
+
+						v_objBaoCao.SL_Nhap = v_objChiTiet.SL_Nhap;
+						v_objBaoCao.Don_Gia_Nhap = v_objChiTiet.Don_Gia_Nhap;
+						v_arrBaoCaoHangNhap.Add(v_objBaoCao);
+					}
+
+				}
+
+			}
+		}
+	}
+
+	protected void Load_Arr_Xuat()
+	{
+		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+		List<CXNK_Xuat_Kho_Raw_Data> v_arrChiTiet = new();
+		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
+		CDM_San_Pham v_objSanPham = new();
+		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
+		Format_Grid(grdData);
+		v_arrPhieuXuat = v_objCtrData.F2012_XK_sp_sel_List_By_Date_From_To(r_objFilter.Date_From, r_objFilter.Date_To);
+
+		if (v_arrPhieuXuat.Count() != 0)
+		{
+			CDM_Bao_Cao_Chi_Tiet_Xuat_Hang v_objBaoCao = new();
+
+			foreach (var item in v_arrPhieuXuat)
+			{
+
+				v_arrChiTiet = new();
+				v_arrChiTiet = v_objCtrRawData.F2013_XKRD_sp_sel_List_By_PhieuXuatID(item.Auto_ID);
+
+				if (v_arrChiTiet.Count() > 0)
+				{
+					foreach (var v_objChiTiet in v_arrChiTiet)
+					{
+						v_objSanPham = new();
+						v_objBaoCao = new();
+						v_objBaoCao.Ngay_Xuat_Kho = item.Ngay_Xuat_Kho;
+						v_objBaoCao.So_Phieu_Xuat_Kho = item.So_Phieu_Xuat_Kho;
+						v_objSanPham = CCache_San_Pham.Get_Data_By_ID(v_objChiTiet.San_Pham_ID);
+
+						if (v_objSanPham != null)
+						{
+							v_objBaoCao.Ma_San_Pham = v_objSanPham.Ma_San_Pham;
+							v_objBaoCao.Ten_San_Pham = v_objSanPham.Ten_San_Pham;
+						}
+						else
+						{
+							v_objBaoCao.Ma_San_Pham = "Unknown";
+							v_objBaoCao.Ten_San_Pham = "Unknown";
+						}
+						v_objBaoCao.SL_Xuat = v_objChiTiet.SL_Xuat;
+						v_objBaoCao.Don_Gia_Xuat = v_objChiTiet.Don_Gia_Xuat;
+						v_arrBaoCaoHangXuat.Add(v_objBaoCao);
+					}
+
+				}
+
+			}
+		}
+	}
+
+}
