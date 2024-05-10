@@ -1,6 +1,27 @@
 ﻿@inherits FBase;
 
-@Layout_Default_Filter(grdData, "Nhap_Kho_Template.xlsx")
+<div class="col-lg-7">
+	<div class="row g-3">
+		<div style="width: 80px; padding-top: 8px;">
+			<label class="form-label">@Get_Language_Data_Field("Từ Ngày "):</label>
+		</div>
+		<div style="width: 140px;">
+			<TelerikDatePicker @bind-Value="@r_objFilter.Date_From" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+		</div>
+		<div style="width: 40px; text-align: center; padding-top: 8px;">
+			<label class="form-label">--></label>
+		</div>
+		<div style="width: 140px;">
+			<TelerikDatePicker @bind-Value="@r_objFilter.Date_To" Format="@CConfig.Date_Format_String"></TelerikDatePicker>
+		</div>
+
+		<div class="col-lg-4">
+			<div class="hstack flex-wrap gap-2 mb-3 mb-lg-0">
+				<button type="button" class="btn rounded-pill btn-primary waves-effect waves-light" @onclick="@(()=> Tim_Kiem_Click())">@Get_Language_Data_Field("Tìm kiếm")</button>
+			</div>
+		</div>
+	</div>
+</div>
 <div style="padding-top: 10px;"></div>
 <div class="row">
 	<div class="col-lg-12">
@@ -9,9 +30,9 @@
 		<TelerikGrid Data="@v_arrData" Height="calc(100vh - 170px)" Resizable="true" Reorderable="true" @ref="@grdData">
 			<GridColumns>
 				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
-				@if (CCache_Grid_UI_Global.List_Data_By_Code("2010", "grdData").Count > 0)
+				@if (CCache_Grid_UI_Global.List_Data_By_Code("2016", "grdData").Count > 0)
 				{
-					<FCommon_General_Col_Grid m_strFCode="2010" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
+					<FCommon_General_Col_Grid m_strFCode="2016" m_strTen_Grid="grdData"></FCommon_General_Col_Grid>
 				}
 				else
 				{
