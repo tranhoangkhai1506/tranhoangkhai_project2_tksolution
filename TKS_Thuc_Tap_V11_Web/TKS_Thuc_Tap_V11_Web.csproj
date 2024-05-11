@@ -12,13 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\NewFolder\**" />
-    <Content Remove="Controllers\NewFolder\**" />
-    <EmbeddedResource Remove="Controllers\NewFolder\**" />
-    <None Remove="Controllers\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Append.Blazor.Printing" Version="6.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
@@ -27,6 +20,7 @@
     <PackageReference Include="Telerik.Reporting.OpenXmlRendering" Version="17.2.23.1114" />
     <PackageReference Include="Telerik.Reporting.Services.AspNetCore" Version="17.2.23.1114" />
     <PackageReference Include="Telerik.ReportViewer.Blazor" Version="17.2.23.1114" />
+    <PackageReference Include="Telerik.ReportViewer.BlazorNative" Version="17.1.23.718" />
     <PackageReference Include="Telerik.UI.for.Blazor" Version="5.0.1" /> 
   </ItemGroup>
 
@@ -41,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="wwwroot\FileManagement\Export_Excel\" />
     <Folder Include="wwwroot\FileManagement\Log\" />
   </ItemGroup>

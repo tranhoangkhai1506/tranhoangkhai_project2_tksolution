@@ -12,6 +12,14 @@ using Append.Blazor.Printing;
 using TKS_Thuc_Tap_V11_Web.Background_Service;
 using TKS_Thuc_Tap_V11_Web;
 
+
+
+
+
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 //builder.Services.AddSignalR();
@@ -39,7 +47,7 @@ builder.Services.AddRazorPages().AddNewtonsoftJson();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IPrintingService, PrintingService>();
-
+builder.Services.AddControllers().AddNewtonsoftJson();
 // Connection
 CConfig.TKS_Thuc_Tap_V11_Conn_String = builder.Configuration.GetConnectionString("TKS_Thuc_Tap_V11_Conn_String");
 
@@ -125,6 +133,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAntiforgery();
+app.UseAntiforgery();
+app.UseAntiforgery();
+app.UseAntiforgery();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapDefaultControllerRoute();

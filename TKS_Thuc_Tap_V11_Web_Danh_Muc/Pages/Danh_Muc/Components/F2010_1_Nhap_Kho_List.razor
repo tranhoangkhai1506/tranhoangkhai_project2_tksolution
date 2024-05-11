@@ -25,13 +25,13 @@
 			</GridExport>
 			<GridColumns>
 				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
-				<GridColumn Width="60px">
+				<GridColumn Width="80px">
 					<Template>
 						<button class="btn btn-link" @onclick="@(()=> Open_Info((context as CXNK_Nhap_Kho).Auto_ID))">
 							<i class="mdi mdi-eye" style="color: purple;"></i>
 						</button>
 						&nbsp;
-						<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+						<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="true">
 							<i class="mdi mdi-cog-outline" style="color: purple;"></i>
 						</button>
 						<ul class="dropdown-menu">
@@ -48,6 +48,10 @@
 								</li>
 							}
 						</ul>
+						&nbsp;
+						<button class="btn btn-link" @onclick="@(()=> Open_Report((context as CXNK_Nhap_Kho).Auto_ID))">
+							<i class="mdi mdi-printer" style="color: purple;"></i>
+						</button>
 					</Template>
 				</GridColumn>
 				@if (CCache_Grid_UI_Global.List_Data_By_Code("2010", "grdData").Count > 0)
@@ -72,7 +76,10 @@
 {
 	<F2010_2_Nhap_Kho_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2010_2_Nhap_Kho_Info>
 }
-
+@if (r_bIs_Show_Report == true)
+{
+	<F2011_4_Nhap_Kho_Report So_Phieu_Nhap_Kho="@r_iAuto_ID.ToString()" OnClose="@Close_Report"></F2011_4_Nhap_Kho_Report>
+}
 @if (r_bIs_Show_Help_Guide == true)
 {
 	<FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>

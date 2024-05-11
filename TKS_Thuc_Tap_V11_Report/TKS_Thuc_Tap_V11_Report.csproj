@@ -11,6 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Telerik.Reporting.OpenXmlRendering" Version="17.2.23.1114" />
+    <PackageReference Include="Telerik.ReportViewer.BlazorNative" Version="17.1.23.718" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TKS_Thuc_Tap_V11_Data_Access\TKS_Thuc_Tap_V11_Data_Access.csproj" />
   </ItemGroup>
 

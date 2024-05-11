@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Adding Telerik Native Blazor Viewer page log</title>
+    <style>
+        body {
+            background: #fff;
+            color: #505050;
+            font: 14px 'Segoe UI', tahoma, arial, helvetica, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        #header {
+            background: #efefef;
+            padding: 0;
+        }
+
+        /* Start: Toggle details */
+        label { 
+            top:0; 
+            left:0; 
+            font-weight:700; 
+            margin-top: 10px;
+            user-select: none;
+            -ms-user-select: none;
+        }
+
+            label:hover{
+                color: cadetblue;
+                border-color: #505050;
+            }
+
+        input#show, input#hide {
+            display:none;
+        }
+
+        ul#details {
+            transition: opacity 1s ease-out;
+            opacity: 0; 
+            height: 0;
+            font-size: 0;
+            overflow: hidden;
+        }
+
+        input#show:checked ~ .show:before {
+            content: "";
+        }
+
+        input#show:checked ~ .hide:before {
+            content: "Hide details";
+            border: solid;
+            padding: 3px;
+        }
+
+        input#hide:checked ~ .hide:before {
+            content: "";
+        }
+
+        input#hide:checked ~ .show:before {
+            content: "Show details"; 
+            border: solid;
+            padding: 3px;
+        }
+
+        input#show:checked ~ ul#details {
+            opacity: 1;
+            font-size: 100%;
+            height: auto;
+            padding: 10px;
+        }
+
+        input#hide:checked ~ ul#details {
+            transition: opacity 1s ease-out;
+            opacity: 0; 
+            height: 0;
+            font-size: 0;
+            overflow: hidden;
+        }
+
+        /* End: toggle details */
+
+
+        h1 {
+            font-size: 48px;
+            font-weight: normal;
+            margin: 0;
+            padding: 0 30px;
+            line-height: 150px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #fff;
+            background: #969696;
+            padding: 0 30px;
+            line-height: 50px;
+        }
+
+        #main {
+            padding: 5px 30px;
+        }
+
+        .section {
+            width: 21.7%;
+            float: left;
+            margin: 0 0 0 40px;
+        }
+
+            .section h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                margin: 0;
+                border-bottom: 1px solid silver;
+                padding-bottom: 12px;
+                margin-bottom: 8px;
+            }
+
+            .section.first {
+                margin-left: 0;
+                width: 25%
+            }
+
+                .section.first h2 {
+                    font-size: 20px;
+                    text-transform: none;
+                    margin-bottom: 16px;
+                    border: none;
+                }
+
+                .section.first li {
+                    border-top: 1px solid silver;
+                    padding: 8px 0;
+                }
+
+            .section.last {
+                margin-right: 0;
+                width: 70%;
+            }
+            
+            .section.last h2 {
+                    font-size: 20px;
+                    text-transform: none;
+                    margin-bottom: 5px;
+                    border: none;
+                }
+
+            .section.last li {
+                padding: 4px 0;
+                border-bottom: solid;
+                border-bottom-width: 1px;
+                border-color: lightgray;
+            }
+            
+            .section.last ul{
+                padding-bottom:10px;   
+                margin-bottom: 10px; 
+            }
+            
+                
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            line-height: 20px;
+        }
+
+
+
+        a {
+            color: #267cb2;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <p><span style="color: red;">ERROR!</span> An error occurred while adding a Razor page with Telerik Native Blazor Report Viewer</p>
+    </div>
+
+    <div id="main">
+        <div class="section first">
+            <h2>Telerik Native Blazor Report Viewer-enabled application consists of: </h2>
+            <ul>
+                <li><a href="https://docs.telerik.com/reporting/embedding-reports/display-reports-in-applications/web-application/native-blazor-report-viewer/overview">Native Blazor Report Viewer</a> prerequisites</li>
+                <li>Razor page with Native Blazor Report Viewer</li>
+                <li><a href="https://docs.telerik.com/reporting/embedding-reports/host-the-report-engine-remotely/telerik-reporting-rest-services/overview" >Telerik Reporting REST Service</a> with its prerequisites</li>
+            </ul>
+        </div>
+
+        <div class="section last">
+            <h2>Summary</h2>
+            <ul style="padding-bottom: 10px; padding-left: 7px;">
+                <li style="color: none;">Added SampleReport.trdp</li>
+<li style="color: none;">Added F2011_4_Nhap_Kho_Report.razor</li>
+<li style="color: #FF0000;">Error: A problem occurred while trying to install the NuGet package Telerik.Reporting.OpenXmlRendering.Trial 18.0.24.305. You can try to update your NuGet client or install the packages manually.</li>
+<li style="color: #FF0000;">Error: A problem occurred while trying to install the NuGet package Telerik.Reporting.Services.AspNetCore.Trial 18.0.24.305. You can try to update your NuGet client or install the packages manually.</li>
+<li style="color: #FF0000;">Error: A problem occurred while trying to install the NuGet package Telerik.ReportViewer.BlazorNative.Trial 18.0.24.305. You can try to update your NuGet client or install the packages manually.</li>
+<li style="color: none;">Added ReportsController.cs</li>
+
+            </ul>
+
+            <input type="radio" id="show" name="group" />   
+            <input type="radio" id="hide" name="group" checked />
+            <label for="hide" class="hide" unselectable="on"></label>
+            <label for="show" class="show" unselectable="on"></label> 
+
+            <ul id="details">
+                5/11/2024 6:37:56 PM
+<li style="color: none;">Folder Reports already exists</li>
+<li style="color: none;">Added SampleReport.trdp</li>
+<li style="color: none;">Adding CS\BlazorNative\TelerikBlazorNativeViewerPage.razor.ServiceUrl project item</li>
+<li style="color: none;">Added F2011_4_Nhap_Kho_Report.razor</li>
+<li style="color: none;">Adding CS\BlazorNative\TelerikBlazorNativeViewerPage.razor.ReportServer project item</li>
+<li style="color: #FF0000;">Error: A problem occurred while trying to install the NuGet package Telerik.Reporting.OpenXmlRendering.Trial 18.0.24.305. You can try to update your NuGet client or install the packages manually.</li>
+<li style="color: none;">Exception details: NuGet.PackageManagement.PackageReferenceRollbackException: Package restore failed. Rolling back package changes for 'TKS_Thuc_Tap_V11_Web'.
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;ExecuteBuildIntegratedProjectActionsAsync&gt;d__93.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;ExecuteNuGetProjectActionsAsync&gt;d__87.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;InstallPackageAsync&gt;d__53.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;InstallPackageAsync&gt;d__52.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalCoreAsync&gt;d__28.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalAsync&gt;d__27.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalAsync&gt;d__27.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.Threading.JoinableTask.CompleteOnCurrentThread()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.InstallPackage(String source, Project project, String packageId, String version, Boolean ignoreDependencies)
+   at Telerik.Reporting.Vs.Common.NugetManager.InstallPackage(String package, String version)</li>
+<li style="color: #FF0000;">Error: A problem occurred while trying to install the NuGet package Telerik.Reporting.Services.AspNetCore.Trial 18.0.24.305. You can try to update your NuGet client or install the packages manually.</li>
+<li style="color: none;">Exception details: NuGet.PackageManagement.PackageReferenceRollbackException: Package restore failed. Rolling back package changes for 'TKS_Thuc_Tap_V11_Web'.
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;ExecuteBuildIntegratedProjectActionsAsync&gt;d__93.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;ExecuteNuGetProjectActionsAsync&gt;d__87.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;InstallPackageAsync&gt;d__53.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;InstallPackageAsync&gt;d__52.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalCoreAsync&gt;d__28.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalAsync&gt;d__27.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalAsync&gt;d__27.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.Threading.JoinableTask.CompleteOnCurrentThread()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.InstallPackage(String source, Project project, String packageId, String version, Boolean ignoreDependencies)
+   at Telerik.Reporting.Vs.Common.NugetManager.InstallPackage(String package, String version)</li>
+<li style="color: #FF0000;">Error: A problem occurred while trying to install the NuGet package Telerik.ReportViewer.BlazorNative.Trial 18.0.24.305. You can try to update your NuGet client or install the packages manually.</li>
+<li style="color: none;">Exception details: NuGet.PackageManagement.PackageReferenceRollbackException: Package restore failed. Rolling back package changes for 'TKS_Thuc_Tap_V11_Web'.
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;ExecuteBuildIntegratedProjectActionsAsync&gt;d__93.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;ExecuteNuGetProjectActionsAsync&gt;d__87.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;InstallPackageAsync&gt;d__53.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.PackageManagement.NuGetPackageManager.&lt;InstallPackageAsync&gt;d__52.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalCoreAsync&gt;d__28.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalAsync&gt;d__27.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.&lt;InstallInternalAsync&gt;d__27.MoveNext()
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.Threading.JoinableTask.CompleteOnCurrentThread()
+   at NuGet.VisualStudio.Implementation.Extensibility.VsPackageInstaller.InstallPackage(String source, Project project, String packageId, String version, Boolean ignoreDependencies)
+   at Telerik.Reporting.Vs.Common.NugetManager.InstallPackage(String package, String version)</li>
+<li style="color: none;">Folder Controllers already exists</li>
+<li style="color: none;">Added ReportsController.cs</li>
+<li style="color: none;">Modifying _Imports.razor...  no usings to add.</li>
+
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

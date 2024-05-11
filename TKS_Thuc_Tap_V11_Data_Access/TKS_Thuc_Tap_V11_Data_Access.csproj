@@ -15,6 +15,8 @@
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Telerik.Reporting.OpenXmlRendering" Version="17.2.23.1114" />
+    <PackageReference Include="Telerik.ReportViewer.BlazorNative" Version="17.1.23.718" />
   </ItemGroup>
 </Project>
 
