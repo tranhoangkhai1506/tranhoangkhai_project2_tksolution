@@ -27,7 +27,7 @@
 			</GridExport>
 			<GridColumns>
 				<GridCheckboxColumn SelectAll="true" CheckBoxOnlySelection="true" Width="30px"></GridCheckboxColumn>
-				<GridColumn Width="60px">
+				<GridColumn Width="80px">
 					<Template>
 						<button class="btn btn-link" @onclick="@(()=> Open_Info((context as CXNK_Xuat_Kho).Auto_ID))">
 							<i class="mdi mdi-eye" style="color: purple;"></i>
@@ -50,6 +50,10 @@
 								</li>
 							}
 						</ul>
+						&nbsp;
+						<button class="btn btn-link" @onclick="@(()=> Open_Report((context as CXNK_Xuat_Kho).Auto_ID))">
+							<i class="mdi mdi-printer" style="color: purple;"></i>
+						</button>
 					</Template>
 				</GridColumn>
 				@if (CCache_Grid_UI_Global.List_Data_By_Code("2012", "grdData").Count > 0)
@@ -72,7 +76,10 @@
 {
 	<F2012_2_Xuat_Kho_Info r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2012_2_Xuat_Kho_Info>
 }
-
+@if (r_bIs_Show_Report == true)
+{
+	<F2012_4_Xuat_Kho_Report So_Phieu_Xuat_Kho="@r_iAuto_ID.ToString()" OnClose="@Close_Report"></F2012_4_Xuat_Kho_Report>
+}
 @if (r_bIs_Show_Help_Guide == true)
 {
 	<FCommon_Help_Guide m_strFCode="@r_strActive_Function_Code" OnClose="@Close_Helpguide"></FCommon_Help_Guide>
