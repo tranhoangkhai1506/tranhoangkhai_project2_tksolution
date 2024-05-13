@@ -105,12 +105,24 @@
 	TelerikGrid<CXNK_Xuat_Kho> grdData = new();
 
 	CXNK_Xuat_Kho m_objXuat_Kho = new();
-
+	public bool r_bIs_Show_Report = false;
 	protected override void Init_Data()
 	{
 
 	}
+	protected void Open_Report(long p_iAuto_ID)
+	{
+		r_strError = "";
+		r_iAuto_ID = p_iAuto_ID;
+		r_bIs_Show_Report = true;
+		StateHasChanged();
+	}
 
+	protected void Close_Report()
+	{
+		r_bIs_Show_Report = false;
+		StateHasChanged();
+	}
 	protected override void Load_Data()
 	{
 		CXNK_Xuat_Kho_Controller v_objCtrData = new();

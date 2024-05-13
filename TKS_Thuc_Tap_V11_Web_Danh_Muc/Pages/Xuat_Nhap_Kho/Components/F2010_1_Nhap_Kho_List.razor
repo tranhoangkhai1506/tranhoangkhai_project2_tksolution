@@ -103,7 +103,7 @@
 @code {
 	public List<CXNK_Nhap_Kho> v_arrData = new();
 	TelerikGrid<CXNK_Nhap_Kho> grdData = new();
-
+	public bool r_bIs_Show_Report = false;
 	CXNK_Nhap_Kho m_objNhap_Kho = new();
 
 	protected override void Init_Data()
@@ -120,7 +120,19 @@
 
 		v_arrData = v_objCtrData.FQ_718_NK_sp_sel_List_By_Created(m_objNhap_Kho.Kho_ID, r_objFilter.Date_From, r_objFilter.Date_To);
 	}
+	protected void Open_Report(long p_iAuto_ID)
+	{
+		r_strError = "";
+		r_iAuto_ID = p_iAuto_ID;
+		r_bIs_Show_Report = true;
+		StateHasChanged();
+	}
 
+	protected void Close_Report()
+	{
+		r_bIs_Show_Report = false;
+		StateHasChanged();
+	}
 	protected override void Delete_Data_Entry(long p_iAuto_ID)
 	{
 		CXNK_Nhap_Kho_Controller v_objCtrData = new();

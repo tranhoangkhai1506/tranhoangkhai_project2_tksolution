@@ -45,8 +45,8 @@
 				}
 				else
 				{
-					<GridColumn Field="Ma_LSP" Title="Mã loại sản phẩm" Width="100px"></GridColumn>
-					<GridColumn Field="Ten_LSP" Title="Tên loại sản phẩm" Width="200px"></GridColumn>
+					<GridColumn Field="Ma_LSP" Title="Mã loại sản phẩm" Width="150px"></GridColumn>
+					<GridColumn Field="Ten_LSP" Title="Tên loại sản phẩm" Width="150px"></GridColumn>
 					<GridColumn Field="Ghi_Chu" Title="Ghi Chú" Width="200px"></GridColumn>
 					<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
 				}
@@ -107,7 +107,7 @@
 		CDM_Loai_San_Pham v_objData = v_objCtrData.FQ_122_LSP_sp_sel_Get_By_ID(p_iAuto_ID);
 		if (v_objData != null)
 			r_strDelete_Key = v_objData.Ma_LSP;
-		// End tracking
+		// End tracking	
 
 		v_objCtrData.FQ_122_LSP_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
 

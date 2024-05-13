@@ -1,7 +1,7 @@
-﻿@inherits FBase_Info;
+﻿	@inherits FBase_Info;
 
 <div class="modal fade show" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; padding-left: 0px; background-color: rgba(10, 10, 10, .8);">
-	<div class="modal-dialog modal-lg">
+	<div class="modal-dialog modal-xl">
 		<div class="modal-content">
 			<div class="modal-header bg-light">
 				<ul class="nav nav-pills card-header-pills" role="tablist">
@@ -16,6 +16,13 @@
 							@Get_Language_Data_Field("Lịch sử xử lý")
 						</a>
 					</li>
+
+					@* <li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" onclick="@(()=> @Open_Chi_Tiet(@r_iAuto_ID))" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Chi Tiết")
+								
+						</a>
+					</li> *@
 				</ul>
 
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
@@ -23,7 +30,10 @@
 			</div>
 
 			@((MarkupString)r_strError)
-
+			@if (r_bIs_Show_Chi_Tiet == true)
+			{
+				<F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List OnClose="@Close_Chi_Tiet" m_lngSo_Phieu_Nhap_Kho="@r_iAuto_ID"></F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List>
+			}
 			<EditForm Model="@m_objData">
 				<div class="modal-body">
 					<div class="tab-content">
@@ -39,29 +49,36 @@
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Nhập kho")</label><br />
-											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Nhap_Kho_ID, false)</span>
+											<label class="form-label-info">@Get_Language_Data_Field("Số phiếu nhập kho")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.So_Phieu_Nhap_Kho, false)</span>
 										</div>
 									</div>
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Sản phẩm")</label><br />
-											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ten_San_Pham, false)</span>
+											<label class="form-label-info">@Get_Language_Data_Field("Kho")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ten_Kho, false)</span>
 										</div>
 									</div>
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Số Lượng Nhập")</label><br />
-											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.SL_Nhap, false)</span>
+											<label class="form-label-info">@Get_Language_Data_Field("Nhà cung cấp")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Nha_Cung_Cap, false)</span>
 										</div>
 									</div>
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Đơn Giá Nhập")</label><br />
-											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Don_Gia_Nhap, false)</span>
+											<label class="form-label-info">@Get_Language_Data_Field("Ngày nhập kho")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ngay_Nhap_Kho, false)</span>
+										</div>
+									</div>
+
+									<div class="row mb-3">
+										<div class="col-lg-11">
+											<label class="form-label-info">@Get_Language_Data_Field("Ghi chú")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ghi_Chu, false)</span>
 										</div>
 									</div>
 
@@ -126,25 +143,30 @@
 </div>
 
 @code {
-	[Parameter]
-	public long m_lngSo_Phieu_Nhap_Kho { get; set; }
-	private CXNK_Nhap_Kho_Raw_Data m_objData = new();
+	private CXNK_Nhap_Kho m_objData = new();
 	private List<CLog_Record_Action_History> m_arrRAH = new();
-
+	public bool r_bIs_Show_Chi_Tiet = false;
 	protected override void Load_Data()
 	{
-		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrData = new();
+		CXNK_Nhap_Kho_Controller v_objCtrData = new();
 		CLog_Record_Action_History_Controller v_objCtrRAH = new();
 
-		if (m_lngSo_Phieu_Nhap_Kho != 0)
-		{
-			m_objData = v_objCtrData.FQ_719_NKRD_sp_sel_Get_By_ID(r_iAuto_ID);
-		}
-		else
-		{
-			m_objData = v_objCtrData.F2011_sp_sel_Get_By_ID_Chi_Tiet_Nhap_Kho_Local(r_iAuto_ID);
-		}
+		m_objData = v_objCtrData.FQ_718_NK_sp_sel_Get_By_ID(r_iAuto_ID);
 
 		//m_arrRAH = v_objCtrRAH.FCommon_Sys_sp_sel_List_Log_Record_Action_History(r_iAuto_ID);
+	}
+
+	protected void Open_Chi_Tiet(long p_iAuto_ID)
+	{
+		r_strError = "";
+		r_iAuto_ID = p_iAuto_ID;
+		r_bIs_Show_Chi_Tiet = true;
+		StateHasChanged();
+	}
+
+	protected void Close_Chi_Tiet()
+	{
+		r_bIs_Show_Chi_Tiet = false;
+		StateHasChanged();
 	}
 }

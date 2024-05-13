@@ -28,7 +28,6 @@
     protected bool r_bIs_Show_Info = false;
     protected bool r_bIs_Show_Info_Drill_Down = false;
     public bool r_bIs_Show_Edit = false;
-    public bool r_bIs_Show_Report = false;
     public bool r_bIs_Import_Excel_Edit = false;
     public bool r_bIs_Show_Filter = false;
     public bool r_bIs_Show_Help_Guide = false;
@@ -1555,11 +1554,6 @@
         StateHasChanged();
     }
 
-    protected void Close_Report()
-    {
-        r_bIs_Show_Report = false;
-        StateHasChanged();
-    }
     protected void Open_Info_Drill_Down(long p_iAuto_ID, string p_strField_Name)
     {
         r_iAuto_ID = p_iAuto_ID;
@@ -1610,13 +1604,7 @@
         StateHasChanged();
     }
 
-    protected void Open_Report(long p_iAuto_ID)
-    {
-        r_strError = "";
-        r_iAuto_ID = p_iAuto_ID;
-        r_bIs_Show_Report = true;
-        StateHasChanged();
-    }
+
 
     protected async Task Close_Edit(CEvent_Call_Back p_objEvent)
     {
