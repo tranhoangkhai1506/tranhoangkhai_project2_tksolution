@@ -216,6 +216,19 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			}
 		}
 
+		public void F2010_NK_sp_del_Delete_By_ID(long p_iAuto_ID, string p_strLast_Updated_By, string p_strLast_Updated_By_Function)
+		{
+			try
+			{
+				CSqlHelper.ExecuteNonquery(CConfig.TKS_Thuc_Tap_V11_Conn_String, "F2010_NK_sp_del_Delete_By_ID", p_iAuto_ID, p_strLast_Updated_By, p_strLast_Updated_By_Function);
+			}
+
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
 		public List<CXNK_Nhap_Kho> F2010_sp_sel_List_By_So_Phieu_Nhap_Kho(string p_strSo_Phieu_Nhap_Kho)
 		{
 			List<CXNK_Nhap_Kho> v_arrRes = new List<CXNK_Nhap_Kho>();

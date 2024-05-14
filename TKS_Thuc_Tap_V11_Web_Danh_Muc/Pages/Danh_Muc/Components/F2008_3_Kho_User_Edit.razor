@@ -47,11 +47,9 @@
 @code {
     [Parameter]
     public long m_lngKho_ID { get; set; }
-
     private CDM_Kho m_objKho = new();
-
     private CDM_Kho_User m_objData = new();
-
+    private CSys_Thanh_Vien_Controller v_objCtrThanh_Vien = new CSys_Thanh_Vien_Controller();
     private List<CSys_Thanh_Vien> m_arrThanh_Vien = new();
     protected override void Init_Data()
     {
@@ -62,13 +60,13 @@
         //Load data kho
         CDM_Kho_Controller v_objCtrKhoData = new();
         m_objKho = v_objCtrKhoData.FQ_114_K_sp_sel_Get_By_ID(m_lngKho_ID);
-
+        //Load data Kho User
         CDM_Kho_User_Controller v_objCtrData = new();
         m_objData = v_objCtrData.FQ_117_KU_sp_sel_Get_By_ID(r_iAuto_ID);
 
         @if (m_lngKho_ID != 0)
         {
-            CSys_Thanh_Vien_Controller v_objCtrThanh_Vien = new CSys_Thanh_Vien_Controller();
+            //Load data thành viên không thuộc kho đang chọn phục vụ việc filter mã đăng nhập
             m_arrThanh_Vien = v_objCtrThanh_Vien.F117_sp_sel_List_Thanh_Vien_Khong_Thuoc_Kho(m_lngKho_ID);
         }
         else
@@ -76,8 +74,10 @@
             m_arrThanh_Vien = null;
         }
 
-    if (m_objData == null)
+        if (m_objData == null)
+        {
             m_objData = new CDM_Kho_User();
+        }
         else
         {
             r_bUpdate = true;
@@ -92,14 +92,6 @@
 
     protected override void Add_Data()
     {
-        @if (m_lngKho_ID == 0)
-        {
-            throw new Exception("Vui lòng chọn Kho.");
-        }
-        @if (m_objData.Thanh_Vien_ID == 0)
-        {
-            throw new Exception("Vui lòng chọn thành viên.");
-        }
         CDM_Kho_User_Controller v_objCtrData = new();
         m_objData.Last_Updated_By = r_strActive_User_Name;
         m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
