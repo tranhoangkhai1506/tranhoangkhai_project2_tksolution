@@ -155,7 +155,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		}
 
 		static List<CXNK_Nhap_Kho_Raw_Data> v_arrTemp = new List<CXNK_Nhap_Kho_Raw_Data>();
-		public void F2011_sp_ins_List_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data temp)
+		public void F2011_sp_ins_Insert_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data temp)
 		{
 			v_arrTemp.Add(temp);
 		}
@@ -201,7 +201,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 				throw;
 			}
 		}
-		public CXNK_Nhap_Kho_Raw_Data F2011_sp_sel_Get_By_ID_Chi_Tiet_Nhap_Kho_Local(long p_iID)
+		public CXNK_Nhap_Kho_Raw_Data F2011_sp_sel_Get_By_ID_Local(long p_iID)
 		{
 			try
 			{

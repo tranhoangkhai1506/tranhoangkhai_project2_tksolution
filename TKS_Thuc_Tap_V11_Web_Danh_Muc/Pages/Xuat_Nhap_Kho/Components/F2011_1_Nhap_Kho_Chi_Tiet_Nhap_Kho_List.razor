@@ -138,7 +138,7 @@
 		else
 		{
 			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
-			CXNK_Nhap_Kho_Raw_Data v_objData = v_objCtrData.F2011_sp_sel_Get_By_ID_Chi_Tiet_Nhap_Kho_Local(p_iAuto_ID);
+			CXNK_Nhap_Kho_Raw_Data v_objData = v_objCtrData.F2011_sp_sel_Get_By_ID_Local(p_iAuto_ID);
 			if (v_objData != null)
 				r_strDelete_Key = v_objData.Auto_ID.ToString();
 			// End tracking

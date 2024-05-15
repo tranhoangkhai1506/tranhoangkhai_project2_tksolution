@@ -12,17 +12,16 @@
 					</li>
 
 					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#chi_tiet_phieu_nhap" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Chi Tiết")
+						</a>
+					</li>
+
+					<li class="nav-item" role="presentation">
 						<a class="nav-link" data-bs-toggle="tab" href="#record_action_history" role="tab" aria-selected="false" tabindex="-1">
 							@Get_Language_Data_Field("Lịch sử xử lý")
 						</a>
 					</li>
-
-					@* <li class="nav-item" role="presentation">
-						<a class="nav-link" data-bs-toggle="tab" onclick="@(()=> @Open_Chi_Tiet(@r_iAuto_ID))" role="tab" aria-selected="false" tabindex="-1">
-							@Get_Language_Data_Field("Chi Tiết")
-								
-						</a>
-					</li> *@
 				</ul>
 
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> Modal_Cancel())">
@@ -30,10 +29,6 @@
 			</div>
 
 			@((MarkupString)r_strError)
-			@if (r_bIs_Show_Chi_Tiet == true)
-			{
-				<F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List OnClose="@Close_Chi_Tiet" m_lngSo_Phieu_Nhap_Kho="@r_iAuto_ID"></F2011_1_Nhap_Kho_Chi_Tiet_Nhap_Kho_List>
-			}
 			<EditForm Model="@m_objData">
 				<div class="modal-body">
 					<div class="tab-content">
@@ -135,6 +130,9 @@
 						<div class="tab-pane" id="record_action_history" role="tabpanel">
 							<FCommon_Record_Action_History_List v_arrData="@m_arrRAH" />
 						</div>
+						<div class="tab-pane" id="chi_tiet_phieu_nhap" role="tabpanel">
+							<FCommon_Chi_Tiet_Phieu_Nhap_List v_arrData="@m_arrRawData" />
+						</div>
 					</div>
 				</div>
 			</EditForm>
@@ -145,28 +143,15 @@
 @code {
 	private CXNK_Nhap_Kho m_objData = new();
 	private List<CLog_Record_Action_History> m_arrRAH = new();
-	public bool r_bIs_Show_Chi_Tiet = false;
+	private List<CXNK_Nhap_Kho_Raw_Data> m_arrRawData = new();
 	protected override void Load_Data()
 	{
 		CXNK_Nhap_Kho_Controller v_objCtrData = new();
+		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrRawData = new();
 		CLog_Record_Action_History_Controller v_objCtrRAH = new();
 
 		m_objData = v_objCtrData.FQ_718_NK_sp_sel_Get_By_ID(r_iAuto_ID);
-
+		m_arrRawData = v_objCtrRawData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(m_objData.Auto_ID);
 		//m_arrRAH = v_objCtrRAH.FCommon_Sys_sp_sel_List_Log_Record_Action_History(r_iAuto_ID);
-	}
-
-	protected void Open_Chi_Tiet(long p_iAuto_ID)
-	{
-		r_strError = "";
-		r_iAuto_ID = p_iAuto_ID;
-		r_bIs_Show_Chi_Tiet = true;
-		StateHasChanged();
-	}
-
-	protected void Close_Chi_Tiet()
-	{
-		r_bIs_Show_Chi_Tiet = false;
-		StateHasChanged();
 	}
 }

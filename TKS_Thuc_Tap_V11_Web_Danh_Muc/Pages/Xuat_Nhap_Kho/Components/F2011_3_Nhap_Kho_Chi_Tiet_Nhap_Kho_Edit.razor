@@ -118,7 +118,7 @@
 		}
 		else
 		{
-			m_objData = v_objCtrData.F2011_sp_sel_Get_By_ID_Chi_Tiet_Nhap_Kho_Local(r_iAuto_ID);
+			m_objData = v_objCtrData.F2011_sp_sel_Get_By_ID_Local(r_iAuto_ID);
 		}
 
 
@@ -138,17 +138,18 @@
 
 	protected override void Add_Data()
 	{
+		// Kiểm tra từ UI đảm bảo dữ liệu cho việc thêm chi tiết tạm
 		@if (m_objData.San_Pham_ID == 0 )
 		{
 			throw new Exception("Vui lòng chon Sản Phẩm.");
 		}
 		@if (m_objData.SL_Nhap <= 0 )
 		{
-			throw new Exception("Vui lòng nhập Số Lượng Nhập > 0.");
+			throw new Exception("Vui lòng nhập Số Lượng Nhập lớn 0.");
 		}
 		@if (m_objData.Don_Gia_Nhap <= 0)
 		{
-			throw new Exception("Vui lòng nhập Đơn Giá Nhập > 0.");
+			throw new Exception("Vui lòng nhập Đơn Giá Nhập lớn 0.");
 		}
 		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrData = new();
 		if (m_lngSo_Phieu_Nhap_Kho != 0)
@@ -169,7 +170,7 @@
 			m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
 			m_objData.Nhap_Kho_ID = m_lngSo_Phieu_Nhap_Kho;
 			m_objData.Auto_ID = v_arrRawData.Count() + 1;
-			v_objCtrData.F2011_sp_ins_List_Chi_Tiet_Nhap_Kho_Local(m_objData);
+			v_objCtrData.F2011_sp_ins_Insert_Chi_Tiet_Nhap_Kho_Local(m_objData);
 
 			r_strAdd_Key = m_objData.Auto_ID.ToString();
 		}
@@ -179,8 +180,15 @@
 	protected override void Update_Data()
 	{
 		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrData = new();
-
-		if (m_lngSo_Phieu_Nhap_Kho != 0)
+		@if (m_objData.SL_Nhap <= 0)
+		{
+			throw new Exception("Vui lòng nhập Số Lượng Nhập lớn 0.");
+		}
+		@if (m_objData.Don_Gia_Nhap <= 0)
+		{
+			throw new Exception("Vui lòng nhập Đơn Giá Nhập lớn 0.");
+		}
+		else if (m_lngSo_Phieu_Nhap_Kho != 0)
 		{
 			
 			m_objData.Last_Updated_By = r_strActive_User_Name;
