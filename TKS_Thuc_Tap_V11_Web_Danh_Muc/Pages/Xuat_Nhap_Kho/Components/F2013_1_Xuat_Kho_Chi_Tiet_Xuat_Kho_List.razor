@@ -63,7 +63,7 @@
 
 @if (r_bIs_Show_Info == true)
 {
-	<F2013_2_Xuat_Kho_Chi_Tiet_Xuat_Kho_Info m_lngSo_Phieu_Xuat_Kho="@m_lngSo_Phieu_Xuat_Kho" r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2013_2_Xuat_Kho_Chi_Tiet_Xuat_Kho_Info>
+	<F2013_2_Xuat_Kho_Chi_Tiet_Xuat_Kho_Info p_lngSo_Phieu_Xuat_Kho="@p_lngSo_Phieu_Xuat_Kho" r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Info"></F2013_2_Xuat_Kho_Chi_Tiet_Xuat_Kho_Info>
 }
 
 @if (r_bIs_Show_Help_Guide == true)
@@ -73,7 +73,7 @@
 
 @if (r_bIs_Show_Edit == true)
 {
-	<F2013_3_Xuat_Kho_Chi_Tiet_Xuat_Kho_Edit m_lngSo_Phieu_Xuat_Kho="@m_lngSo_Phieu_Xuat_Kho" r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2013_3_Xuat_Kho_Chi_Tiet_Xuat_Kho_Edit>
+	<F2013_3_Xuat_Kho_Chi_Tiet_Xuat_Kho_Edit p_lngSo_Phieu_Xuat_Kho="@p_lngSo_Phieu_Xuat_Kho" r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2013_3_Xuat_Kho_Chi_Tiet_Xuat_Kho_Edit>
 }
 
 @if (r_bIs_Show_Import_Excel == true)
@@ -88,7 +88,7 @@
 
 @code {
 	[Parameter]
-	public long m_lngSo_Phieu_Xuat_Kho { get; set; }
+	public long p_lngSo_Phieu_Xuat_Kho { get; set; }
 	public List<CXNK_Xuat_Kho_Raw_Data> v_arrData = new();
 	TelerikGrid<CXNK_Xuat_Kho_Raw_Data> grdData = new();
 	public List<CXNK_Xuat_Kho_Raw_Data> v_arrDataTemp = new();
@@ -104,11 +104,11 @@
 		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
 		Format_Grid(grdData);
 
-		if (m_lngSo_Phieu_Xuat_Kho != 0)
+		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
 			v_arrData.Clear();
 			v_arrDataTemp = v_objCtrData.FQ_734_XKRD_sp_sel_List_By_Created(r_objFilter.Date_From, r_objFilter.Date_To);
-			v_arrData = v_arrDataTemp.Where(p => p.Xuat_Kho_ID == m_lngSo_Phieu_Xuat_Kho).ToList();
+			v_arrData = v_arrDataTemp.Where(p => p.Xuat_Kho_ID == p_lngSo_Phieu_Xuat_Kho).ToList();
 		}
 		else
 		{
@@ -122,7 +122,7 @@
 	protected override void Delete_Data_Entry(long p_iAuto_ID)
 	{
 		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
-		if (m_lngSo_Phieu_Xuat_Kho != 0)
+		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
 			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
 			CXNK_Xuat_Kho_Raw_Data v_objData = v_objCtrData.FQ_734_XKRD_sp_sel_Get_By_ID(p_iAuto_ID);
@@ -135,7 +135,7 @@
 		else
 		{
 			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
-			CXNK_Xuat_Kho_Raw_Data v_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Chi_Tiet_Xuat_Kho_Local(p_iAuto_ID);
+			CXNK_Xuat_Kho_Raw_Data v_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Local(p_iAuto_ID);
 			if (v_objData != null)
 				r_strDelete_Key = v_objData.Auto_ID.ToString();
 			// End tracking

@@ -59,7 +59,7 @@
 			</EditForm>
 
 			<div style="padding-left: 20px; padding-right: 20px; padding-bottom: 20px">
-				<F2013_1_Xuat_Kho_Chi_Tiet_Xuat_Kho_List m_lngSo_Phieu_Xuat_Kho="@r_iAuto_ID"></F2013_1_Xuat_Kho_Chi_Tiet_Xuat_Kho_List>
+				<F2013_1_Xuat_Kho_Chi_Tiet_Xuat_Kho_List p_lngSo_Phieu_Xuat_Kho="@r_iAuto_ID"></F2013_1_Xuat_Kho_Chi_Tiet_Xuat_Kho_List>
 			</div>
 
 			<div class="modal-footer">
@@ -71,7 +71,7 @@
 
 @code {
 	[Parameter]
-	public long m_lngKho_ID { get; set; }
+	public long p_lngKho_ID { get; set; }
 	private CXNK_Xuat_Kho m_objData = new();
 
 	protected override void Init_Data()
@@ -100,29 +100,8 @@
 
 	protected override void Add_Data()
 	{
-		@if (m_lngKho_ID == 0)
-		{
-			throw new Exception("Vui lòng chọn Kho.");
-		}
-		@if (m_objData.Ngay_Xuat_Kho is null)
-		{
-			throw new Exception("Vui lòng chọn ngày xuất kho.");
-		}
-
 		CXNK_Xuat_Kho_Controller v_objCtrData = new();
-
-
-		List<CXNK_Xuat_Kho> m_objExistData = v_objCtrData.F2012_sp_sel_List_By_So_Phieu_Xuat_Kho(m_objData.So_Phieu_Xuat_Kho);
-
-		if (m_objExistData.Count() != 0)
-		{
-			if (m_objData.Auto_ID != m_objExistData[0].Auto_ID)
-			{
-				throw new Exception("Số phiếu xuất kho đã tồn tại.");
-			}
-		}
-
-		m_objData.Kho_ID = m_lngKho_ID;
+		m_objData.Kho_ID = p_lngKho_ID;
 		m_objData.Last_Updated_By = r_strActive_User_Name;
 		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
 
@@ -156,26 +135,7 @@
 
 	protected override void Update_Data()
 	{
-		
-		@if (m_lngKho_ID == 0)
-		{
-			throw new Exception("Vui lòng chọn Kho.");
-		}
-		@if (m_objData.Ngay_Xuat_Kho is null)
-		{
-			throw new Exception("Vui lòng chọn Ngày nhập kho.");
-		};
-
 		CXNK_Xuat_Kho_Controller v_objCtrData = new();
-		List<CXNK_Xuat_Kho> m_objExistData = v_objCtrData.F2012_sp_sel_List_By_So_Phieu_Xuat_Kho(m_objData.So_Phieu_Xuat_Kho);
-
-		if (m_objExistData.Count() != 0)
-		{
-			if (m_objData.Auto_ID != m_objExistData[0].Auto_ID)
-			{
-				throw new Exception("Số phiếu nhập kho đã tồn tại.");
-			}
-		}
 		m_objData.Last_Updated_By = r_strActive_User_Name;
 		m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
 

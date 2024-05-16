@@ -183,25 +183,18 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		}
 
 		static List<CXNK_Xuat_Kho_Raw_Data> v_arrTemp = new List<CXNK_Xuat_Kho_Raw_Data>();
-		public void F2013_sp_ins_List_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
+		public void F2013_sp_ins_Insert_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
 		{
 			v_arrTemp.Add(temp);
 		}
 
 		public void F2013_sp_upd_Update_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
 		{
-			try
+			CXNK_Xuat_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
+			if (existDetail is not null)
 			{
-				CXNK_Xuat_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
-				if (existDetail is not null)
-				{
-					existDetail.SL_Xuat = temp.SL_Xuat;
-					existDetail.Don_Gia_Xuat = temp.Don_Gia_Xuat;
-				}
-			}
-			catch (Exception)
-			{
-				throw;
+				existDetail.SL_Xuat = temp.SL_Xuat;
+				existDetail.Don_Gia_Xuat = temp.Don_Gia_Xuat;
 			}
 		}
 
@@ -216,30 +209,15 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		}
 		public void F2013_sp_del_By_ID_Chi_Tiet_Xuat_Kho_Local(long p_iID)
 		{
-			try
+			CXNK_Xuat_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+			if (existDetail is not null)
 			{
-				CXNK_Xuat_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
-				if (existDetail is not null)
-				{
-					v_arrTemp.Remove(existDetail);
-				}
-			}
-			catch (Exception)
-			{
-				throw;
+				v_arrTemp.Remove(existDetail);
 			}
 		}
-		public CXNK_Xuat_Kho_Raw_Data F2013_sp_sel_Get_By_ID_Chi_Tiet_Xuat_Kho_Local(long p_iID)
+		public CXNK_Xuat_Kho_Raw_Data F2013_sp_sel_Get_By_ID_Local(long p_iID)
 		{
-			try
-			{
-				return v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
-			}
-
-			catch (Exception)
-			{
-				throw;
-			}
+			return v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
 		}
 	}
 }

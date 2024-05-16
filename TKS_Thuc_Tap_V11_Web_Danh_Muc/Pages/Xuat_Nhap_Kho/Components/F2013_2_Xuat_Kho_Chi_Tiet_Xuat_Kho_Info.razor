@@ -39,14 +39,14 @@
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Xuất kho")</label><br />
+											<label class="form-label-info">@Get_Language_Data_Field("Xuất Kho")</label><br />
 											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Xuat_Kho_ID, false)</span>
 										</div>
 									</div>
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Sản phẩm")</label><br />
+											<label class="form-label-info">@Get_Language_Data_Field("Sản Phẩm")</label><br />
 											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ten_San_Pham, false)</span>
 										</div>
 									</div>
@@ -60,7 +60,7 @@
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Đơn giá xuất")</label><br />
+											<label class="form-label-info">@Get_Language_Data_Field("Đơn Giá Xuất")</label><br />
 											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Don_Gia_Xuat, false)</span>
 										</div>
 									</div>
@@ -127,7 +127,7 @@
 
 @code {
 	[Parameter]
-	public long m_lngSo_Phieu_Xuat_Kho { get; set; }
+	public long p_lngSo_Phieu_Xuat_Kho { get; set; }
 	private CXNK_Xuat_Kho_Raw_Data m_objData = new();
 	private List<CLog_Record_Action_History> m_arrRAH = new();
 
@@ -136,13 +136,13 @@
 		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
 		CLog_Record_Action_History_Controller v_objCtrRAH = new();
 
-		if (m_lngSo_Phieu_Xuat_Kho != 0)
+		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
 			m_objData = v_objCtrData.FQ_734_XKRD_sp_sel_Get_By_ID(r_iAuto_ID);
 		}
 		else
 		{
-			m_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Chi_Tiet_Xuat_Kho_Local(r_iAuto_ID);
+			m_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Local(r_iAuto_ID);
 		}
 		
 

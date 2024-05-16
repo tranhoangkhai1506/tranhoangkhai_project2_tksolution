@@ -103,7 +103,7 @@
 
 @code {
 	[Parameter]
-	public long m_lngSo_Phieu_Xuat_Kho { get; set; }
+	public long p_lngSo_Phieu_Xuat_Kho { get; set; }
 	private CXNK_Xuat_Kho_Raw_Data m_objData = new();
 
 	protected override void Init_Data()
@@ -114,13 +114,13 @@
 	protected override void Load_Data()
 	{
 		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
-		if (m_lngSo_Phieu_Xuat_Kho != 0)
+		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
 			m_objData = v_objCtrData.FQ_734_XKRD_sp_sel_Get_By_ID(r_iAuto_ID);
 		}
 		else
 		{
-			m_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Chi_Tiet_Xuat_Kho_Local(r_iAuto_ID);
+			m_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Local(r_iAuto_ID);
 		}
 		if (m_objData == null)
 			m_objData = new CXNK_Xuat_Kho_Raw_Data();
@@ -141,21 +141,21 @@
 		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
 		@if (m_objData.San_Pham_ID == 0)
 		{
-			throw new Exception("Vui lòng chon Sản Phẩm.");
+			throw new Exception("Vui lòng chọn sản phẩm.");
 		}
 		@if (m_objData.SL_Xuat <= 0)
 		{
-			throw new Exception("Vui lòng nhập Số Lượng Nhập > 0.");
+			throw new Exception("Vui lòng nhập số lượng xuất lớn hơn 0.");
 		}
 		@if (m_objData.Don_Gia_Xuat <= 0)
 		{
-			throw new Exception("Vui lòng nhập Đơn Giá Nhập > 0.");
+			throw new Exception("Vui lòng nhập đơn giá xuất 0.");
 		}
-		if (m_lngSo_Phieu_Xuat_Kho != 0)
+		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
 			m_objData.Last_Updated_By = r_strActive_User_Name;
 			m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
-			m_objData.Xuat_Kho_ID = m_lngSo_Phieu_Xuat_Kho;
+			m_objData.Xuat_Kho_ID = p_lngSo_Phieu_Xuat_Kho;
 			m_objData.Auto_ID = r_iAuto_ID = v_objCtrData.FQ_734_XKRD_sp_ins_Insert(m_objData);
 
 			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
@@ -167,9 +167,9 @@
 			List<CXNK_Xuat_Kho_Raw_Data> v_arrRawData = v_objCtrData.F2013_sp_sel_List_Chi_Tiet_Xuat_Kho_Local();
 			m_objData.Last_Updated_By = r_strActive_User_Name;
 			m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
-			m_objData.Xuat_Kho_ID = m_lngSo_Phieu_Xuat_Kho;
+			m_objData.Xuat_Kho_ID = p_lngSo_Phieu_Xuat_Kho;
 			m_objData.Auto_ID = v_arrRawData.Count() + 1;
-			v_objCtrData.F2013_sp_ins_List_Chi_Tiet_Xuat_Kho_Local(m_objData);
+			v_objCtrData.F2013_sp_ins_Insert_Chi_Tiet_Xuat_Kho_Local(m_objData);
 
 			r_strAdd_Key = m_objData.Auto_ID.ToString();
 		}
@@ -186,7 +186,7 @@
 		{
 			throw new Exception("Vui lòng nhập Đơn Giá Nhập > 0.");
 		}
-		if (m_lngSo_Phieu_Xuat_Kho != 0)
+		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
 
 			m_objData.Last_Updated_By = r_strActive_User_Name;

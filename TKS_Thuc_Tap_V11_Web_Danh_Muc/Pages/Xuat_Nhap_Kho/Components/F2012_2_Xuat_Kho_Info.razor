@@ -10,7 +10,11 @@
 							@Get_Language_Data_Field("Thông tin")
 						</a>
 					</li>
-
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" data-bs-toggle="tab" href="#chi_tiet_phieu_xuat" role="tab" aria-selected="false" tabindex="-1">
+							@Get_Language_Data_Field("Chi Tiết")
+						</a>
+					</li>
 					<li class="nav-item" role="presentation">
 						<a class="nav-link" data-bs-toggle="tab" href="#record_action_history" role="tab" aria-selected="false" tabindex="-1">
 							@Get_Language_Data_Field("Lịch sử xử lý")
@@ -39,21 +43,28 @@
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Số phiếu xuất kho")</label><br />
+											<label class="form-label-info">@Get_Language_Data_Field("Số Phiếu Xuất Kho")</label><br />
 											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.So_Phieu_Xuat_Kho, false)</span>
 										</div>
 									</div>
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Ngày xuất kho")</label><br />
+											<label class="form-label-info">@Get_Language_Data_Field("Tên Kho")</label><br />
+											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ten_Kho, false)</span>
+										</div>
+									</div>
+
+									<div class="row mb-3">
+										<div class="col-lg-11">
+											<label class="form-label-info">@Get_Language_Data_Field("Ngày Xuất Kho")</label><br />
 											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ngay_Xuat_Kho, false)</span>
 										</div>
 									</div>
 
 									<div class="row mb-3">
 										<div class="col-lg-11">
-											<label class="form-label-info">@Get_Language_Data_Field("Ghi chú")</label><br />
+											<label class="form-label-info">@Get_Language_Data_Field("Ghi Chú")</label><br />
 											<span class="form-label">@CUtility.Get_Label_Text(@m_objData.Ghi_Chu, false)</span>
 										</div>
 									</div>
@@ -111,6 +122,9 @@
 						<div class="tab-pane" id="record_action_history" role="tabpanel">
 							<FCommon_Record_Action_History_List v_arrData="@m_arrRAH" />
 						</div>
+						<div class="tab-pane" id="chi_tiet_phieu_xuat" role="tabpanel">
+							<FCommon_Chi_Tiet_Phieu_Xuat_List v_arrData="@m_arrRawData" />
+						</div>
 					</div>
 				</div>
 			</EditForm>
@@ -121,14 +135,16 @@
 @code {
 	private CXNK_Xuat_Kho m_objData = new();
 	private List<CLog_Record_Action_History> m_arrRAH = new();
+	private List<CXNK_Xuat_Kho_Raw_Data> m_arrRawData = new();
 
 	protected override void Load_Data()
 	{
 		CXNK_Xuat_Kho_Controller v_objCtrData = new();
+		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
 		CLog_Record_Action_History_Controller v_objCtrRAH = new();
 
 		m_objData = v_objCtrData.FQ_728_XK_sp_sel_Get_By_ID(r_iAuto_ID);
-
+		m_arrRawData = v_objCtrRawData.F2013_XKRD_sp_sel_List_By_PhieuXuatID(r_iAuto_ID);
 		//m_arrRAH = v_objCtrRAH.FCommon_Sys_sp_sel_List_Log_Record_Action_History(r_iAuto_ID);
 	}
 }

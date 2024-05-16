@@ -1,0 +1,31 @@
+﻿<div class="row">
+	<div class="col-lg-12">
+		<TelerikGrid Data="@v_arrData" Height="400px" Resizable="true" Reorderable="true" @ref="@grdData">			
+			<GridColumns>
+				<GridColumn Field="Ten_San_Pham" Title="Sản Phẩm" Width="200px"></GridColumn>
+				<GridColumn Field="SL_Xuat" Title="Số Lượng Xuất" Width="100px"></GridColumn>
+				<GridColumn Field="Don_Gia_Xuat" Title="Đơn Giá Xuất" Width="100px"></GridColumn>
+				<GridColumn Field="" Title=""><FooterTemplate Context="Footer"></FooterTemplate></GridColumn>
+				<GridColumn Field="" Title=""><FooterTemplate></FooterTemplate></GridColumn>
+			</GridColumns>
+		</TelerikGrid>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public List<CXNK_Xuat_Kho_Raw_Data> v_arrData { get; set; } = new();
+
+	TelerikGrid<CXNK_Xuat_Kho_Raw_Data> grdData = new();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		CCommonFunction.Format_Grid(grdData, "", "");
+
+		var v_objState = grdData.GetState(); // giữ state để sau khi thay đổi thì set lại
+		var v_arrGrid_Props = grdData.GetType().GetProperties(); //lấy các thuộc tính của grid
+		v_arrGrid_Props.FirstOrDefault(x => x.Name == "FilterMode").SetValue(grdData, GridFilterMode.None);
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+}
