@@ -80,6 +80,7 @@
 			{
 				
 				v_arrChiTiet = new();
+				//Lấy tất cả chi tiết của từng phiếu
 				v_arrChiTiet = v_objCtrRawData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(item.Auto_ID);
 
 				if (v_arrChiTiet.Count() > 0)

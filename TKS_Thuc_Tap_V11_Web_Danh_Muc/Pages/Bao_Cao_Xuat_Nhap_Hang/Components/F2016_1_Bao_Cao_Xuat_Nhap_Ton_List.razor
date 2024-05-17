@@ -51,15 +51,20 @@
 
 
 @code {
-	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrData = new();
-	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrBaoCaoTonDauKy = new();
-	TelerikGrid<CDM_Bao_Cao_Xuat_Nhap_Ton> grdData = new();
-	public List<CDM_Bao_Cao_Chi_Tiet_Nhap_Hang> v_arrBaoCaoHangNhap = new();
-	public List<CDM_Bao_Cao_Chi_Tiet_Nhap_Hang> v_arrBaoCaoHangNhapDauKy = new();
-	public List<CXNK_Nhap_Kho> v_arrPhieuNhap = new();
-	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrBaoCaoHangXuat = new();
-	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrBaoCaoHangXuatDauKy= new ();
-	public List<CXNK_Xuat_Kho> v_arrPhieuXuat = new();
+	//List Hiển Thị Kết Quả
+	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrData = null;
+	TelerikGrid<CDM_Bao_Cao_Xuat_Nhap_Ton> grdData = null;
+	//List Tính Đầu Kỳ
+	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrBaoCaoTonDauKy = null;
+	public List<CDM_Bao_Cao_Chi_Tiet_Nhap_Hang> v_arrBaoCaoHangNhapDauKy = null;
+	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrBaoCaoHangXuatDauKy = null;
+	//List Tính Số Lượng Xuất Nhập Trong Đoạn Tìm Kiếm
+	public List<CXNK_Nhap_Kho> v_arrPhieuNhap = null;
+	public List<CDM_Bao_Cao_Chi_Tiet_Nhap_Hang> v_arrBaoCaoHangNhap = null;	
+	public List<CXNK_Xuat_Kho> v_arrPhieuXuat = null;
+	public List<CDM_Bao_Cao_Chi_Tiet_Xuat_Hang> v_arrBaoCaoHangXuat = null;
+	
+	
 	protected override void Init_Data()
 	{
 
@@ -73,18 +78,21 @@
 		v_arrBaoCaoTonDauKy  = new();
 		v_arrBaoCaoHangNhapDauKy = new();
 		v_arrBaoCaoHangXuatDauKy= new();
-		Load_Phieu_Nhap_Dau_Ky();
-		Load_Phieu_Xuat_Dau_Ky();
 		Load_SL_Dau_Ky();
 		Load_Arr_Nhap();
 		Load_Arr_Xuat();
 		Load_SL_Nhap();
 		Load_SL_Xuat();
-
 	}
 
+
+	// Tính Toán Số Liệu Cho Đầu Kỳ
 	protected void Load_SL_Dau_Ky()
 	{
+		Load_Phieu_Nhap_Dau_Ky();
+		Load_Phieu_Xuat_Dau_Ky();
+
+		//Tính số lượng nhập trước đoạn tìm kiếm
 		if (v_arrBaoCaoHangNhapDauKy.Count()  != 0)
 		{
 			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangNhapDauKy)
@@ -115,7 +123,7 @@
 			}
 		}
 
-		//
+		//Tính số lượng xuất trước đoạn tìm kiếm
 		if (v_arrBaoCaoHangXuatDauKy.Count() != 0)
 		{
 			foreach (var v_objBaoCaoHangXuat in v_arrBaoCaoHangXuatDauKy)
@@ -146,7 +154,7 @@
 			}
 		}
 
-		//
+		//Set số lượng đầu kỳ cho đoạn tìm kiếm(Kết quả để hiển thị)
 		if (v_arrBaoCaoTonDauKy.Count() != 0)
 		{
 			if (v_arrData.Count() != 0)
@@ -160,6 +168,7 @@
 					}
 					else
 					{
+						//Tạo mới một Xuất Nhập Tồn cho sản phẩm trong trường hợp sản phẩm không có xuất nhập trong đoạn tìm kiếm
 						CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
 						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
 						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
@@ -179,6 +188,7 @@
 					}
 					else
 					{
+						//Tạo mới một Xuất Nhập Tồn cho sản phẩm trong trường hợp sản phẩm không có xuất nhập trong đoạn tìm kiếm
 						CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
 						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
 						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
@@ -189,7 +199,7 @@
 			}
 		}
 	}
-
+	
 	protected void Load_SL_Nhap()
 	{
 		if (v_arrBaoCaoHangNhap.Count()  != 0)
