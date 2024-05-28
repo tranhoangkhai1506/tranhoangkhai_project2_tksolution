@@ -79,8 +79,8 @@
 		v_arrBaoCaoHangNhapDauKy = new();
 		v_arrBaoCaoHangXuatDauKy= new();
 		Load_SL_Dau_Ky();
-		Load_Arr_Nhap();
-		Load_Arr_Xuat();
+		Load_Phieu_Nhap_Trong_Tim_Kiem();
+		Load_Phieu_Xuat_Trong_Tim_Kiem();
 		Load_SL_Nhap();
 		Load_SL_Xuat();
 	}
@@ -89,8 +89,8 @@
 	// Tính Toán Số Liệu Cho Đầu Kỳ
 	protected void Load_SL_Dau_Ky()
 	{
-		Load_Phieu_Nhap_Dau_Ky();
-		Load_Phieu_Xuat_Dau_Ky();
+		Load_Phieu_Nhap_Truoc_Tim_Kiem();
+		Load_Phieu_Xuat_Truoc_Tim_Kiem();
 
 		//Tính số lượng nhập trước đoạn tìm kiếm
 		if (v_arrBaoCaoHangNhapDauKy.Count()  != 0)
@@ -266,7 +266,7 @@
 		}
 	}
 
-	protected void Load_Phieu_Nhap_Dau_Ky()
+	protected void Load_Phieu_Nhap_Truoc_Tim_Kiem()
 	{
 		CXNK_Nhap_Kho_Controller v_objCtrData = new();
 		List<CXNK_Nhap_Kho_Raw_Data> v_arrChiTiet = new();
@@ -320,7 +320,7 @@
 		}
 	}
 
-	protected void Load_Phieu_Xuat_Dau_Ky()
+	protected void Load_Phieu_Xuat_Truoc_Tim_Kiem()
 	{
 		CXNK_Xuat_Kho_Controller v_objCtrData = new();
 		List<CXNK_Xuat_Kho_Raw_Data> v_arrChiTiet = new();
@@ -371,14 +371,12 @@
 			}
 		}
 	}
-	protected void Load_Arr_Nhap()
+	protected void Load_Phieu_Nhap_Trong_Tim_Kiem()
 	{
 		CXNK_Nhap_Kho_Controller v_objCtrData = new();
 		List<CXNK_Nhap_Kho_Raw_Data> v_arrChiTiet = new();
 		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrRawData = new();
 		CDM_San_Pham v_objSanPham = new();
-		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
-		Format_Grid(grdData);
 		v_arrPhieuNhap = v_objCtrData.F2010_NK_sp_sel_List_By_Date_From_To(r_objFilter.Date_From, r_objFilter.Date_To);
 
 		if (v_arrPhieuNhap.Count() != 0)
@@ -424,14 +422,12 @@
 		}
 	}
 
-	protected void Load_Arr_Xuat()
+	protected void Load_Phieu_Xuat_Trong_Tim_Kiem()
 	{
 		CXNK_Xuat_Kho_Controller v_objCtrData = new();
 		List<CXNK_Xuat_Kho_Raw_Data> v_arrChiTiet = new();
 		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
 		CDM_San_Pham v_objSanPham = new();
-		//Format lại grid đúng chuẩn, Đặt trước hàm load dữ liệu vì nó sẽ chạy nhanh hơn
-		Format_Grid(grdData);
 		v_arrPhieuXuat = v_objCtrData.F2012_XK_sp_sel_List_By_Date_From_To(r_objFilter.Date_From, r_objFilter.Date_To);
 
 		if (v_arrPhieuXuat.Count() != 0)

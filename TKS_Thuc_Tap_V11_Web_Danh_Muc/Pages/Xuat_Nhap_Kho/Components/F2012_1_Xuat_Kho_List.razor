@@ -43,6 +43,12 @@
 									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu chỉnh")</button>
 								</li>
 							}
+							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+							{
+								<li>
+									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Chi_Tiet_Function_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Chi Tiết")</button>
+								</li>
+							}
 							@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
 							{
 								<li>
@@ -90,6 +96,11 @@
 	<F2012_3_Xuat_Kho_Edit p_lngKho_ID=@m_objXuat_Kho.Kho_ID r_iAuto_ID="@r_iAuto_ID" OnClose="@Close_Edit"></F2012_3_Xuat_Kho_Edit>
 }
 
+@if (m_blIs_Show_Edit_Chi_Tiet == true)
+{
+	<F2013_4_Xuat_Kho_Chi_Tiet_Xuat_Kho_Edit p_lngSo_Phieu_Xuat_Kho="@r_iAuto_ID" OnClose="@Close_Chi_Tiet_Function"></F2013_4_Xuat_Kho_Chi_Tiet_Xuat_Kho_Edit>
+}
+
 @if (r_bIs_Show_Import_Excel == true)
 {
 	<FCommon_Import_Excel r_objImport_Excel="@r_objImport_Excel" OnClose="@Close_Import_Excel"></FCommon_Import_Excel>
@@ -103,7 +114,7 @@
 @code {
 	public List<CXNK_Xuat_Kho> v_arrData = new();
 	TelerikGrid<CXNK_Xuat_Kho> grdData = new();
-
+	private bool m_blIs_Show_Edit_Chi_Tiet { get; set; } = false;
 	CXNK_Xuat_Kho m_objXuat_Kho = new();
 	public bool r_bIs_Show_Report = false;
 	protected override void Init_Data()
@@ -122,6 +133,23 @@
 	{
 		r_bIs_Show_Report = false;
 		StateHasChanged();
+	}
+
+	protected void Open_Chi_Tiet_Function_Edit(long p_iAuto_ID)
+	{
+		r_strError = "";
+		r_iAuto_ID = p_iAuto_ID;
+		m_blIs_Show_Edit_Chi_Tiet = true;
+		StateHasChanged();
+	}
+
+	private void Close_Chi_Tiet_Function(CEvent_Call_Back p_obj)
+	{
+		if (p_obj.Message_ID != (int)EModal_Result.Exception)
+		{
+			m_blIs_Show_Edit_Chi_Tiet = false;
+			Load_Data_Init();
+		}
 	}
 	protected override void Load_Data()
 	{
