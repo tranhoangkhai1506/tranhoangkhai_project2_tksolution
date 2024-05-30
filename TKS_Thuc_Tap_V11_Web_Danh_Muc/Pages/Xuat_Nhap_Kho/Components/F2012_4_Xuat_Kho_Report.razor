@@ -45,10 +45,10 @@
     public bool ParametersAreaVisible { get; set; }
     public bool DocumentMapVisible { get; set; }
     public double Scale { get; set; } = 1.0;
-    CNumber v_objCNumber = new();
-    private double v_objTotalQuantity = 0;
-    List<CXNK_Xuat_Kho_Raw_Data> v_arrChiTiet = new();
-    CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrRawData = new();
+    CNumber m_objCNumber = new();
+    private double m_objTotalQuantity = 0;
+    List<CXNK_Xuat_Kho_Raw_Data> m_arrChiTiet = new();
+    CXNK_Xuat_Kho_Raw_Data_Controller m_objCtrRawData = new();
     public ReportSourceOptions ReportSource { get; set; } = new ReportSourceOptions("rpt2012_A_M1_Phieu_Xuat_Kho_Default.trdp", new Dictionary<string, object>
     {
 
@@ -56,15 +56,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        v_arrChiTiet = v_objCtrRawData.F2013_XKRD_sp_sel_List_By_PhieuXuatID(CUtility.Convert_To_Int64(p_lngSo_Phieu_Xuat_Kho));
+        m_arrChiTiet = m_objCtrRawData.F2013_XKRD_sp_sel_List_By_PhieuXuatID(CUtility.Convert_To_Int64(p_lngSo_Phieu_Xuat_Kho));
 
-        if (v_arrChiTiet.Count() != 0)
+        if (m_arrChiTiet.Count() != 0)
         {
-            v_objTotalQuantity += v_arrChiTiet.Sum(p => p.SL_Xuat);
+            m_objTotalQuantity += m_arrChiTiet.Sum(p => p.SL_Xuat);
         }
 
         ReportSource.Parameters.Add("So_Phieu_Xuat_ID", p_lngSo_Phieu_Xuat_Kho);
-        ReportSource.Parameters.Add("So_Luong_Xuat_Double", v_objTotalQuantity);
-        ReportSource.Parameters.Add("So_Luong_Xuat_String", v_objCNumber.ReadInt(v_objTotalQuantity.ToString(),""));
+        ReportSource.Parameters.Add("So_Luong_Xuat_Double", m_objTotalQuantity);
+        ReportSource.Parameters.Add("So_Luong_Xuat_String", m_objCNumber.ReadInt(m_objTotalQuantity.ToString(),""));
     }
 }

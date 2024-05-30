@@ -164,11 +164,11 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		{
 			try
 			{
-				CXNK_Nhap_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
-				if (existDetail is not null)
+				CXNK_Nhap_Kho_Raw_Data v_objExistDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
+				if (v_objExistDetail is not null)
 				{
-					existDetail.SL_Nhap = temp.SL_Nhap;
-					existDetail.Don_Gia_Nhap = temp.Don_Gia_Nhap;
+					v_objExistDetail.SL_Nhap = temp.SL_Nhap;
+					v_objExistDetail.Don_Gia_Nhap = temp.Don_Gia_Nhap;
 				}
 			}
 			catch (Exception)
@@ -190,10 +190,10 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 		{
 			try
 			{
-				CXNK_Nhap_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
-				if (existDetail is not null)
+				CXNK_Nhap_Kho_Raw_Data v_objExistDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+				if (v_objExistDetail is not null)
 				{
-					v_arrTemp.Remove(existDetail);
+					v_arrTemp.Remove(v_objExistDetail);
 				}
 			}
 			catch (Exception)
