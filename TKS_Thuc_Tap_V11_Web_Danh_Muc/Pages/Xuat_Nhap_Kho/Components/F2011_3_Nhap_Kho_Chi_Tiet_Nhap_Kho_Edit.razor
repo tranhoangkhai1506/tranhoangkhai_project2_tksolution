@@ -118,7 +118,7 @@
 		}
 		else
 		{
-			m_objData = v_objCtrData.F2011_sp_sel_Get_By_ID_Local(r_iAuto_ID);
+			m_objData = v_objCtrData.Get_By_ID_Local(r_iAuto_ID);
 		}
 
 
@@ -165,12 +165,12 @@
 		}
 		else
 		{
-			List<CXNK_Nhap_Kho_Raw_Data> v_arrRawData = v_objCtrData.F2011_sp_sel_List_Chi_Tiet_Nhap_Kho_Local();
+			List<CXNK_Nhap_Kho_Raw_Data> v_arrRawData = v_objCtrData.Get_List_Chi_Tiet_Nhap_Kho_Local();
 			m_objData.Last_Updated_By = r_strActive_User_Name;
 			m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
 			m_objData.Nhap_Kho_ID = m_lngSo_Phieu_Nhap_Kho;
 			m_objData.Auto_ID = v_arrRawData.Count() + 1;
-			v_objCtrData.F2011_sp_ins_Insert_Chi_Tiet_Nhap_Kho_Local(m_objData);
+			v_objCtrData.Insert_Chi_Tiet_Nhap_Kho_Local(m_objData);
 
 			r_strAdd_Key = m_objData.Auto_ID.ToString();
 		}
@@ -204,7 +204,7 @@
 		}
 		else
 		{
-			v_objCtrData.F2011_sp_upd_Update_Chi_Tiet_Nhap_Kho_Local(m_objData);
+			v_objCtrData.Update_Chi_Tiet_Nhap_Kho_Local(m_objData);
 			CXNK_Nhap_Kho_Raw_Data v_objClone = new();
 			CUtility.Clone_Entity(m_objData, v_objClone);
 			r_objDes = v_objClone;

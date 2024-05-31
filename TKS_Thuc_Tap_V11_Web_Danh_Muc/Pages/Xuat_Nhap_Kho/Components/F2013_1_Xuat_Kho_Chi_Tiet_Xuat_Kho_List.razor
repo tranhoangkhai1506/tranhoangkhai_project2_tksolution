@@ -113,7 +113,7 @@
 		else
 		{
 			v_arrData.Clear();
-			v_arrDataTemp = v_objCtrData.F2013_sp_sel_List_Chi_Tiet_Xuat_Kho_Local();
+			v_arrDataTemp = v_objCtrData.Get_List_Chi_Tiet_Xuat_Kho_Local();
 			foreach (var i in v_arrDataTemp)
 				v_arrData.Add(i);
 		}
@@ -124,98 +124,20 @@
 		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
 		if (p_lngSo_Phieu_Xuat_Kho != 0)
 		{
-			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
 			CXNK_Xuat_Kho_Raw_Data v_objData = v_objCtrData.FQ_734_XKRD_sp_sel_Get_By_ID(p_iAuto_ID);
 			if (v_objData != null)
 				r_strDelete_Key = v_objData.Auto_ID.ToString();
-			// End tracking
 
 			v_objCtrData.FQ_734_XKRD_sp_del_Delete_By_ID(p_iAuto_ID, r_strActive_User_Name, r_strActive_Function_Code);
 		}
 		else
 		{
-			// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
-			CXNK_Xuat_Kho_Raw_Data v_objData = v_objCtrData.F2013_sp_sel_Get_By_ID_Local(p_iAuto_ID);
+			CXNK_Xuat_Kho_Raw_Data v_objData = v_objCtrData.Get_By_ID_Local(p_iAuto_ID);
 			if (v_objData != null)
 				r_strDelete_Key = v_objData.Auto_ID.ToString();
-			// End tracking
 
-			v_objCtrData.F2013_sp_del_By_ID_Chi_Tiet_Xuat_Kho_Local(p_iAuto_ID);
+			v_objCtrData.Delete_By_ID_Chi_Tiet_Xuat_Kho_Local(p_iAuto_ID);
 		}
 	}
 
-	protected override void Import_Excel_Entry(CExcel_Controller v_objCtrlExcel, ref int p_iCount_Success, ref int p_iCount_Error)
-	{
-		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
-
-		StringBuilder v_sbError = new StringBuilder();
-		SqlConnection v_conn = null;
-		SqlTransaction v_trans = null;
-
-		try
-		{
-			DataTable v_dt = v_objCtrlExcel.List_Range_Value_To_End(0, "A2", "D");
-
-			// Loại mấy dòng trống
-			for (int v_i = v_dt.Rows.Count - 1; v_i >= 0; v_i--)
-				if (v_dt.Rows[v_i][0].ToString().Trim() == "")
-					v_dt.Rows.RemoveAt(v_i);
-
-			int v_iCount = 1;
-
-			foreach (DataRow v_row in v_dt.Rows)
-			{
-				v_iCount++;
-
-				//tao ket noi transaction
-				v_conn = CSqlHelper.CreateConnection(CConfig.TKS_Thuc_Tap_V11_Conn_String);
-				v_conn.Open();
-				v_trans = v_conn.BeginTransaction();
-
-				try
-				{
-					CXNK_Xuat_Kho_Raw_Data v_objData = new CXNK_Xuat_Kho_Raw_Data();
-					v_objData.SL_Xuat = CUtility.Convert_To_Double(v_row[2]);
-					v_objData.Don_Gia_Xuat = CUtility.Convert_To_Double(v_row[3]);
-					v_objData.Last_Updated_By = r_strActive_User_Name;
-					v_objData.Last_Updated_By_Function = r_strActive_Function_Code;
-
-					v_objData.Auto_ID = v_objCtrData.FQ_734_XKRD_sp_ins_Insert(v_conn, v_trans, v_objData);
-					p_iCount_Success++;
-					v_trans.Commit();
-
-					CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.SL_Xuat);
-				}
-
-				catch (Exception ex)
-				{
-					v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iCount.ToString() + " " + Get_Language_Data_Field("có lỗi") + ": " + ex.Message + "<br/>");
-
-					if (v_trans != null)
-						v_trans.Rollback();
-				}
-
-				finally
-				{
-					if (v_trans != null)
-						v_trans.Dispose();
-
-					if (v_conn != null)
-						v_conn.Close();
-				}
-			}
-
-			p_iCount_Error = v_dt.Rows.Count - p_iCount_Success;
-			string v_strMessage = CCommonFunction.Set_Success_MessageBox(Get_Language_Data_Field("Thêm mới") + " " + p_iCount_Success.ToString() + " " + Get_Language_Data_Field("dòng thành công."));
-			if (v_sbError.ToString() != "")
-				v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
-
-			Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);
-		}
-
-		catch (Exception ex)
-		{
-			Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), ex.Message);
-		}
-	}
 }

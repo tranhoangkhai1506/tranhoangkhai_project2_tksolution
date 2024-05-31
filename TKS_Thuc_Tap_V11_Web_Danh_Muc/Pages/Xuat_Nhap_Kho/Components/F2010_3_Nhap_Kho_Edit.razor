@@ -108,23 +108,16 @@
 
 		CXNK_Nhap_Kho_Raw_Data_Controller v_objCtrRawData = new();
 
-		List<CXNK_Nhap_Kho_Raw_Data> v_arrRawData = v_objCtrRawData.F2011_sp_sel_List_Chi_Tiet_Nhap_Kho_Local();
+		List<CXNK_Nhap_Kho_Raw_Data> v_arrRawData = v_objCtrRawData.Get_List_Chi_Tiet_Nhap_Kho_Local();
 
-		try
+		if (v_arrRawData.Count() != 0)
 		{
-			if (v_arrRawData.Count() != 0)
+			foreach (var v_objDetail in v_arrRawData)
 			{
-				foreach (var v_objDetail in v_arrRawData)
-				{
-					v_objDetail.Nhap_Kho_ID = m_objData.Auto_ID;
-					v_objCtrRawData.FQ_719_NKRD_sp_ins_Insert(v_objDetail);
-				}
-				v_objCtrRawData.F2011_sp_del_List_Chi_Tiet_Nhap_Kho_Local();
+				v_objDetail.Nhap_Kho_ID = m_objData.Auto_ID;
+				v_objCtrRawData.FQ_719_NKRD_sp_ins_Insert(v_objDetail);
 			}
-		}
-		catch (Exception ex)
-		{
-			throw new Exception(ex.Message);
+			v_objCtrRawData.Clear_List_Chi_Tiet_Nhap_Kho_Local();
 		}
 		// Đoạn code lưu key cho việc tracking log CRUD, vui lòng đừng xóa
 		r_strAdd_Key = m_objData.So_Phieu_Nhap_Kho;

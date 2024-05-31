@@ -154,66 +154,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			}
 		}
 
-		static List<CXNK_Nhap_Kho_Raw_Data> v_arrTemp = new List<CXNK_Nhap_Kho_Raw_Data>();
-		public void F2011_sp_ins_Insert_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data temp)
-		{
-			v_arrTemp.Add(temp);
-		}
-
-		public void F2011_sp_upd_Update_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data temp)
-		{
-			try
-			{
-				CXNK_Nhap_Kho_Raw_Data v_objExistDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
-				if (v_objExistDetail is not null)
-				{
-					v_objExistDetail.SL_Nhap = temp.SL_Nhap;
-					v_objExistDetail.Don_Gia_Nhap = temp.Don_Gia_Nhap;
-				}
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-		}
-
-		public List<CXNK_Nhap_Kho_Raw_Data> F2011_sp_sel_List_Chi_Tiet_Nhap_Kho_Local()
-		{
-			return v_arrTemp;
-		}
-
-		public void F2011_sp_del_List_Chi_Tiet_Nhap_Kho_Local()
-		{
-			v_arrTemp.Clear();
-		}
-		public void F2011_sp_del_By_ID_Chi_Tiet_Nhap_Kho_Local(long p_iID)
-		{
-			try
-			{
-				CXNK_Nhap_Kho_Raw_Data v_objExistDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
-				if (v_objExistDetail is not null)
-				{
-					v_arrTemp.Remove(v_objExistDetail);
-				}
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-		}
-		public CXNK_Nhap_Kho_Raw_Data F2011_sp_sel_Get_By_ID_Local(long p_iID)
-		{
-			try
-			{
-				return v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
-			}
-
-			catch (Exception)
-			{
-				throw;
-			}
-		}
-
 		public List<CXNK_Nhap_Kho_Raw_Data> F2011_NKRD_sp_sel_List_By_PhieuNhapID(long p_lngPhieuNhapID)
 		{
 			List<CXNK_Nhap_Kho_Raw_Data> v_arrRes = new List<CXNK_Nhap_Kho_Raw_Data>();
@@ -229,12 +169,10 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 					v_arrRes.Add(v_objRes);
 				}
 			}
-
 			catch (Exception)
 			{
 				throw;
 			}
-
 			finally
 			{
 				v_dt.Dispose();
@@ -243,5 +181,46 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			return v_arrRes;
 		}
 
+		// List thêm Raw Data tạm
+		static List<CXNK_Nhap_Kho_Raw_Data> m_arrRawDataTemp = new List<CXNK_Nhap_Kho_Raw_Data>();
+
+		public void Insert_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data p_objRawDataTemp)
+		{
+			m_arrRawDataTemp.Add(p_objRawDataTemp);
+		}
+
+		public void Update_Chi_Tiet_Nhap_Kho_Local(CXNK_Nhap_Kho_Raw_Data p_objRawDataTemp)
+		{
+			CXNK_Nhap_Kho_Raw_Data v_objExistDetail = m_arrRawDataTemp.FirstOrDefault(p => p.Auto_ID == p_objRawDataTemp.Auto_ID);
+			if (v_objExistDetail is not null)
+			{
+				v_objExistDetail.SL_Nhap = p_objRawDataTemp.SL_Nhap;
+				v_objExistDetail.Don_Gia_Nhap = p_objRawDataTemp.Don_Gia_Nhap;
+			}
+		}
+
+		public List<CXNK_Nhap_Kho_Raw_Data> Get_List_Chi_Tiet_Nhap_Kho_Local()
+		{
+			return m_arrRawDataTemp;
+		}
+
+		public void Clear_List_Chi_Tiet_Nhap_Kho_Local()
+		{
+			m_arrRawDataTemp.Clear();
+		}
+
+		public void Delete_By_ID_Chi_Tiet_Nhap_Kho_Local(long p_iID)
+		{
+			CXNK_Nhap_Kho_Raw_Data v_objExistDetail = m_arrRawDataTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+			if (v_objExistDetail is not null)
+			{
+				m_arrRawDataTemp.Remove(v_objExistDetail);
+			}
+		}
+
+		public CXNK_Nhap_Kho_Raw_Data Get_By_ID_Local(long p_iID)
+		{
+			return m_arrRawDataTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+		}
 	}
 }

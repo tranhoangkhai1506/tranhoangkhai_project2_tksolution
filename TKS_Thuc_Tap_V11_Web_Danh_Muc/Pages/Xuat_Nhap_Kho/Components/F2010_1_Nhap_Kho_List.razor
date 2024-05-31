@@ -114,7 +114,7 @@
 @code {
 	public List<CXNK_Nhap_Kho> v_arrData = new();
 	TelerikGrid<CXNK_Nhap_Kho> grdData = new();
-	public bool m_bIs_Show_Report = false;
+	private bool m_bIs_Show_Report = false;
 	CXNK_Nhap_Kho m_objNhap_Kho = new();
 	private bool m_blIs_Show_Edit_Chi_Tiet { get; set; } = false;
 
@@ -162,6 +162,7 @@
 			Load_Data_Init();
 		}
 	}
+
 	protected override void Delete_Data_Entry(long p_iAuto_ID)
 	{
 		CXNK_Nhap_Kho_Controller v_objCtrData = new();
@@ -200,6 +201,7 @@
 			v_trans = v_conn.BeginTransaction();
 			string v_strMessage = "";
 
+			//Insert Thông tin phiếu xuất
 			CXNK_Nhap_Kho v_objData = new CXNK_Nhap_Kho();
 			v_objData.So_Phieu_Nhap_Kho = CUtility.Convert_To_String(v_objCtrlExcel.Get_Cell_Value("A2"));
 			v_objData.Kho_ID = CUtility.Convert_To_Int64(v_objCtrlExcel.Get_Cell_Value("B2"));
@@ -217,12 +219,12 @@
 
 			if (v_sbError.ToString() == "")
 			{
+				//Tiến hành thêm các chi tiết
 				v_strMessage = CCommonFunction.Set_Success_MessageBox(Get_Language_Data_Field("Thêm mới 1 dòng thành công."));
 				foreach (DataRow v_rowRaw in v_dtRaw.Rows)
 				{
 					CXNK_Nhap_Kho_Raw_Data v_objRawData = new CXNK_Nhap_Kho_Raw_Data();
 					v_objRawData.Nhap_Kho_ID = v_lngAuto_ID_Data;
-
 					v_objRawData.San_Pham_ID = CUtility.Convert_To_Int64(v_rowRaw[0]);
 					v_objRawData.SL_Nhap = CUtility.Convert_To_Double(v_rowRaw[1]);
 					v_objRawData.Don_Gia_Nhap = CUtility.Convert_To_Double(v_rowRaw[2]);
@@ -231,10 +233,12 @@
 
 					v_objRawData.Auto_ID = v_objCtrRawData.FQ_719_NKRD_sp_ins_Insert(v_conn, v_trans, v_objRawData);
 				}
+				CCommon_Controller.FCommon_Insert_Action_History(v_objData.Auto_ID, Get_Language_Data_Field("Import Excel - Thêm Mới"), "Web", r_strActive_User_Name, r_strActive_Function_Code, r_objChuc_Nang.Ten_Chuc_Nang, "Key: " + v_objData.So_Phieu_Nhap_Kho);
 				v_trans.Commit();
 			}
 			else
 			{
+				//Có lỗi ở chi tiết => rollback và chạy đến finally
 				v_strMessage += CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field("Thêm mới thất bại."));
 				v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
 				Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);
@@ -248,8 +252,7 @@
 		{
 			v_sbError.AppendLine(Get_Language_Data_Field("Dòng 2 ") + Get_Language_Data_Field("có lỗi") + ": " + ex.Message + "<br/>");
 			string v_strMessage = CCommonFunction.Set_Error_MessageBox(Get_Language_Data_Field("Thêm mới thất bại."));
-			if (v_sbError.ToString() != "")
-				v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
+			v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
 			Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);
 			v_trans.Rollback();
 		}

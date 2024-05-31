@@ -182,15 +182,17 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			}
 		}
 
-		static List<CXNK_Xuat_Kho_Raw_Data> v_arrTemp = new List<CXNK_Xuat_Kho_Raw_Data>();
-		public void F2013_sp_ins_Insert_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
+		// List thêm Raw Data tạm
+		static List<CXNK_Xuat_Kho_Raw_Data> m_arrRawDataTemp = new List<CXNK_Xuat_Kho_Raw_Data>();
+
+		public void Insert_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
 		{
-			v_arrTemp.Add(temp);
+			m_arrRawDataTemp.Add(temp);
 		}
 
-		public void F2013_sp_upd_Update_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
+		public void Update_Chi_Tiet_Xuat_Kho_Local(CXNK_Xuat_Kho_Raw_Data temp)
 		{
-			CXNK_Xuat_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
+			CXNK_Xuat_Kho_Raw_Data existDetail = m_arrRawDataTemp.FirstOrDefault(p => p.Auto_ID == temp.Auto_ID);
 			if (existDetail is not null)
 			{
 				existDetail.SL_Xuat = temp.SL_Xuat;
@@ -198,26 +200,28 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			}
 		}
 
-		public List<CXNK_Xuat_Kho_Raw_Data> F2013_sp_sel_List_Chi_Tiet_Xuat_Kho_Local()
+		public List<CXNK_Xuat_Kho_Raw_Data> Get_List_Chi_Tiet_Xuat_Kho_Local()
 		{
-			return v_arrTemp;
+			return m_arrRawDataTemp;
 		}
 
-		public void F2013_sp_del_List_Chi_Tiet_Xuat_Kho_Local()
+		public void Clear_Chi_Tiet_Xuat_Kho_Local()
 		{
-			v_arrTemp.Clear();
+			m_arrRawDataTemp.Clear();
 		}
-		public void F2013_sp_del_By_ID_Chi_Tiet_Xuat_Kho_Local(long p_iID)
+
+		public void Delete_By_ID_Chi_Tiet_Xuat_Kho_Local(long p_iID)
 		{
-			CXNK_Xuat_Kho_Raw_Data existDetail = v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+			CXNK_Xuat_Kho_Raw_Data existDetail = m_arrRawDataTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
 			if (existDetail is not null)
 			{
-				v_arrTemp.Remove(existDetail);
+				m_arrRawDataTemp.Remove(existDetail);
 			}
 		}
-		public CXNK_Xuat_Kho_Raw_Data F2013_sp_sel_Get_By_ID_Local(long p_iID)
+
+		public CXNK_Xuat_Kho_Raw_Data Get_By_ID_Local(long p_iID)
 		{
-			return v_arrTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
+			return m_arrRawDataTemp.FirstOrDefault(p => p.Auto_ID == p_iID);
 		}
 	}
 }
