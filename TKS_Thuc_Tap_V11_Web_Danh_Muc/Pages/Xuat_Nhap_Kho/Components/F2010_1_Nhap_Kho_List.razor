@@ -215,7 +215,25 @@
 			v_objData.Auto_ID = v_lngAuto_ID_Data = v_objCtrData.FQ_718_NK_sp_ins_Insert(v_conn, v_trans, v_objData);
 
 			// Kiểm tra tất cả các lỗi của Raw Data
-			v_sbError.Append(Get_Error_Raw_Data(v_dtRaw));
+			int v_iRawCount = 5;
+
+			foreach (DataRow v_rowRaw in v_dtRaw.Rows)
+			{
+				v_iRawCount++;
+				CDM_San_Pham v_objSanPham = CCache_San_Pham.Get_Data_By_ID(CUtility.Convert_To_Int64(v_rowRaw[0]));
+				if (v_objSanPham is null || CUtility.Convert_To_Int64(v_rowRaw[0]) == 0)
+				{
+					v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iRawCount.ToString() + " " + Get_Language_Data_Field(" chi tiết có lỗi: Sản phẩm không tồn tại.") +  "<br/>");
+				}
+				if (CUtility.Convert_To_Double(v_rowRaw[1]) <= 0)
+				{
+					v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iRawCount.ToString() + " " + Get_Language_Data_Field(" chi tiết có lỗi") + ": Số lượng phải lớn hơn không." + "<br/>");
+				}
+				if (CUtility.Convert_To_Double(v_rowRaw[2]) <= 0)
+				{
+					v_sbError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iRawCount.ToString() + " " + Get_Language_Data_Field(" chi tiết có lỗi") + ": Đơn giá phải lớn hơn không." + "<br/>");
+				}
+			}
 
 			if (v_sbError.ToString() == "")
 			{
@@ -265,31 +283,4 @@
 				v_conn.Close();
 		}
 	}
-
-	private StringBuilder Get_Error_Raw_Data(DataTable p_arrRawData)
-	{
-		StringBuilder v_strError = new StringBuilder();
-		int v_iRawCount = 5;
-		
-		foreach (DataRow v_rowRaw in p_arrRawData.Rows)
-		{
-			v_iRawCount++;
-			CDM_San_Pham v_objSanPham = CCache_San_Pham.Get_Data_By_ID(CUtility.Convert_To_Int64(v_rowRaw[0]));
-			if (v_objSanPham is null || CUtility.Convert_To_Int64(v_rowRaw[0]) == 0)
-			{
-				v_strError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iRawCount.ToString() + " " + Get_Language_Data_Field(" chi tiết có lỗi: Sản phẩm không tồn tại.") +  "<br/>");
-			}
-			if (CUtility.Convert_To_Double(v_rowRaw[1]) <= 0)
-			{
-				v_strError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iRawCount.ToString() + " " + Get_Language_Data_Field(" chi tiết có lỗi") + ": Số lượng phải lớn hơn không." + "<br/>");
-			}
-			if (CUtility.Convert_To_Double(v_rowRaw[2]) <= 0)
-			{
-				v_strError.AppendLine(Get_Language_Data_Field("Dòng") + " " + v_iRawCount.ToString() + " " + Get_Language_Data_Field(" chi tiết có lỗi") + ": Đơn giá phải lớn hơn không." + "<br/>");
-			}
-		}
-		
-		return v_strError;
-	}
-
 }

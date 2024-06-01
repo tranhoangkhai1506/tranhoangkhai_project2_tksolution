@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TKS_Thuc_Tap_V11_Data_Access.Controller.Cache;
+using TKS_Thuc_Tap_V11_Data_Access.Controller.DM;
 using TKS_Thuc_Tap_V11_Data_Access.Utility;
 
 namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
@@ -18,7 +19,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private double m_dblSL_Nhap;
 		private double m_dblDon_Gia_Nhap;
 		private double m_dblTri_Gia;
-
+		CDM_NCC_Controller v_objCtrNCC = new CDM_NCC_Controller();
 		public CDM_Bao_Cao_Chi_Tiet_Nhap_Hang()
 		{
 			ResetData();
@@ -58,14 +59,16 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_lngNCC_ID = value;
 			}
 		}
+
 		public string Nha_Cung_Cap
 		{
 			get
 			{
-				var result = NCC_ID != 0 ? CCache_NCC.Get_Data_By_ID(NCC_ID).Ten_NCC : "UNKNONW";
-				return result;
+				var result = v_objCtrNCC.FQ_123_N_sp_sel_Get_By_ID(NCC_ID);
+				return result is not null ? result.Ten_NCC : "Unknown";
 			}
 		}
+
 		public DateTime? Ngay_Nhap_Kho
 		{
 			get
@@ -77,6 +80,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_dtmNgay_Nhap_Kho = value;
 			}
 		}
+
 		public string Ma_San_Pham
 		{
 			get

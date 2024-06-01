@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TKS_Thuc_Tap_V11_Data_Access.Controller.Cache;
+using TKS_Thuc_Tap_V11_Data_Access.Controller.DM;
 using TKS_Thuc_Tap_V11_Data_Access.Utility;
 
 namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
@@ -23,7 +24,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
-
+		CDM_Kho_Controller v_objCtrKho = new CDM_Kho_Controller();
+		CDM_NCC_Controller v_objCtrNCC = new CDM_NCC_Controller();
 		public CXNK_Nhap_Kho()
 		{
 			ResetData();
@@ -85,8 +87,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = Kho_ID != 0 ? CCache_Kho.Get_Data_By_ID(Kho_ID).Ten_Kho : "UNKNONW";
-				return result;
+				var result = v_objCtrKho.FQ_114_K_sp_sel_Get_By_ID(Kho_ID);
+				return result is not null ? result.Ten_Kho : "Unknown";
 			}
 		}
 
@@ -105,8 +107,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = NCC_ID != 0 ? CCache_NCC.Get_Data_By_ID(NCC_ID).Ten_NCC : "UNKNONW";
-				return result;
+				var result = v_objCtrNCC.FQ_123_N_sp_sel_Get_By_ID(NCC_ID);
+				return result is not null ? result.Ten_NCC : "Unknown";
 			}
 		}
 

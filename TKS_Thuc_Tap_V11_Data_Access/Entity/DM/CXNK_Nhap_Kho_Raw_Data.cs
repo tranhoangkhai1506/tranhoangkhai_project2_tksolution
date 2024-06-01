@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TKS_Thuc_Tap_V11_Data_Access.Controller.Cache;
+using TKS_Thuc_Tap_V11_Data_Access.Controller.DM;
 using TKS_Thuc_Tap_V11_Data_Access.Utility;
 
 namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
@@ -22,7 +23,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
-
+		CDM_San_Pham_Controller v_objCtrSanPham = new CDM_San_Pham_Controller();
 		public CXNK_Nhap_Kho_Raw_Data()
 		{
 			ResetData();
@@ -82,8 +83,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = San_Pham_ID != 0 ? CCache_San_Pham.Get_Data_By_ID(San_Pham_ID).Ten_San_Pham : "UNKNONW";
-				return result;
+				var result = v_objCtrSanPham.FQ_165_SP_sp_sel_Get_By_ID(San_Pham_ID);
+				return result is not null ? result.Ten_San_Pham : "Unknown";
 			}
 		}
 

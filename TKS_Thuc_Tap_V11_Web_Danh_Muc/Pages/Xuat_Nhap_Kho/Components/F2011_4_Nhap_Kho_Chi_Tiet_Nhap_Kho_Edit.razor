@@ -166,15 +166,14 @@
 		if (m_lngSo_Phieu_Nhap_Kho != 0)
 		{
 			v_arrData.Clear();
-			v_arrDataTemp = v_objCtrData.FQ_719_NKRD_sp_sel_List_By_Created(r_objFilter.Date_From, r_objFilter.Date_To);
-			v_arrData = v_arrDataTemp.Where(p => p.Nhap_Kho_ID == m_lngSo_Phieu_Nhap_Kho).ToList();
+			v_arrData = v_objCtrData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(m_lngSo_Phieu_Nhap_Kho);
 		}
 		else
 		{
 			v_arrData.Clear();
 			v_arrDataTemp = v_objCtrData.Get_List_Chi_Tiet_Nhap_Kho_Local();
-			foreach (var i in v_arrDataTemp)
-				v_arrData.Add(i);
+			foreach (var v_objDataTemp in v_arrDataTemp)
+				v_arrData.Add(v_objDataTemp);
 		}
 
 	}

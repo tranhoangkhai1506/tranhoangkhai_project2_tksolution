@@ -97,7 +97,7 @@
 		{
 			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangNhapDauKy)
 			{
-				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				CDM_Bao_Cao_Xuat_Nhap_Ton v_objXuatNhapTonNewItem = new();
 				if (v_arrData.Count != 0)
 				{
 					var V_objXuatNhapTonItem = v_arrBaoCaoTonDauKy.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangNhap.Ma_San_Pham));
@@ -107,18 +107,18 @@
 					}
 					else
 					{
-						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
-						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
-						V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
-						v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+						v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+						v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+						v_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+						v_arrBaoCaoTonDauKy.Add(v_objXuatNhapTonNewItem);
 					}
 				}
 				else
 				{
-					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
-					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
-					V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
-					v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+					v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+					v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+					v_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+					v_arrBaoCaoTonDauKy.Add(v_objXuatNhapTonNewItem);
 				}
 			}
 		}
@@ -128,7 +128,7 @@
 		{
 			foreach (var v_objBaoCaoHangXuat in v_arrBaoCaoHangXuatDauKy)
 			{
-				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				CDM_Bao_Cao_Xuat_Nhap_Ton v_objXuatNhapTonNewItem = new();
 				if (v_arrData.Count != 0)
 				{
 					var V_objXuatNhapTonItem = v_arrBaoCaoTonDauKy.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangXuat.Ma_San_Pham));
@@ -138,18 +138,18 @@
 					}
 					else
 					{
-						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangXuat.Ma_San_Pham;
-						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangXuat.Ten_San_Pham;
-						V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangXuat.SL_Xuat;
-						v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+						v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangXuat.Ma_San_Pham;
+						v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangXuat.Ten_San_Pham;
+						v_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangXuat.SL_Xuat;
+						v_arrBaoCaoTonDauKy.Add(v_objXuatNhapTonNewItem);
 					}
 				}
 				else
 				{
-					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangXuat.Ma_San_Pham;
-					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangXuat.Ten_San_Pham;
-					V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangXuat.SL_Xuat;
-					v_arrBaoCaoTonDauKy.Add(V_objXuatNhapTonNewItem);
+					v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangXuat.Ma_San_Pham;
+					v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangXuat.Ten_San_Pham;
+					v_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangXuat.SL_Xuat;
+					v_arrBaoCaoTonDauKy.Add(v_objXuatNhapTonNewItem);
 				}
 			}
 		}
@@ -169,11 +169,11 @@
 					else
 					{
 						//Tạo mới một Xuất Nhập Tồn cho sản phẩm trong trường hợp sản phẩm không có xuất nhập trong đoạn tìm kiếm
-						CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
-						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
-						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
-						V_objXuatNhapTonNewItem.SL_Dau_Ky = v_objBaoCaoTonItem.SL_Cuoi_Ky;
-						v_arrData.Add(V_objXuatNhapTonNewItem);
+						CDM_Bao_Cao_Xuat_Nhap_Ton v_objXuatNhapTonNewItem = new();
+						v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
+						v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
+						v_objXuatNhapTonNewItem.SL_Dau_Ky = v_objBaoCaoTonItem.SL_Cuoi_Ky;
+						v_arrData.Add(v_objXuatNhapTonNewItem);
 					}
 				}
 			}
@@ -189,11 +189,11 @@
 					else
 					{
 						//Tạo mới một Xuất Nhập Tồn cho sản phẩm trong trường hợp sản phẩm không có xuất nhập trong đoạn tìm kiếm
-						CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
-						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
-						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
-						V_objXuatNhapTonNewItem.SL_Dau_Ky = v_objBaoCaoTonItem.SL_Cuoi_Ky;
-						v_arrData.Add(V_objXuatNhapTonNewItem);
+						CDM_Bao_Cao_Xuat_Nhap_Ton v_objXuatNhapTonNewItem = new();
+						v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoTonItem.Ma_San_Pham;
+						v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoTonItem.Ten_San_Pham;
+						v_objXuatNhapTonNewItem.SL_Dau_Ky = v_objBaoCaoTonItem.SL_Cuoi_Ky;
+						v_arrData.Add(v_objXuatNhapTonNewItem);
 					}
 				}
 			}
@@ -206,7 +206,7 @@
 		{
 			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangNhap)
 			{
-				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				CDM_Bao_Cao_Xuat_Nhap_Ton v_objXuatNhapTonNewItem = new();
 				if (v_arrData.Count != 0)
 				{
 					var V_objXuatNhapTonItem = v_arrData.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangNhap.Ma_San_Pham));
@@ -216,18 +216,18 @@
 					}
 					else
 					{
-						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
-						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
-						V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
-						v_arrData.Add(V_objXuatNhapTonNewItem);
+						v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+						v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+						v_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+						v_arrData.Add(v_objXuatNhapTonNewItem);
 					} 
 				}
 				else
 				{
-					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
-					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
-					V_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
-					v_arrData.Add(V_objXuatNhapTonNewItem);
+					v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+					v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+					v_objXuatNhapTonNewItem.SL_Nhap = v_objBaoCaoHangNhap.SL_Nhap;
+					v_arrData.Add(v_objXuatNhapTonNewItem);
 				}
 			}
 		}
@@ -239,7 +239,7 @@
 		{
 			foreach (var v_objBaoCaoHangNhap in v_arrBaoCaoHangXuat)
 			{
-				CDM_Bao_Cao_Xuat_Nhap_Ton V_objXuatNhapTonNewItem = new();
+				CDM_Bao_Cao_Xuat_Nhap_Ton v_objXuatNhapTonNewItem = new();
 				if (v_arrData.Count != 0)
 				{
 					var V_objXuatNhapTonItem = v_arrData.FirstOrDefault(p => p.Ma_San_Pham.Equals(v_objBaoCaoHangNhap.Ma_San_Pham));
@@ -249,18 +249,18 @@
 					}
 					else
 					{
-						V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
-						V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
-						V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangNhap.SL_Xuat;
-						v_arrData.Add(V_objXuatNhapTonNewItem);
+						v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+						v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+						v_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangNhap.SL_Xuat;
+						v_arrData.Add(v_objXuatNhapTonNewItem);
 					}
 				}
 				else
 				{
-					V_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
-					V_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
-					V_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangNhap.SL_Xuat;
-					v_arrData.Add(V_objXuatNhapTonNewItem);
+					v_objXuatNhapTonNewItem.Ma_San_Pham = v_objBaoCaoHangNhap.Ma_San_Pham;
+					v_objXuatNhapTonNewItem.Ten_San_Pham = v_objBaoCaoHangNhap.Ten_San_Pham;
+					v_objXuatNhapTonNewItem.SL_Xuat = v_objBaoCaoHangNhap.SL_Xuat;
+					v_arrData.Add(v_objXuatNhapTonNewItem);
 				}
 			}
 		}
