@@ -21,7 +21,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
-		CDM_Kho_Controller v_objCtrKho = new CDM_Kho_Controller();
 		public CDM_Kho_User()
 		{
 			ResetData();
@@ -69,17 +68,17 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = v_objCtrKho.FQ_114_K_sp_sel_Get_By_ID(Kho_ID);
-				return result is not null ? result.Ten_Kho : "Unknown";
+				var result = CCache_Kho.Get_Data_By_ID(Kho_ID);
+				return result is null ? "UNKNONW" : result.Ten_Kho;
 			}
 		}
 
 		public string Ma_Dang_Nhap {
             get
             {
-                var result = Thanh_Vien_ID != 0 ? CCache_Thanh_Vien.Get_Data_By_ID(Thanh_Vien_ID).Ma_Dang_Nhap : "UNKNONW";
-                return result;
-            }
+				var result = CCache_Thanh_Vien.Get_Data_By_ID(Thanh_Vien_ID);
+				return result is null ? "UNKNONW" : result.Ma_Dang_Nhap;
+			}
         }
 
 		public long Kho_ID

@@ -40,7 +40,7 @@
 
 @code {
     [Parameter]
-    public string So_Phieu_Nhap_Kho { get; set; }
+    public string p_lngSo_Phieu_Nhap_Kho { get; set; }
     public ScaleMode ScaleMode { get; set; } = ScaleMode.Specific;
     public ViewMode ViewMode { get; set; } = ViewMode.Interactive;
     public bool ParametersAreaVisible { get; set; }
@@ -57,7 +57,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        v_arrChiTiet = v_objCtrRawData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(CUtility.Convert_To_Int64(So_Phieu_Nhap_Kho));
+        v_arrChiTiet = v_objCtrRawData.F2011_NKRD_sp_sel_List_By_PhieuNhapID(CUtility.Convert_To_Int64(p_lngSo_Phieu_Nhap_Kho));
         if (v_arrChiTiet.Count() != 0)
         {
             foreach(var v_objRawData in v_arrChiTiet)
@@ -66,7 +66,7 @@
             }
         }    
 
-        ReportSource.Parameters.Add("So_Phieu_Nhap_ID", So_Phieu_Nhap_Kho);
+        ReportSource.Parameters.Add("So_Phieu_Nhap_ID", p_lngSo_Phieu_Nhap_Kho);
         ReportSource.Parameters.Add("Tong_Tien_String", r_ObjCNumber.ReadInt(v_objTotalPrice.ToString(),"đồng"));
     }
 }

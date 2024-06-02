@@ -23,7 +23,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
-		CDM_San_Pham_Controller v_objCtrSanPham = new CDM_San_Pham_Controller();
 		public CXNK_Xuat_Kho_Raw_Data()
 		{
 			ResetData();
@@ -84,8 +83,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = v_objCtrSanPham.FQ_165_SP_sp_sel_Get_By_ID(San_Pham_ID);
-				return result is not null ? result.Ten_San_Pham : "Unknown";
+				var result = CCache_San_Pham.Get_Data_By_ID(San_Pham_ID);
+				return result is null ? "UNKNONW" : result.Ten_San_Pham;
 			}
 		}
 		public double SL_Xuat

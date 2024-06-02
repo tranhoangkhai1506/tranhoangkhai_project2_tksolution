@@ -24,8 +24,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
-		CDM_Loai_San_Pham_Controller v_objCtrLSP = new CDM_Loai_San_Pham_Controller();
-		CDM_Don_Vi_Tinh_Controller v_objCtrDVT = new CDM_Don_Vi_Tinh_Controller();
 		public CDM_San_Pham()
 		{
 			ResetData();
@@ -99,8 +97,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = v_objCtrLSP.FQ_122_LSP_sp_sel_Get_By_ID(Loai_San_Pham_ID);
-				return result is not null ? result.Ten_LSP : "Unknown";
+				var result = CCache_Loai_San_Pham.Get_Data_By_ID(Loai_San_Pham_ID);
+				return result is null ? "UNKNONW" : result.Ten_LSP;
 			}
 		}
 		public long Don_Vi_Tinh_ID
@@ -118,8 +116,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = v_objCtrDVT.FQ_110_DVT_sp_sel_Get_By_ID(Don_Vi_Tinh_ID);
-				return result is not null ? result.Ten_Don_Vi_Tinh : "Unknown";
+				var result = CCache_Don_Vi_Tinh.Get_Data_By_ID(Don_Vi_Tinh_ID);
+				return result is null ? "UNKNONW" : result.Ten_Don_Vi_Tinh;
 			}
 		}
 

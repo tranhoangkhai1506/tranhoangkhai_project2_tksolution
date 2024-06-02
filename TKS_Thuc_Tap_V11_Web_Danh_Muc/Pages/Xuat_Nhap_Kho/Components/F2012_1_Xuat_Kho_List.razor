@@ -33,29 +33,31 @@
 							<i class="mdi mdi-eye" style="color: purple;"></i>
 						</button>
 						&nbsp;
-						<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
-							<i class="mdi mdi-cog-outline" style="color: purple;"></i>
-						</button>
-						<ul class="dropdown-menu">
-							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
-							{
-								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Phiếu")</button>
-								</li>
-							}
-							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
-							{
-								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Chi_Tiet_Function_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Chi Tiết")</button>
-								</li>
-							}
-							@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
-							{
-								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
-								</li>
-							}
-						</ul>
+						<div class="btn-group" role="group">
+							<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="mdi mdi-cog-outline" style="color: purple;"></i>
+							</button>
+							<ul class="dropdown-menu">
+								@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+								{
+									<li>
+										<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Phiếu")</button>
+									</li>
+								}
+								@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+								{
+									<li>
+										<button class="dropdown-item" type="button" @onclick="@(()=> Open_Chi_Tiet_Function_Edit((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Chi Tiết")</button>
+									</li>
+								}
+								@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+								{
+									<li>
+										<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CXNK_Xuat_Kho).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+									</li>
+								}
+							</ul>
+						</div>
 						&nbsp;
 						<button class="btn btn-link" @onclick="@(()=> Open_Report((context as CXNK_Xuat_Kho).Auto_ID))">
 							<i class="mdi mdi-printer" style="color: purple;"></i>

@@ -31,29 +31,31 @@
 							<i class="mdi mdi-eye" style="color: purple;"></i>
 						</button>
 						&nbsp;
-						<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="true">
-							<i class="mdi mdi-cog-outline" style="color: purple;"></i>
-						</button>
-						<ul class="dropdown-menu" style="position: absolute; transform: translate(100px, 100px); z-index: 1050; visibility: visible;">
-							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
-							{
-								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CXNK_Nhap_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Phiếu")</button>
-								</li>
-							}
-							@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
-							{
-								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Open_Chi_Tiet_Function_Edit((context as CXNK_Nhap_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Chi Tiết")</button>
-								</li>
-							}
-							@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
-							{
-								<li>
-									<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CXNK_Nhap_Kho).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
-								</li>
-							}
-						</ul>
+						<div class="btn-group" role="group">
+							<button class="btn btn-link" data-bs-toggle="dropdown" aria-expanded="true">
+								<i class="mdi mdi-cog-outline" style="color: purple;"></i>
+							</button>
+							<ul class="dropdown-menu" style="position: relative; top: 100px;">
+								@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+								{
+									<li>
+										<button class="dropdown-item" type="button" @onclick="@(()=> Open_Edit((context as CXNK_Nhap_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Phiếu")</button>
+									</li>
+								}
+								@if (r_objChuc_Nang.Is_Have_Edit_Permission == true)
+								{
+									<li>
+										<button class="dropdown-item" type="button" @onclick="@(()=> Open_Chi_Tiet_Function_Edit((context as CXNK_Nhap_Kho).Auto_ID))"><i class="ri-edit-2-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Hiệu Chỉnh Chi Tiết")</button>
+									</li>
+								}
+								@if (r_objChuc_Nang.Is_Have_Delete_Permission == true)
+								{
+									<li>
+										<button class="dropdown-item" type="button" @onclick="@(()=> Delete_Data((context as CXNK_Nhap_Kho).Auto_ID))"><i class="ri-delete-bin-line align-bottom me-1"></i> &nbsp; @Get_Language_Data_Field("Xóa")</button>
+									</li>
+								}
+							</ul>
+						</div>
 						&nbsp;
 						<button class="btn btn-link" @onclick="@(()=> Open_Report((context as CXNK_Nhap_Kho).Auto_ID))">
 							<i class="mdi mdi-printer" style="color: purple;"></i>
@@ -84,7 +86,7 @@
 }
 @if (m_bIs_Show_Report == true)
 {
-	<F2010_4_Nhap_Kho_Report So_Phieu_Nhap_Kho="@r_iAuto_ID.ToString()" OnClose="@Close_Report"></F2010_4_Nhap_Kho_Report>
+	<F2010_4_Nhap_Kho_Report p_lngSo_Phieu_Nhap_Kho="@r_iAuto_ID.ToString()" OnClose="@Close_Report"></F2010_4_Nhap_Kho_Report>
 }
 @if (r_bIs_Show_Help_Guide == true)
 {

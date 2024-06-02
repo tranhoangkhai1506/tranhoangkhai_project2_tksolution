@@ -19,7 +19,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private double m_dblSL_Nhap;
 		private double m_dblDon_Gia_Nhap;
 		private double m_dblTri_Gia;
-		CDM_NCC_Controller v_objCtrNCC = new CDM_NCC_Controller();
 		public CDM_Bao_Cao_Chi_Tiet_Nhap_Hang()
 		{
 			ResetData();
@@ -64,8 +63,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = v_objCtrNCC.FQ_123_N_sp_sel_Get_By_ID(NCC_ID);
-				return result is not null ? result.Ten_NCC : "Unknown";
+				var result = NCC_ID != 0 ? CCache_NCC.Get_Data_By_ID(NCC_ID).Ten_NCC : "UNKNONW";
+				return result;
 			}
 		}
 
