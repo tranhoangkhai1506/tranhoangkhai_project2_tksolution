@@ -16,6 +16,10 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private long m_lngSan_Pham_ID;
 		private double m_dblSL_Xuat;
 		private double m_dblDon_Gia_Xuat;
+		private DateTime? m_dtmNgay_Xuat_Kho;
+		private string m_strMa_San_Pham;
+		private string m_strSo_Phieu_Xuat_Kho;
+		private double m_dblTri_Gia;
 		private int m_intdeleted;
 		private DateTime? m_dtmCreated;
 		private string m_strCreated_By;
@@ -38,6 +42,10 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_strTen_San_Pham = CConst.STR_VALUE_NULL;
 			m_dblSL_Xuat = CConst.FLT_VALUE_NULL;
 			m_dblDon_Gia_Xuat = CConst.FLT_VALUE_NULL;
+			m_dblTri_Gia = CConst.FLT_VALUE_NULL;
+			m_strMa_San_Pham = CConst.STR_VALUE_NULL;
+			m_strSo_Phieu_Xuat_Kho = CConst.STR_VALUE_NULL;
+			m_dtmNgay_Xuat_Kho = CConst.DTM_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
 			m_dtmCreated = CConst.DTM_VALUE_NULL;
 			m_strCreated_By = CConst.STR_VALUE_NULL;
@@ -80,6 +88,41 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			set
 			{
 				m_lngSan_Pham_ID = value;
+			}
+		}
+		public string So_Phieu_Xuat_Kho
+		{
+			get
+			{
+				return m_strSo_Phieu_Xuat_Kho;
+			}
+			set
+			{
+				m_strSo_Phieu_Xuat_Kho = value;
+			}
+		}
+
+		public string Ma_San_Pham
+		{
+			get
+			{
+				return m_strMa_San_Pham;
+			}
+			set
+			{
+				m_strMa_San_Pham = value.Trim();
+			}
+		}
+
+		public DateTime? Ngay_Xuat_Kho
+		{
+			get
+			{
+				return m_dtmNgay_Xuat_Kho;
+			}
+			set
+			{
+				m_dtmNgay_Xuat_Kho = value;
 			}
 		}
 
@@ -200,6 +243,18 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			set
 			{
 				m_strLast_Updated_By_Function = value.Trim();
+			}
+		}
+
+		public double Tri_Gia
+		{
+			get
+			{
+				return SL_Xuat * Don_Gia_Xuat;
+			}
+			set
+			{
+				m_dblTri_Gia = value;
 			}
 		}
 	}

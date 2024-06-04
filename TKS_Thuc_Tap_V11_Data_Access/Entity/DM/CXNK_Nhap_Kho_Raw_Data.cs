@@ -16,6 +16,11 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private long m_lngSan_Pham_ID;
 		private double m_dblSL_Nhap;
 		private double m_dblDon_Gia_Nhap;
+		private double m_dblTri_Gia;
+		private string m_strTen_NCC;
+		private DateTime? m_dtmNgay_Nhap_Kho;
+		private string m_strMa_San_Pham;
+		private string m_strSo_Phieu_Nhap_Kho;
 		private int m_intdeleted;
 		private DateTime? m_dtmCreated;
 		private string m_strCreated_By;
@@ -36,6 +41,11 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_lngSan_Pham_ID = CConst.INT_VALUE_NULL;
 			m_dblSL_Nhap = CConst.FLT_VALUE_NULL;
 			m_dblDon_Gia_Nhap = CConst.FLT_VALUE_NULL;
+			m_dblTri_Gia = CConst.FLT_VALUE_NULL;
+			m_strTen_NCC = CConst.STR_VALUE_NULL;
+			m_strMa_San_Pham = CConst.STR_VALUE_NULL;
+			m_strSo_Phieu_Nhap_Kho = CConst.STR_VALUE_NULL;
+			m_dtmNgay_Nhap_Kho = CConst.DTM_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
 			m_dtmCreated = CConst.DTM_VALUE_NULL;
 			m_strCreated_By = CConst.STR_VALUE_NULL;
@@ -68,6 +78,19 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_lngNhap_Kho_ID = value;
 			}
 		}
+
+		public string So_Phieu_Nhap_Kho
+		{
+			get
+			{
+				return m_strSo_Phieu_Nhap_Kho;
+			}
+			set
+			{
+				m_strSo_Phieu_Nhap_Kho = value;
+			}
+		}
+
 		public long San_Pham_ID
 		{
 			get
@@ -79,6 +102,19 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_lngSan_Pham_ID = value;
 			}
 		}
+
+		public string Ma_San_Pham
+		{
+			get
+			{
+				return m_strMa_San_Pham;
+			}
+			set
+			{
+				m_strMa_San_Pham = value.Trim();
+			}
+		}
+
 		public string Ten_San_Pham
 		{
 			get
@@ -91,6 +127,19 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			}
 		}
 
+
+		public DateTime? Ngay_Nhap_Kho
+		{
+			get
+			{
+				return m_dtmNgay_Nhap_Kho;
+			}
+			set
+			{
+				m_dtmNgay_Nhap_Kho = value;
+			}
+		}
+
 		public double SL_Nhap
 		{
 			get
@@ -100,6 +149,18 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			set
 			{
 				m_dblSL_Nhap = value;
+			}
+		}
+
+		public string Ten_NCC
+		{
+			get
+			{
+				return m_strTen_NCC;
+			}
+			set
+			{
+				m_strTen_NCC = value.Trim();
 			}
 		}
 
@@ -196,6 +257,18 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			set
 			{
 				m_strLast_Updated_By_Function = value.Trim();
+			}
+		}
+
+		public double Tri_Gia
+		{
+			get
+			{
+				return SL_Nhap * Don_Gia_Nhap;
+			}
+			set
+			{
+				m_dblTri_Gia = value;
 			}
 		}
 	}
