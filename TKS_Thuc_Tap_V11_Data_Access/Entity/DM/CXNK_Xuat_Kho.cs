@@ -14,6 +14,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private long m_lngAuto_ID;
 		private string m_strSo_Phieu_Xuat_Kho;
 		private long m_lngKho_ID;
+		private string m_strTen_Kho;
 		private DateTime? m_dtmNgay_Xuat_Kho;
 		private string m_strGhi_Chu;
 		private int m_intdeleted;
@@ -33,6 +34,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_lngAuto_ID = CConst.INT_VALUE_NULL;
 			m_strSo_Phieu_Xuat_Kho = CConst.STR_VALUE_NULL;
 			m_lngKho_ID = CConst.INT_VALUE_NULL;
+			m_strTen_Kho = CConst.STR_VALUE_NULL;
 			m_dtmNgay_Xuat_Kho = CConst.DTM_VALUE_NULL;
 			m_strGhi_Chu = CConst.STR_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
@@ -84,8 +86,11 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = CCache_Kho.Get_Data_By_ID(Kho_ID);
-				return result is null ? "UNKNONW" : result.Ten_Kho;
+				return m_strTen_Kho;
+			}
+			set
+			{
+				m_strTen_Kho = value.Trim();
 			}
 		}
 

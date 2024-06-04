@@ -15,6 +15,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private string m_strSo_Phieu_Nhap_Kho;
 		private long m_lngKho_ID;
 		private long m_lngNCC_ID;
+		private string m_strTen_Kho;
+		private string m_strTen_NCC;
 		private DateTime? m_dtmNgay_Nhap_Kho;
 		private string m_strGhi_Chu;
 		private int m_intdeleted;
@@ -37,6 +39,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_lngNCC_ID = CConst.INT_VALUE_NULL;
 			m_dtmNgay_Nhap_Kho = CConst.DTM_VALUE_NULL;
 			m_strGhi_Chu = CConst.STR_VALUE_NULL;
+			m_strTen_Kho = CConst.STR_VALUE_NULL;
+			m_strTen_NCC = CConst.STR_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
 			m_dtmCreated = CConst.DTM_VALUE_NULL;
 			m_strCreated_By = CConst.STR_VALUE_NULL;
@@ -85,8 +89,11 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = CCache_Kho.Get_Data_By_ID(Kho_ID);
-				return result is null ? "UNKNONW" : result.Ten_Kho;
+				return m_strTen_Kho;
+			}
+			set
+			{
+				m_strTen_Kho = value.Trim();
 			}
 		}
 
@@ -101,12 +108,15 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_lngNCC_ID = value;
 			}
 		}
-		public string Nha_Cung_Cap
+		public string Ten_NCC
 		{
 			get
 			{
-				var result = CCache_NCC.Get_Data_By_ID(NCC_ID);
-				return result is null ? "UNKNONW" : result.Ten_NCC;
+				return m_strTen_NCC;
+			}
+			set
+			{
+				m_strTen_NCC = value.Trim();
 			}
 		}
 

@@ -17,6 +17,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private long m_lngLoai_San_Pham_ID;
 		private long m_lngDon_Vi_Tinh_ID;
 		private string m_strGhi_Chu;
+		private string m_strTen_LSP;
+		private string m_strTen_Don_Vi_Tinh_ID;
 		private int m_intdeleted;
 		private DateTime? m_dtmCreated;
 		private string m_strCreated_By;
@@ -37,6 +39,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_lngLoai_San_Pham_ID = CConst.INT_VALUE_NULL;
 			m_lngDon_Vi_Tinh_ID = CConst.INT_VALUE_NULL;
 			m_strGhi_Chu = CConst.STR_VALUE_NULL;
+			m_strTen_LSP = CConst.STR_VALUE_NULL;
+			m_strTen_Don_Vi_Tinh_ID = CConst.STR_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
 			m_dtmCreated = CConst.DTM_VALUE_NULL;
 			m_strCreated_By = CConst.STR_VALUE_NULL;
@@ -93,12 +97,15 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_lngLoai_San_Pham_ID = value;
 			}
 		}
-		public string Ten_Loai_San_Pham
+		public string Ten_LSP
 		{
 			get
 			{
-				var result = CCache_Loai_San_Pham.Get_Data_By_ID(Loai_San_Pham_ID);
-				return result is null ? "UNKNONW" : result.Ten_LSP;
+				return m_strTen_LSP;
+			}
+			set
+			{
+				m_strTen_LSP = value.Trim();
 			}
 		}
 		public long Don_Vi_Tinh_ID
@@ -116,8 +123,11 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = CCache_Don_Vi_Tinh.Get_Data_By_ID(Don_Vi_Tinh_ID);
-				return result is null ? "UNKNONW" : result.Ten_Don_Vi_Tinh;
+				return m_strTen_Don_Vi_Tinh_ID;
+			}
+			set
+			{
+				m_strTen_Don_Vi_Tinh_ID = value.Trim();
 			}
 		}
 

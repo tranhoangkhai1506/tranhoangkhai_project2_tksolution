@@ -23,6 +23,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
+		private string m_strTen_San_Pham;
+
 		public CXNK_Xuat_Kho_Raw_Data()
 		{
 			ResetData();
@@ -33,6 +35,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_lngAuto_ID = CConst.INT_VALUE_NULL;
 			m_lngXuat_Kho_ID = CConst.INT_VALUE_NULL;
 			m_lngSan_Pham_ID = CConst.INT_VALUE_NULL;
+			m_strTen_San_Pham = CConst.STR_VALUE_NULL;
 			m_dblSL_Xuat = CConst.FLT_VALUE_NULL;
 			m_dblDon_Gia_Xuat = CConst.FLT_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
@@ -79,14 +82,19 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 				m_lngSan_Pham_ID = value;
 			}
 		}
+
 		public string Ten_San_Pham
 		{
 			get
 			{
-				var result = CCache_San_Pham.Get_Data_By_ID(San_Pham_ID);
-				return result is null ? "UNKNONW" : result.Ten_San_Pham;
+				return m_strTen_San_Pham;
+			}
+			set
+			{
+				m_strTen_San_Pham = value;
 			}
 		}
+
 		public double SL_Xuat
 		{
 			get

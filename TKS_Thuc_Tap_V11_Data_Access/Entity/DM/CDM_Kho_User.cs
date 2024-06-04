@@ -14,6 +14,8 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private long m_lngAuto_ID;
 		private long m_lngThanh_Vien_ID;
 		private long m_lngKho_ID;
+		private string m_strTen_Kho;
+		private string m_strMa_Dang_Nhap;
 		private int m_intdeleted;
 		private DateTime? m_dtmCreated;
 		private string m_strCreated_By;
@@ -31,6 +33,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 			m_lngAuto_ID = CConst.INT_VALUE_NULL;
 			m_lngThanh_Vien_ID = CConst.INT_VALUE_NULL;
 			m_lngKho_ID = CConst.INT_VALUE_NULL;
+			m_strTen_Kho = CConst.STR_VALUE_NULL;
 			m_intdeleted = CConst.INT_VALUE_NULL;
 			m_dtmCreated = CConst.DTM_VALUE_NULL;
 			m_strCreated_By = CConst.STR_VALUE_NULL;
@@ -68,18 +71,24 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				var result = CCache_Kho.Get_Data_By_ID(Kho_ID);
-				return result is null ? "UNKNONW" : result.Ten_Kho;
+				return m_strTen_Kho;
+			}
+			set
+			{
+				m_strTen_Kho = value.Trim();
 			}
 		}
 
 		public string Ma_Dang_Nhap {
-            get
-            {
-				var result = CCache_Thanh_Vien.Get_Data_By_ID(Thanh_Vien_ID);
-				return result is null ? "UNKNONW" : result.Ma_Dang_Nhap;
+			get
+			{
+				return m_strMa_Dang_Nhap;
 			}
-        }
+			set
+			{
+				m_strMa_Dang_Nhap = value.Trim();
+			}
+		}
 
 		public long Kho_ID
 		{
