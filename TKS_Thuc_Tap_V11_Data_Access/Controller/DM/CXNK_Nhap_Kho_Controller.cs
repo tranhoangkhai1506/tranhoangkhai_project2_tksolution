@@ -46,67 +46,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			return v_arrRes;
 		}
 
-		public List<CXNK_Nhap_Kho> F2010_NK_sp_sel_List_By_Date_From_To(DateTime? p_dtmFrom, DateTime? p_dtmTo)
-		{
-			List<CXNK_Nhap_Kho> v_arrRes = new List<CXNK_Nhap_Kho>();
-			DataTable v_dt = new DataTable();
-
-			try
-			{
-				p_dtmFrom = CUtility_Date.Convert_To_Dau_Ngay(p_dtmFrom);
-				p_dtmTo = CUtility_Date.Convert_To_Cuoi_Ngay(p_dtmTo);
-
-				CSqlHelper.FillDataTable(CConfig.TKS_Thuc_Tap_V11_Conn_String, v_dt, "F2010_NK_sp_sel_List_By_Date_From_To", p_dtmFrom, p_dtmTo);
-
-				foreach (DataRow v_row in v_dt.Rows)
-				{
-					CXNK_Nhap_Kho v_objRes = CUtility.Map_Row_To_Entity<CXNK_Nhap_Kho>(v_row);
-					v_arrRes.Add(v_objRes);
-				}
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-
-			finally
-			{
-				v_dt.Dispose();
-			}
-
-			return v_arrRes;
-		}
-
-		public List<CXNK_Nhap_Kho> F2010_NK_sp_sel_List_By_Date(DateTime? p_dtmDate)
-		{
-			List<CXNK_Nhap_Kho> v_arrRes = new List<CXNK_Nhap_Kho>();
-			DataTable v_dt = new DataTable();
-
-			try
-			{
-				p_dtmDate = CUtility_Date.Convert_To_Dau_Ngay(p_dtmDate);
-
-				CSqlHelper.FillDataTable(CConfig.TKS_Thuc_Tap_V11_Conn_String, v_dt, "F2010_NK_sp_sel_List_By_Date", p_dtmDate);
-
-				foreach (DataRow v_row in v_dt.Rows)
-				{
-					CXNK_Nhap_Kho v_objRes = CUtility.Map_Row_To_Entity<CXNK_Nhap_Kho>(v_row);
-					v_arrRes.Add(v_objRes);
-				}
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-
-			finally
-			{
-				v_dt.Dispose();
-			}
-
-			return v_arrRes;
-		}
-
 		public CXNK_Nhap_Kho FQ_718_NK_sp_sel_Get_By_ID(long p_iID)
 		{
 			CXNK_Nhap_Kho v_objRes = null;
@@ -227,35 +166,6 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Controller.DM
 			{
 				throw;
 			}
-		}
-
-		public List<CXNK_Nhap_Kho> F2010_sp_sel_List_By_So_Phieu_Nhap_Kho(string p_strSo_Phieu_Nhap_Kho)
-		{
-			List<CXNK_Nhap_Kho> v_arrRes = new List<CXNK_Nhap_Kho>();
-			DataTable v_dt = new DataTable();
-
-			try
-			{
-				CSqlHelper.FillDataTable(CConfig.TKS_Thuc_Tap_V11_Conn_String, v_dt, "F2010_sp_sel_List_By_So_Phieu_Nhap_Kho", p_strSo_Phieu_Nhap_Kho);
-
-				foreach (DataRow v_row in v_dt.Rows)
-				{
-					CXNK_Nhap_Kho v_objRes = CUtility.Map_Row_To_Entity<CXNK_Nhap_Kho>(v_row);
-					v_arrRes.Add(v_objRes);
-				}
-			}
-
-			catch (Exception)
-			{
-				throw;
-			}
-
-			finally
-			{
-				v_dt.Dispose();
-			}
-
-			return v_arrRes;
 		}
 	}
 }

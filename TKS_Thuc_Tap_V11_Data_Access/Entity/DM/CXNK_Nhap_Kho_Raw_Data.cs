@@ -14,12 +14,13 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private long m_lngAuto_ID;
 		private long m_lngNhap_Kho_ID;
 		private long m_lngSan_Pham_ID;
+		private string m_strMa_San_Pham;
+		private string m_strTen_San_Pham;
 		private double m_dblSL_Nhap;
 		private double m_dblDon_Gia_Nhap;
 		private double m_dblTri_Gia;
 		private string m_strTen_NCC;
-		private DateTime? m_dtmNgay_Nhap_Kho;
-		private string m_strMa_San_Pham;
+		private DateTime? m_dtmNgay_Nhap_Kho;		
 		private string m_strSo_Phieu_Nhap_Kho;
 		private int m_intdeleted;
 		private DateTime? m_dtmCreated;
@@ -28,7 +29,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		private DateTime? m_dtmLast_Updated;
 		private string m_strLast_Updated_By;
 		private string m_strLast_Updated_By_Function;
-		private string m_strTen_San_Pham;
+		
 		public CXNK_Nhap_Kho_Raw_Data()
 		{
 			ResetData();
