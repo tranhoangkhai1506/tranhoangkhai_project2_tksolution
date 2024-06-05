@@ -54,6 +54,7 @@
 @code {
 	public List<CXNK_Xuat_Kho_Raw_Data> v_arrData = new();
 	TelerikGrid<CXNK_Xuat_Kho_Raw_Data> grdData = new();
+	CXNK_Xuat_Kho_Raw_Data_Controller m_objCtrData = new();
 
 	protected override void Init_Data()
 	{
@@ -62,9 +63,7 @@
 
 	protected override void Load_Data()
 	{
-		v_arrData = new();
-		CXNK_Xuat_Kho_Raw_Data_Controller v_objCtrData = new();
 		Format_Grid(grdData);
-		v_arrData = v_objCtrData.F2015_XKRD_sp_sel_List_Bao_Cao_Hang_Xuat(r_objFilter.Date_From, r_objFilter.Date_To);
+		v_arrData = m_objCtrData.F2015_XKRD_sp_sel_List_Bao_Cao_Hang_Xuat(r_objFilter.Date_From, r_objFilter.Date_To);
 	}
 }

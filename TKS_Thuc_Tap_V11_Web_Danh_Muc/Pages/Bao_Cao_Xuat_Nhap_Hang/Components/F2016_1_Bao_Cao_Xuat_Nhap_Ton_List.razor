@@ -54,7 +54,7 @@
 	//List Hiển Thị Kết Quả
 	public List<CDM_Bao_Cao_Xuat_Nhap_Ton> v_arrData = new();
 	TelerikGrid<CDM_Bao_Cao_Xuat_Nhap_Ton> grdData = new();
-
+	CXNK_Bao_Cao_Xuat_Nhap_Ton_Controller m_objCtrData = new();
 	protected override void Init_Data()
 	{
 
@@ -62,9 +62,7 @@
 
 	protected override void Load_Data()
 	{
-		v_arrData = new();
-		Format_Grid(grdData);
-		CXNK_Bao_Cao_Xuat_Nhap_Ton_Controller v_objCtrData = new();
-		v_arrData = v_objCtrData.F2016_XNT_sp_sel_List_Bao_Cao_Xuat_Nhap_Ton(r_objFilter.Date_From, r_objFilter.Date_To);
+		Format_Grid(grdData);		
+		v_arrData = m_objCtrData.F2016_XNT_sp_sel_List_Bao_Cao_Xuat_Nhap_Ton(r_objFilter.Date_From, r_objFilter.Date_To);
 	}
 }
