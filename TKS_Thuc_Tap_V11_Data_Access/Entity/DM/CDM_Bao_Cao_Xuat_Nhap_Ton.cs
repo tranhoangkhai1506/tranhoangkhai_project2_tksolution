@@ -93,7 +93,7 @@ namespace TKS_Thuc_Tap_V11_Data_Access.Entity.DM
 		{
 			get
 			{
-				return (SL_Dau_Ky + SL_Nhap) - SL_Xuat;
+				return m_dblSL_Cuoi_Ky;
 			}
 			set
 			{

@@ -259,7 +259,6 @@
 				v_strMessage += CCommonFunction.Set_Error_MessageBox(v_sbError.ToString());
 				Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);
 				v_trans.Rollback();
-				return;
 			}
 
 			Open_Message_Info(Get_Language_Data_Field("Thông báo Import Excel"), v_strMessage);

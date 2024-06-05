@@ -168,6 +168,7 @@
 			m_objData.Last_Updated_By = r_strActive_User_Name;
 			m_objData.Last_Updated_By_Function = r_strActive_Function_Code;
 			m_objData.Xuat_Kho_ID = p_lngSo_Phieu_Xuat_Kho;
+			m_objData.Ten_San_Pham = CCache_San_Pham.Get_Data_By_ID(m_objData.San_Pham_ID).Ten_San_Pham;
 			m_objData.Auto_ID = v_arrRawData.Count() + 1;
 			v_objCtrData.Insert_Chi_Tiet_Xuat_Kho_Local(m_objData);
 
